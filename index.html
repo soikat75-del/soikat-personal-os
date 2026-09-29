@@ -5,24 +5,560 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Soikat Personal OS</title>
+
+    <style>
+        /* ================================
+           RESET
+        ================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+
+            background: #090b0f;
+            color: #f2f4f7;
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* ================================
+           MAIN CONTAINER
+        ================================= */
+
+        .container {
+            width: min(1180px, calc(100% - 48px));
+
+            margin: 0 auto;
+
+            flex: 1;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* ================================
+           HEADER
+        ================================= */
+
+        header {
+            text-align: center;
+
+            padding-top: 90px;
+            padding-bottom: 70px;
+        }
+
+        .brand {
+            font-size: clamp(32px, 4vw, 46px);
+
+            font-weight: 700;
+
+            letter-spacing: 0.16em;
+
+            line-height: 1;
+        }
+
+        .os-name {
+            margin-top: 14px;
+
+            font-size: 13px;
+
+            font-weight: 500;
+
+            letter-spacing: 0.38em;
+
+            color: #7d8591;
+        }
+
+
+        /* ================================
+           MODULE GRID
+        ================================= */
+
+        .modules {
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 18px;
+        }
+
+
+        /* ================================
+           MODULE CARD
+        ================================= */
+
+        .module {
+            position: relative;
+
+            min-height: 190px;
+
+            padding: 30px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #10141a,
+                    #0d1015
+                );
+
+            border: 1px solid #1c222b;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: flex-end;
+
+            text-decoration: none;
+
+            color: inherit;
+
+            overflow: hidden;
+
+            transition:
+                transform 220ms ease,
+                border-color 220ms ease,
+                background 220ms ease,
+                box-shadow 220ms ease;
+        }
+
+
+        /* subtle light at top */
+
+        .module::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: 15%;
+
+            width: 70%;
+            height: 1px;
+
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.12),
+                transparent
+            );
+
+            opacity: 0;
+
+            transition: opacity 220ms ease;
+        }
+
+
+        /* hover */
+
+        .module:hover {
+            transform: translateY(-5px);
+
+            border-color: #303743;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #131820,
+                    #10141a
+                );
+
+            box-shadow:
+                0 18px 45px rgba(0,0,0,0.28);
+        }
+
+        .module:hover::before {
+            opacity: 1;
+        }
+
+
+        /* click */
+
+        .module:active {
+            transform: translateY(-1px);
+        }
+
+
+        /* ================================
+           NUMBER
+        ================================= */
+
+        .number {
+            position: absolute;
+
+            top: 22px;
+            right: 24px;
+
+            font-size: 10px;
+
+            font-weight: 600;
+
+            letter-spacing: 0.14em;
+
+            color: #4d5561;
+        }
+
+
+        /* ================================
+           CARD TITLE
+        ================================= */
+
+        .title {
+            font-size: 21px;
+
+            font-weight: 600;
+
+            letter-spacing: -0.02em;
+
+            color: #f1f3f5;
+        }
+
+
+        /* ================================
+           HOVER ARROW
+        ================================= */
+
+        .arrow {
+            position: absolute;
+
+            right: 24px;
+            bottom: 25px;
+
+            font-size: 17px;
+
+            color: #555e6b;
+
+            opacity: 0;
+
+            transform: translateX(-5px);
+
+            transition:
+                opacity 220ms ease,
+                transform 220ms ease;
+        }
+
+        .module:hover .arrow {
+            opacity: 1;
+
+            transform: translateX(0);
+        }
+
+
+        /* ================================
+           EMPTY CARD
+        ================================= */
+
+        .empty {
+            cursor: default;
+
+            border-style: dashed;
+
+            background: transparent;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+        .empty:hover {
+            transform: none;
+
+            background: transparent;
+
+            border-color: #252c35;
+
+            box-shadow: none;
+        }
+
+        .empty .number {
+            display: none;
+        }
+
+        .empty-title {
+            color: #454c56;
+
+            font-size: 20px;
+
+            font-weight: 500;
+
+            letter-spacing: 0.05em;
+        }
+
+
+        /* ================================
+           FOOTER
+        ================================= */
+
+        footer {
+            text-align: center;
+
+            padding-top: 75px;
+            padding-bottom: 30px;
+
+            font-size: 12px;
+
+            color: #535b67;
+
+            letter-spacing: 0.02em;
+        }
+
+
+        /* ================================
+           TABLET
+        ================================= */
+
+        @media (max-width: 850px) {
+
+            .container {
+                width: min(680px, calc(100% - 32px));
+            }
+
+            header {
+                padding-top: 60px;
+                padding-bottom: 45px;
+            }
+
+            .modules {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .module {
+                min-height: 170px;
+            }
+        }
+
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 520px) {
+
+            .container {
+                width: calc(100% - 24px);
+            }
+
+            header {
+                padding-top: 45px;
+                padding-bottom: 35px;
+            }
+
+            .brand {
+                font-size: 28px;
+
+                letter-spacing: 0.13em;
+            }
+
+            .os-name {
+                margin-top: 11px;
+
+                font-size: 10px;
+
+                letter-spacing: 0.28em;
+            }
+
+            .modules {
+                grid-template-columns: 1fr;
+
+                gap: 12px;
+            }
+
+            .module {
+                min-height: 135px;
+
+                padding: 24px;
+            }
+
+            .title {
+                font-size: 19px;
+            }
+
+            .arrow {
+                opacity: 1;
+
+                transform: none;
+
+                right: 22px;
+                bottom: 23px;
+            }
+
+            footer {
+                padding-top: 50px;
+
+                padding-bottom: 25px;
+            }
+        }
+    </style>
 </head>
+
 
 <body>
 
-    <h1>SOIKAT</h1>
-    <h2>PERSONAL OS</h2>
+    <div class="container">
 
-    <div>
-        <button>1L GOAL</button>
-        <button>200D STUDY PLAN</button>
-        <button>TODO + NOTES</button>
-        <button>REPORTS</button>
-        <button>...</button>
+
+        <!-- ================================
+             HEADER
+        ================================= -->
+
+        <header>
+
+            <h1 class="brand">
+                SOIKAT
+            </h1>
+
+            <div class="os-name">
+                PERSONAL OS
+            </div>
+
+        </header>
+
+
+
+        <!-- ================================
+             MODULES
+        ================================= -->
+
+        <main class="modules">
+
+
+            <!-- 1L GOAL -->
+
+            <a
+                href="goal.html"
+                class="module"
+            >
+
+                <span class="number">
+                    01
+                </span>
+
+                <span class="title">
+                    1L GOAL
+                </span>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+
+            <!-- 200D STUDY -->
+
+            <a
+                href="study.html"
+                class="module"
+            >
+
+                <span class="number">
+                    02
+                </span>
+
+                <span class="title">
+                    200D STUDY PLAN
+                </span>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+
+            <!-- TODO + NOTES -->
+
+            <a
+                href="todo-notes.html"
+                class="module"
+            >
+
+                <span class="number">
+                    03
+                </span>
+
+                <span class="title">
+                    TODO + NOTES
+                </span>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+
+            <!-- REPORTS -->
+
+            <a
+                href="reports.html"
+                class="module"
+            >
+
+                <span class="number">
+                    04
+                </span>
+
+                <span class="title">
+                    REPORTS
+                </span>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+
+            <!-- EMPTY / FUTURE MODULE -->
+
+            <div class="module empty">
+
+                <span class="empty-title">
+                    ...
+                </span>
+
+            </div>
+
+
+        </main>
+
+
+
+        <!-- ================================
+             FOOTER
+        ================================= -->
+
+        <footer>
+            Built with ❤︎ by Soikat
+        </footer>
+
+
     </div>
-
-    <footer>
-        Built with love by Soikat
-    </footer>
 
 </body>
 </html>
