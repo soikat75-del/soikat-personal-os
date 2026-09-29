@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOIKAT · 200D PLAN</title>
+<style>
+:root{
+  --bg:#070b14;--panel:#0d1422;--panel2:#111a2b;--line:#1d2940;
+  --text:#edf3ff;--muted:#8190a8;--green:#35e39a;--blue:#5aa7ff;
+  --purple:#a77bff;--orange:#ffb454;--red:#ff6b78;--yellow:#f4d35e;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 0%,#101a30 0,#070b14 38%,#050810 100%);
+font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
+.wrap{max-width:1200px;margin:auto;padding:28px 22px 45px}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px}
+.brand{font-weight:800;letter-spacing:.16em;font-size:15px}.brand span{color:var(--blue)}
+.sub{font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:5px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:1px solid var(--line);background:#0c1422;color:var(--text);border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:700}
+button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
+.hero{display:grid;grid-template-columns:1.45fr .75fr;gap:16px}
+.card{background:linear-gradient(180deg,#0e1727,#0a111e);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 12px 35px #0004}
+.kicker{font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:800}
+.big{font-size:34px;font-weight:900;margin:8px 0}
+.big span{color:var(--blue)}
+.progress{height:9px;background:#182237;border-radius:20px;overflow:hidden;margin:15px 0 10px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:20px}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+.stat{background:#0b1321;border:1px solid var(--line);border-radius:10px;padding:12px}
+.stat b{display:block;font-size:20px;margin-top:5px}.stat small{color:var(--muted)}
+.report{border-left:3px solid var(--green)}
+.report h2{margin:5px 0 7px;font-size:18px}.report p{color:var(--muted);font-size:13px;line-height:1.55;margin:0}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.section-title h2{margin:0;font-size:16px}.tag{font-size:10px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);padding:5px 7px;border-radius:7px}
+.daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:12px;border-radius:10px;margin-bottom:10px}
+.daybar strong{font-size:13px}.daybar span{font-size:11px;color:var(--muted)}
+.study-row{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #162238}
+.study-row:last-child{border-bottom:0}
+.check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+.subject{font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.topic{font-size:14px;margin-top:3px}.carry{font-size:10px;color:var(--orange);margin-top:4px}
+.status{font-size:10px;color:var(--muted);white-space:nowrap}
+.status.done{color:var(--green)}
+.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+.month-nav{display:flex;gap:8px;align-items:center}.month-nav button{padding:7px 10px}
+.month-name{min-width:135px;text-align:center;font-weight:800}
+.month-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.month-item{border:1px solid var(--line);border-radius:9px;padding:11px;background:#0a1220;cursor:pointer}
+.month-item.active{border-color:var(--blue);box-shadow:0 0 0 1px #5aa7ff33 inset}
+.month-item b{display:block;font-size:12px}.month-item span{font-size:10px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+input,select,textarea{width:100%;background:#080f1c;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+.full{grid-column:1/-1}
+.add{width:100%;margin-top:9px;background:#14253d;border-color:#31547e}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
+.cal-head{font-size:9px;text-align:center;color:var(--muted);padding:5px}
+.cal-day{min-height:58px;border:1px solid var(--line);border-radius:7px;padding:7px;background:#0a1220;cursor:pointer}
+.cal-day:hover{border-color:#3d5a80}.cal-day.today{box-shadow:0 0 0 1px var(--blue) inset}.cal-day.done{background:#0d2a21;border-color:#1d7358}
+.cal-day.partial{background:#282310;border-color:#75651c}.cal-day.missed{background:#2a1118;border-color:#71313d}
+.cal-day .n{font-size:11px;font-weight:800}.cal-day .mini{font-size:9px;color:var(--muted);margin-top:6px}
+.rev{margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#0a1220}
+.rev-head{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.rev small{display:block;color:var(--muted);margin-top:5px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal.open{display:flex}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#0d1524;border:1px solid var(--line);border-radius:14px;padding:18px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.bulk{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;min-height:240px;resize:vertical}
+.note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
+@media(max-width:850px){.hero,.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.wrap{padding:18px 12px}.stats{grid-template-columns:1fr 1fr}.month-list{grid-template-columns:1fr 1fr}.cal-day{min-height:48px;padding:5px}.status{display:none}.big{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="brand">SOIKAT <span>· 200D PLAN</span></div>
+    <div class="sub">ROUTINE / WEEKLY / MONTHLY / PROGRESS</div>
+  </div>
+  <div class="top-actions">
+    <button onclick="openBulk()">SET ROUTINE</button>
+    <button onclick="resetAll()">RESET</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="card">
+    <div class="kicker">200 DAY PROGRESS</div>
+    <div class="big">DAY <span id="dayNo">1</span> <small style="font-size:15px;color:var(--muted)">/ 200</small></div>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="meta"><span id="startText"></span><span id="endText"></span></div>
+    <div class="stats">
+      <div class="stat"><small>DAYS LEFT</small><b id="daysLeft">200</b></div>
+      <div class="stat"><small>STUDY DONE</small><b id="studyDone">0%</b></div>
+      <div class="stat"><small>STUDY LEFT</small><b id="studyLeft">0</b></div>
+      <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b></div>
+    </div>
+  </div>
+  <div class="card report" id="reportCard">
+    <div class="kicker">PROGRESS REPORT</div>
+    <h2 id="reportTitle">GOOD</h2>
+    <p id="reportText">Set your routine and start completing studies.</p>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="section-title"><h2>ROUTINE</h2><span class="tag" id="selectedDateLabel">TODAY</span></div>
+    <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
+    <div id="routineList"></div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="section-title"><h2>WEEKLY REVISION</h2><span class="tag" id="weekLabel">THIS WEEK</span></div>
+      <div id="weeklyList"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="section-title"><h2>MONTHLY REVISION</h2><span class="tag" id="monthLabel">THIS MONTH</span></div>
+      <div id="monthlyList"></div>
+    </div>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="section-title">
+      <h2>200D CALENDAR</h2>
+      <div class="month-nav"><button onclick="changeMonth(-1)">‹</button><div class="month-name" id="calMonth"></div><button onclick="changeMonth(1)">›</button></div>
+    </div>
+    <div class="calendar" id="calendar"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title"><h2>ROUTINE SETUP</h2><span class="tag">2–3 MONTHS AT ONCE</span></div>
+    <div class="form-grid">
+      <input id="dateInput" type="date">
+      <input id="subjectInput" placeholder="Subject">
+      <input id="topicInput" class="full" placeholder="Topic / Study">
+    </div>
+    <button class="add" onclick="addOne()">+ ADD TO ROUTINE</button>
+    <div class="note">তুমি চাইলে একদিনে একাধিক Study যোগ করতে পারবে। Routine আগে থেকেই সেট থাকবে; অসম্পূর্ণ Study পরের দিনের actual routine-এ carry হবে।</div>
+    <div style="margin-top:16px" class="section-title"><h2>SELECTED MONTH</h2><span class="tag" id="setupMonth"></span></div>
+    <div class="month-list" id="monthList"></div>
+  </div>
+</section>
+
+<footer>Built with love by Soikat</footer>
+</div>
+
+<div class="modal" id="bulkModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2 style="margin:0;font-size:17px">SET ROUTINE IN BULK</h2><button onclick="closeBulk()">×</button></div>
+    <textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
+02 Oct 2026 | বাংলা | সমাস
+03 Oct 2026 | English | Tense
+04 Oct 2026 | গণিত | শতকরা"></textarea>
+    <div class="note">Format: <b>DD Mon YYYY | Subject | Topic</b><br>প্রতি লাইনে একটি Study। Existing routine মুছে যাবে না; নতুনগুলো যোগ হবে।</div>
+    <button class="add" onclick="importBulk()">IMPORT ROUTINE</button>
+  </div>
+</div>
+
+<script>
+const START = new Date(2026,9,1);
+const END = new Date(2027,3,18);
+const DAYS = 200;
+const KEY = 'soikat_200d_plan_v1';
+let data = JSON.parse(localStorage.getItem(KEY) || '{"routine":{},"done":{},"weekly":{},"monthly":{}}');
+let selected = new Date();
+let calCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
+
+function iso(d){return d.toISOString().slice(0,10)}
+function cloneDate(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function inPlan(d){return d>=START && d<=END}
+function fmt(d){return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function dayIndex(d){return Math.floor((cloneDate(d)-START)/86400000)+1}
+function allDates(){let a=[];for(let d=cloneDate(START);d<=END;d.setDate(d.getDate()+1))a.push(cloneDate(d));return a}
+function entries(date){return data.routine[iso(date)]||[]}
+
+function actualItems(date){
+  const planned=entries(date).map((x,i)=>({...x,plannedDate:iso(date),sourceIndex:i,carry:false}));
+  let carry=[];
+  for(let d=cloneDate(START);d<date;d.setDate(d.getDate()+1)){
+    const k=iso(d), next=cloneDate(d); next.setDate(next.getDate()+1);
+    if(next.toDateString()===date.toDateString()){
+      (data.routine[k]||[]).forEach((x,i)=>{
+        const id=itemId(k,i);
+        if(!data.done[id]) carry.push({...x,plannedDate:k,sourceIndex:i,carry:true});
+      });
+    }
+  }
+  // recursively bring unresolved items from previous days through the selected date
+  let unresolved=[];
+  for(let d=cloneDate(START);d<date;d.setDate(d.getDate()+1)){
+    (data.routine[iso(d)]||[]).forEach((x,i)=>{
+      const id=itemId(iso(d),i);
+      if(!data.done[id]){
+        let age=Math.floor((date-d)/86400000);
+        if(age>0 && age<200) unresolved.push({...x,plannedDate:iso(d),sourceIndex:i,carry:true});
+      }
+    });
+  }
+  // remove duplicates by original item id
+  const seen=new Set(), out=[];
+  [...unresolved,...planned].forEach(x=>{
+    const id=itemId(x.plannedDate,x.sourceIndex);
+    if(!seen.has(id)){seen.add(id);out.push(x)}
+  });
+  return out;
+}
+function itemId(k,i){return k+'#'+i}
+
+function render(){
+  const now=new Date();
+  let current=inPlan(now)?cloneDate(now):selected;
+  if(current<START) current=cloneDate(START);
+  if(current>END) current=cloneDate(END);
+  selected=current;
+
+  const idx=dayIndex(current);
+  document.getElementById('dayNo').textContent=Math.max(1,Math.min(200,idx));
+  document.getElementById('daysLeft').textContent=Math.max(0,DAYS-Math.max(0,idx));
+  document.getElementById('bar').style.width=Math.min(100,Math.max(0,idx/DAYS*100))+'%';
+  document.getElementById('startText').textContent='01 Oct 2026';
+  document.getElementById('endText').textContent='18 Apr 2027';
+
+  const all=allDates(), planned=all.flatMap(d=>entries(d).map((x,i)=>({x,d,i})));
+  const done=planned.filter(o=>data.done[itemId(iso(o.d),o.i)]).length;
+  const total=planned.length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('studyDone').textContent=pct+'%';
+  document.getElementById('studyLeft').textContent=Math.max(0,total-done);
+  let carry=actualItems(current).filter(x=>x.carry && !data.done[itemId(x.plannedDate,x.sourceIndex)]).length;
+  document.getElementById('carryCount').textContent=carry;
+
+  let title='GOOD', text='Routine অনুযায়ী পড়াশোনা ঠিকঠাক চলছে।';
+  const due=planned.filter(o=>o.d<=current).length;
+  const dueDone=planned.filter(o=>o.d<=current && data.done[itemId(iso(o.d),o.i)]).length;
+  const duePct=due?dueDone/due*100:100;
+  if(total===0){title='SET ROUTINE';text='আগে ২–৩ মাসের Daily Routine সেট করো, তারপর progress report নিজে থেকে কাজ করবে.'}
+  else if(carry>=5 || duePct<60){title='BEHIND';text='অনেকগুলো Study বাকি আছে। Carry-forward ও completion gap বেড়েছে।'}
+  else if(carry>0 || duePct<85){title='NEEDS ATTENTION';text='কিছু Study বাকি আছে। Routine অনুযায়ী catch up করার জায়গা আছে।'}
+  document.getElementById('reportTitle').textContent=title;
+  document.getElementById('reportText').textContent=text;
+
+  document.getElementById('routineDate').textContent=fmt(current);
+  document.getElementById('routineDay').textContent='DAY '+idx+' / 200';
+  document.getElementById('selectedDateLabel').textContent=iso(current)===iso(now)?'TODAY':'SELECTED';
+  renderRoutine(current); renderWeekly(current); renderMonthly(current); renderCalendar(); renderMonths();
+}
+function renderRoutine(d){
+  const box=document.getElementById('routineList'), items=actualItems(d);
+  if(!items.length){box.innerHTML='<div class="empty">No study set for this day.</div>';return}
+  box.innerHTML=items.map((x)=>{
+    const id=itemId(x.plannedDate,x.sourceIndex), checked=!!data.done[id];
+    return `<label class="study-row">
+      <input class="check" type="checkbox" ${checked?'checked':''} onchange="toggleDone('${id}',this.checked)">
+      <div><div class="subject">${escapeHtml(x.subject||'Study')}</div><div class="topic">${escapeHtml(x.topic||'Untitled')}</div>${x.carry?'<div class="carry">↳ CARRY FORWARD</div>':''}</div>
+      <div class="status ${checked?'done':''}">${checked?'COMPLETED':'PENDING'}</div>
+    </label>`;
+  }).join('');
+}
+function toggleDone(id,v){data.done[id]=v;if(!v)delete data.done[id];save();render()}
+function renderWeekly(d){
+  const start=cloneDate(d); const day=(start.getDay()+6)%7; start.setDate(start.getDate()-day);
+  let items=[];
+  for(let i=0;i<7;i++){let x=cloneDate(start);x.setDate(x.getDate()+i);if(inPlan(x))items.push(...entries(x).map((e,j)=>({e,k:itemId(iso(x),j)})))}
+  document.getElementById('weekLabel').textContent=fmt(start).slice(0,6)+' WEEK';
+  const box=document.getElementById('weeklyList');
+  if(!items.length){box.innerHTML='<div class="empty">No studies in this week.</div>';return}
+  const done=items.filter(x=>data.done[x.k]).length;
+  box.innerHTML=`<div class="rev"><div class="rev-head"><span>${done}/${items.length} COMPLETED</span><span>${Math.round(done/items.length*100)}%</span></div><small>Weekly revision follows the studies planned in this week. Tick them after revision.</small></div>`;
+}
+function renderMonthly(d){
+  const key=d.getFullYear()+'-'+d.getMonth();
+  let items=[];
+  const last=new Date(d.getFullYear(),d.getMonth()+1,0);
+  for(let x=cloneDate(new Date(d.getFullYear(),d.getMonth(),1));x<=last;x.setDate(x.getDate()+1))
+    if(inPlan(x))items.push(...entries(x).map((e,j)=>({e,k:itemId(iso(x),j)})));
+  const done=items.filter(x=>data.done[x.k]).length;
+  document.getElementById('monthLabel').textContent=d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+  document.getElementById('monthlyList').innerHTML=`<div class="rev"><div class="rev-head"><span>${done}/${items.length} COMPLETED</span><span>${items.length?Math.round(done/items.length*100):0}%</span></div><small>Monthly revision tracks the completed study set for this month.</small></div>`;
+}
+function renderCalendar(){
+  const box=document.getElementById('calendar'), y=calCursor.getFullYear(),m=calCursor.getMonth();
+  document.getElementById('calMonth').textContent=calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
+  let h=['MON','TUE','WED','THU','FRI','SAT','SUN'].map(x=>`<div class="cal-head">${x}</div>`).join('');
+  let first=new Date(y,m,1), offset=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
+  for(let i=0;i<offset;i++)h+='<div></div>';
+  for(let n=1;n<=days;n++){
+    const d=new Date(y,m,n), k=iso(d), list=entries(d), done=list.filter((x,i)=>data.done[itemId(k,i)]).length;
+    let cls=''; if(list.length&&done===list.length)cls='done'; else if(done>0)cls='partial'; else if(list.length&&d<new Date()&&done<list.length)cls='missed';
+    if(iso(d)===iso(new Date()))cls+=' today';
+    h+=`<div class="cal-day ${cls}" onclick="selectDate('${k}')"><div class="n">${n}</div><div class="mini">${list.length?done+'/'+list.length:'—'}</div></div>`;
+  }
+  box.innerHTML=h;
+}
+function selectDate(k){selected=new Date(k+'T00:00:00');calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);document.getElementById('dateInput').value=k;render()}
+function changeMonth(n){calCursor.setMonth(calCursor.getMonth()+n);renderCalendar()}
+function renderMonths(){
+  const box=document.getElementById('monthList'), arr=[];
+  let d=cloneDate(START);
+  while(d<=END){arr.push(new Date(d.getFullYear(),d.getMonth(),1));d.setMonth(d.getMonth()+1)}
+  document.getElementById('setupMonth').textContent=calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
+  box.innerHTML=arr.map(m=>{
+    const active=m.getFullYear()===calCursor.getFullYear()&&m.getMonth()===calCursor.getMonth();
+    return `<div class="month-item ${active?'active':''}" onclick="calCursor=new Date(${m.getFullYear()},${m.getMonth()},1);renderCalendar();renderMonths()"><b>${m.toLocaleDateString('en-US',{month:'long'})}</b><span>${m.getFullYear()}</span></div>`;
+  }).join('');
+}
+function addOne(){
+  const date=document.getElementById('dateInput').value, subject=document.getElementById('subjectInput').value.trim(), topic=document.getElementById('topicInput').value.trim();
+  if(!date||!subject||!topic)return alert('Date, Subject and Topic — তিনটাই দিতে হবে।');
+  const d=new Date(date+'T00:00:00'); if(!inPlan(d))return alert('200D plan: 01 Oct 2026 থেকে 18 Apr 2027 পর্যন্ত।');
+  data.routine[date]??=[];data.routine[date].push({subject,topic});save();
+  document.getElementById('subjectInput').value='';document.getElementById('topicInput').value='';selected=d;render();
+}
+function openBulk(){document.getElementById('bulkModal').classList.add('open')}
+function closeBulk(){document.getElementById('bulkModal').classList.remove('open')}
+function importBulk(){
+  const lines=document.getElementById('bulkInput').value.split(/\n/).map(x=>x.trim()).filter(Boolean);let added=0,bad=0;
+  lines.forEach(line=>{
+    const p=line.split('|').map(x=>x.trim()); if(p.length<3){bad++;return}
+    const d=new Date(p[0]); if(isNaN(d)||!inPlan(d)){bad++;return}
+    const k=iso(d);data.routine[k]??=[];data.routine[k].push({subject:p[1],topic:p.slice(2).join(' | ')});added++;
+  });
+  save();closeBulk();render();alert(added+' study added.'+(bad?' '+bad+' line skipped.':''));
+}
+function resetAll(){if(confirm('200D Plan-এর সব routine এবং progress মুছে ফেলবে?')){data={routine:{},done:{},weekly:{},monthly:{}};save();render()}}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+document.getElementById('dateInput').value=iso(inPlan(new Date())?new Date():START);
+render();
+</script>
+</body>
+</html>
