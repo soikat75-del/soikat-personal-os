@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1L Goal — Soikat Personal OS</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+    --bg:#07111d;
+    --panel:#0d1a29;
+    --panel2:#101f31;
+    --line:#21354d;
+    --text:#f5f8fc;
+    --muted:#8292a8;
+
+    --green:#35e58f;
+    --blue:#4da3ff;
+    --purple:#a879ff;
+    --orange:#ffb43d;
+    --cyan:#36d8e8;
+    --pink:#ff70b5;
+    --red:#ff6570;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 8% 0%,rgba(45,120,255,.13),transparent 28%),
+        radial-gradient(circle at 92% 12%,rgba(166,105,255,.11),transparent 27%),
+        var(--bg);
+    color:var(--text);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+.container{
+    width:min(1280px,calc(100% - 42px));
+    margin:auto;
+}
+
+.topbar{
+    height:72px;
+    border-bottom:1px solid rgba(105,140,180,.18);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.back{
+    color:#a9b6c8;
+    text-decoration:none;
+    font-size:13px;
+}
+
+.back:hover{color:#fff}
+
+.brand{
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.18em;
+}
+
+.top-date{
+    color:#8291a5;
+    font-size:12px;
+}
+
+.title{
+    padding:34px 0 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+}
+
+.kicker{
+    color:#708097;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+
+h1{
+    font-size:34px;
+    letter-spacing:-.03em;
+}
+
+.period{
+    margin-top:7px;
+    color:var(--muted);
+    font-size:13px;
+}
+
+.pill{
+    padding:8px 13px;
+    border:1px solid #2b405d;
+    background:#102238;
+    border-radius:999px;
+    color:#a3b6cc;
+    font-size:11px;
+}
+
+/* MAIN GOAL */
+
+.goal{
+    background:linear-gradient(135deg,#10243a,#0d1a2b);
+    border:1px solid #28415f;
+    border-radius:16px;
+    padding:25px;
+    box-shadow:0 16px 45px rgba(0,0,0,.18);
+}
+
+.goal-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+}
+
+.goal-label{
+    color:#8ea0b7;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.13em;
+}
+
+.amount{
+    font-size:40px;
+    font-weight:700;
+    margin-top:5px;
+}
+
+.percent{
+    font-size:26px;
+    color:var(--green);
+    font-weight:700;
+}
+
+.bar{
+    height:11px;
+    background:#17283b;
+    border-radius:99px;
+    margin-top:20px;
+    overflow:hidden;
+}
+
+.fill{
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#26d879,#4ee8a1);
+    border-radius:99px;
+    transition:width .35s ease;
+}
+
+.goal-bottom{
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:12px;
+    color:#7f90a6;
+}
+
+/* CARDS */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:16px;
+}
+
+.card{
+    min-height:150px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+    position:relative;
+    overflow:hidden;
+}
+
+.card::after{
+    content:"";
+    position:absolute;
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    right:-38px;
+    bottom:-50px;
+    opacity:.15;
+    filter:blur(4px);
+}
+
+.week{
+    background:linear-gradient(145deg,#10263c,#0d1928);
+    border-color:#24537e;
+}
+.week::after{background:var(--blue)}
+
+.month{
+    background:linear-gradient(145deg,#211a38,#151529);
+    border-color:#493678;
+}
+.month::after{background:var(--purple)}
+
+.overall{
+    background:linear-gradient(145deg,#102d2a,#10201f);
+    border-color:#23614d;
+}
+.overall::after{background:var(--green)}
+
+.blue{
+    background:linear-gradient(145deg,#10283e,#0d1928);
+    border-color:#24577d;
+}
+.blue::after{background:var(--cyan)}
+
+.orange{
+    background:linear-gradient(145deg,#332515,#20180f);
+    border-color:#6d4c20;
+}
+.orange::after{background:var(--orange)}
+
+.pink{
+    background:linear-gradient(145deg,#321827,#20121d);
+    border-color:#68334e;
+}
+.pink::after{background:var(--pink)}
+
+.card-name{
+    font-size:11px;
+    letter-spacing:.14em;
+    color:#91a1b6;
+    text-transform:uppercase;
+}
+
+.card-value{
+    font-size:30px;
+    font-weight:700;
+    margin-top:18px;
+}
+
+.card-sub{
+    font-size:12px;
+    color:#7e8da2;
+    margin-top:7px;
+}
+
+.week .card-value{color:#62b2ff}
+.month .card-value{color:#b88cff}
+.overall .card-value{color:#4fe69b}
+.blue .card-value{color:#54dce8}
+.orange .card-value{color:#ffb94d}
+.pink .card-value{color:#ff75b4}
+
+/* LOWER */
+
+.lower{
+    display:grid;
+    grid-template-columns:1fr 1.35fr;
+    gap:16px;
+    margin-top:16px;
+}
+
+.panel{
+    background:linear-gradient(145deg,#0d1927,#0b1520);
+    border:1px solid var(--line);
+    border-radius:15px;
+    padding:22px;
+}
+
+.panel-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:19px;
+}
+
+.panel-title{
+    font-size:17px;
+    font-weight:650;
+}
+
+.panel-tag{
+    font-size:10px;
+    color:#7f90a6;
+    border:1px solid #26384f;
+    border-radius:20px;
+    padding:5px 8px;
+}
+
+label{
+    display:block;
+    font-size:10px;
+    color:#8190a5;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    margin-bottom:7px;
+}
+
+input{
+    width:100%;
+    background:#08121d;
+    border:1px solid #26384e;
+    border-radius:9px;
+    padding:13px;
+    color:#fff;
+    outline:none;
+    margin-bottom:14px;
+}
+
+input:focus{
+    border-color:#3e78ad;
+}
+
+button{
+    width:100%;
+    border:0;
+    border-radius:9px;
+    padding:13px;
+    font-weight:700;
+    background:linear-gradient(90deg,#2788ff,#6a67ff);
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{filter:brightness(1.1)}
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-top:14px;
+}
+
+.mini{
+    background:#09131e;
+    border:1px solid #1c2b3e;
+    border-radius:9px;
+    padding:10px;
+}
+
+.mini span{
+    display:block;
+    color:#74859b;
+    font-size:10px;
+}
+
+.mini strong{
+    display:block;
+    margin-top:5px;
+    font-size:13px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+}
+
+th{
+    text-align:left;
+    color:#718198;
+    font-weight:500;
+    padding:0 8px 11px;
+    border-bottom:1px solid #213047;
+}
+
+td{
+    padding:12px 8px;
+    border-bottom:1px solid #182638;
+}
+
+.net{color:var(--green);font-weight:700}
+.positive{color:var(--green)}
+.negative{color:var(--red)}
+
+.status{
+    display:inline-block;
+    font-size:9px;
+    padding:4px 7px;
+    border-radius:20px;
+    background:rgba(53,229,143,.1);
+    color:var(--green);
+    border:1px solid rgba(53,229,143,.25);
+}
+
+.status-below{
+    background:rgba(255,101,112,.08);
+    color:var(--red);
+    border-color:rgba(255,101,112,.25);
+}
+
+.delete-btn{
+    width:auto;
+    padding:4px 7px;
+    font-size:9px;
+    background:transparent;
+    border:1px solid #2b394b;
+    color:#7e8da2;
+}
+
+.delete-btn:hover{
+    color:var(--red);
+    border-color:#70404a;
+}
+
+.notice{
+    margin-top:13px;
+    color:#5f7086;
+    font-size:10px;
+    line-height:1.5;
+}
+
+footer{
+    text-align:center;
+    color:#56657a;
+    font-size:11px;
+    padding:40px 0 24px;
+}
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%) translateY(20px);
+    background:#edf2f7;
+    color:#09101a;
+    padding:10px 15px;
+    border-radius:8px;
+    font-size:12px;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s ease;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+@media(max-width:850px){
+    .cards{grid-template-columns:1fr}
+    .lower{grid-template-columns:1fr}
+    .title{
+        align-items:start;
+        gap:15px;
+        flex-direction:column;
+    }
+}
+
+@media(max-width:600px){
+    .container{width:calc(100% - 28px)}
+    .topbar{height:68px}
+    .top-date{display:none}
+    .title{padding:35px 0 24px}
+    h1{font-size:29px}
+    .goal{padding:22px}
+    .goal-top{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .amount{font-size:32px}
+    .percent{font-size:21px}
+    .summary{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="topbar">
+        <a class="back" href="index.html">← Back</a>
+        <div class="brand">SOIKAT · 1L GOAL</div>
+        <div class="top-date">1 Oct 2026 → 31 Dec 2027</div>
+    </div>
+
+    <section class="title">
+        <div>
+            <div class="kicker">Personal Target</div>
+            <h1>৳1,00,000 Goal</h1>
+            <div class="period">457 day target period · Fixed daily target ৳220</div>
+        </div>
+        <div class="pill">৳220 / DAY</div>
+    </section>
+
+    <section class="goal">
+        <div class="goal-top">
+            <div>
+                <div class="goal-label">Overall Progress</div>
+                <div class="amount" id="overallAmount">৳0</div>
+            </div>
+            <div class="percent" id="overallPercent">0%</div>
+        </div>
+
+        <div class="bar">
+            <div class="fill" id="overallFill"></div>
+        </div>
+
+        <div class="goal-bottom">
+            <span id="earnedLabel">৳0 earned</span>
+            <span>Target ৳1,00,000</span>
+        </div>
+    </section>
+
+    <!-- WEEKLY / MONTHLY / OVERALL -->
+    <section class="cards">
+
+        <div class="card week">
+            <div class="card-name">Weekly</div>
+            <div class="card-value" id="weeklyPercent">0%</div>
+            <div class="card-sub" id="weeklySub">৳0 / ৳1,540 target</div>
+        </div>
+
+        <div class="card month">
+            <div class="card-name">Monthly</div>
+            <div class="card-value" id="monthlyPercent">0%</div>
+            <div class="card-sub" id="monthlySub">৳0 / monthly target</div>
+        </div>
+
+        <div class="card overall">
+            <div class="card-name">Overall</div>
+            <div class="card-value" id="overallPercent2">0%</div>
+            <div class="card-sub" id="overallSub">৳0 / ৳1,00,000</div>
+        </div>
+
+    </section>
+
+    <!-- OTHER INFORMATION -->
+    <section class="cards">
+
+        <div class="card blue">
+            <div class="card-name">Remaining Target</div>
+            <div class="card-value" id="remainingTarget">৳1,00,000</div>
+            <div class="card-sub">Still needed to reach goal</div>
+        </div>
+
+        <div class="card orange">
+            <div class="card-name">Days Left</div>
+            <div class="card-value" id="daysLeft">457</div>
+            <div class="card-sub">Until 31 Dec 2027</div>
+        </div>
+
+        <div class="card pink">
+            <div class="card-name">Required / Day</div>
+            <div class="card-value">৳220</div>
+            <div class="card-sub">Fixed daily target</div>
+        </div>
+
+    </section>
+
+    <!-- ENTRY + HISTORY -->
+    <section class="lower">
+
+        <div class="panel">
+
+            <div class="panel-head">
+                <div class="panel-title">Daily Entry</div>
+                <div class="panel-tag">NET ONLY</div>
+            </div>
+
+            <label for="entryDate">Date</label>
+            <input id="entryDate" type="date">
+
+            <label for="profit">Net Profit</label>
+            <input
+                id="profit"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="৳ Enter today's net profit"
+            >
+
+            <button id="addButton">Add Entry</button>
+
+            <div class="summary">
+
+                <div class="mini">
+                    <span>Daily Target</span>
+                    <strong>৳220</strong>
+                </div>
+
+                <div class="mini">
+                    <span>Selected Net</span>
+                    <strong id="todayNet">—</strong>
+                </div>
+
+                <div class="mini">
+                    <span>Difference</span>
+                    <strong id="difference">—</strong>
+                </div>
+
+            </div>
+
+            <div class="notice">
+                এখানে শুধু final Net Profit লিখবে।
+                Mail, IP, failed work বা অন্য কোনো খরচ আলাদা করে input করতে হবে না।
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <div class="panel-head">
+                <div class="panel-title">Recent Entries</div>
+                <div class="panel-tag">LATEST 10</div>
+            </div>
+
+            <div style="overflow-x:auto">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Net</th>
+                            <th>Target</th>
+                            <th>Diff</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="entriesBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <footer>
+        Built with love by Soikat
+    </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+const TARGET = 100000;
+
+const DAILY_TARGET = 220;
+
+const START_DATE = "2026-10-01";
+
+const END_DATE = "2027-12-31";
+
+const STORAGE_KEY = "soikat_1l_goal_entries_v2";
+
+
+/* =========================================
+   HELPERS
+========================================= */
+
+function parseDate(value){
+
+    const [y,m,d] = value.split("-").map(Number);
+
+    return new Date(y,m-1,d);
+}
+
+function dateKey(date){
+
+    const y = date.getFullYear();
+
+    const m = String(date.getMonth()+1).padStart(2,"0");
+
+    const d = String(date.getDate()).padStart(2,"0");
+
+    return `${y}-${m}-${d}`;
+}
+
+function money(value){
+
+    return "৳" + Math.round(value).toLocaleString("en-IN");
+}
+
+function percent(value){
+
+    if(!isFinite(value) || value <= 0){
+
+        return "0%";
+
+    }
+
+    return Math.min(100,value)
+        .toFixed(1)
+        .replace(".0","") + "%";
+}
+
+function daysInclusive(start,end){
+
+    return Math.floor(
+        (end-start)/86400000
+    ) + 1;
+}
+
+function getEntries(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(STORAGE_KEY)
+        ) || {};
+
+    }catch{
+
+        return {};
+
+    }
+}
+
+function saveEntries(entries){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(entries)
+    );
+}
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+        toast.classList.remove("show");
+    },1800);
+}
+
+
+/* =========================================
+   PERIOD
+========================================= */
+
+const startDate = parseDate(START_DATE);
+
+const endDate = parseDate(END_DATE);
+
+
+function getTotalDays(){
+
+    return daysInclusive(
+        startDate,
+        endDate
+    );
+}
+
+
+function getToday(){
+
+    const now = new Date();
+
+    return new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    );
+}
+
+
+function clampDate(date){
+
+    if(date < startDate){
+
+        return startDate;
+
+    }
+
+    if(date > endDate){
+
+        return endDate;
+
+    }
+
+    return date;
+}
+
+
+function getDaysLeft(){
+
+    const today =
+        clampDate(getToday());
+
+    return Math.max(
+        0,
+        daysInclusive(today,endDate)
+    );
+}
+
+
+/* =========================================
+   SUM
+========================================= */
+
+function totalIncome(entries){
+
+    return Object.values(entries)
+        .reduce(
+            (sum,value)=>
+                sum + Number(value || 0),
+            0
+        );
+}
+
+
+function rangeTotal(entries,start,end){
+
+    let total = 0;
+
+    Object.entries(entries).forEach(
+        ([key,value])=>{
+
+            const date =
+                parseDate(key);
+
+            if(
+                date >= start &&
+                date <= end
+            ){
+
+                total += Number(value || 0);
+
+            }
+
+        }
+    );
+
+    return total;
+}
+
+
+/* =========================================
+   WEEK
+========================================= */
+
+function getWeekRange(date){
+
+    const d = new Date(date);
+
+    const day = d.getDay();
+
+    const mondayOffset =
+        day === 0 ? -6 : 1-day;
+
+    const monday =
+        new Date(d);
+
+    monday.setDate(
+        d.getDate()+mondayOffset
+    );
+
+    const sunday =
+        new Date(monday);
+
+    sunday.setDate(
+        monday.getDate()+6
+    );
+
+    if(monday < startDate){
+
+        monday.setTime(
+            startDate.getTime()
+        );
+
+    }
+
+    if(sunday > endDate){
+
+        sunday.setTime(
+            endDate.getTime()
+        );
+
+    }
+
+    return {
+        start:monday,
+        end:sunday
+    };
+}
+
+
+/* =========================================
+   MONTH
+========================================= */
+
+function getMonthRange(date){
+
+    const start =
+        new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            1
+        );
+
+    const end =
+        new Date(
+            date.getFullYear(),
+            date.getMonth()+1,
+            0
+        );
+
+    if(start < startDate){
+
+        start.setTime(
+            startDate.getTime()
+        );
+
+    }
+
+    if(end > endDate){
+
+        end.setTime(
+            endDate.getTime()
+        );
+
+    }
+
+    return {
+        start,
+        end
+    };
+}
+
+
+/* =========================================
+   RENDER
+========================================= */
+
+function render(){
+
+    const entries =
+        getEntries();
+
+    const total =
+        totalIncome(entries);
+
+    const overall =
+        Math.min(
+            100,
+            (total/TARGET)*100
+        );
+
+
+    /* OVERALL */
+
+    document.getElementById(
+        "overallAmount"
+    ).textContent = money(total);
+
+    document.getElementById(
+        "overallPercent"
+    ).textContent = percent(overall);
+
+    document.getElementById(
+        "overallPercent2"
+    ).textContent = percent(overall);
+
+    document.getElementById(
+        "overallSub"
+    ).textContent =
+        money(total) +
+        " / " +
+        money(TARGET);
+
+    document.getElementById(
+        "overallFill"
+    ).style.width =
+        overall + "%";
+
+    document.getElementById(
+        "earnedLabel"
+    ).textContent =
+        money(total) + " earned";
+
+
+    /* REMAINING */
+
+    const remaining =
+        Math.max(
+            0,
+            TARGET-total
+        );
+
+    document.getElementById(
+        "remainingTarget"
+    ).textContent =
+        money(remaining);
+
+
+    /* DAYS */
+
+    document.getElementById(
+        "daysLeft"
+    ).textContent =
+        getDaysLeft().toLocaleString(
+            "en-IN"
+        );
+
+
+    /* SELECTED DATE */
+
+    const selectedDate =
+        parseDate(
+            document.getElementById(
+                "entryDate"
+            ).value
+        );
+
+
+    /* WEEKLY */
+
+    const week =
+        getWeekRange(selectedDate);
+
+    const weekTotal =
+        rangeTotal(
+            entries,
+            week.start,
+            week.end
+        );
+
+    const weekDays =
+        daysInclusive(
+            week.start,
+            week.end
+        );
+
+    const weekTarget =
+        DAILY_TARGET * weekDays;
+
+    const weekPercent =
+        weekTarget > 0
+        ? (weekTotal/weekTarget)*100
+        : 0;
+
+    document.getElementById(
+        "weeklyPercent"
+    ).textContent =
+        percent(weekPercent);
+
+    document.getElementById(
+        "weeklySub"
+    ).textContent =
+        money(weekTotal) +
+        " / " +
+        money(weekTarget) +
+        " target";
+
+
+    /* MONTHLY */
+
+    const month =
+        getMonthRange(selectedDate);
+
+    const monthTotal =
+        rangeTotal(
+            entries,
+            month.start,
+            month.end
+        );
+
+    const monthDays =
+        daysInclusive(
+            month.start,
+            month.end
+        );
+
+    const monthTarget =
+        DAILY_TARGET * monthDays;
+
+    const monthPercent =
+        monthTarget > 0
+        ? (monthTotal/monthTarget)*100
+        : 0;
+
+    document.getElementById(
+        "monthlyPercent"
+    ).textContent =
+        percent(monthPercent);
+
+    document.getElementById(
+        "monthlySub"
+    ).textContent =
+        money(monthTotal) +
+        " / " +
+        money(monthTarget) +
+        " target";
+
+
+    /* SELECTED ENTRY */
+
+    const selectedKey =
+        document.getElementById(
+            "entryDate"
+        ).value;
+
+    const selectedNet =
+        Number(
+            entries[selectedKey] || 0
+        );
+
+
+    if(
+        Object.prototype.hasOwnProperty.call(
+            entries,
+            selectedKey
+        )
+    ){
+
+        document.getElementById(
+            "todayNet"
+        ).textContent =
+            money(selectedNet);
+
+        const diff =
+            selectedNet - DAILY_TARGET;
+
+        const diffElement =
+            document.getElementById(
+                "difference"
+            );
+
+        diffElement.textContent =
+            diff >= 0
+            ? "+" + money(diff)
+            : "−" + money(Math.abs(diff));
+
+        diffElement.style.color =
+            diff >= 0
+            ? "var(--green)"
+            : "var(--red)";
+
+    }else{
+
+        document.getElementById(
+            "todayNet"
+        ).textContent = "—";
+
+        document.getElementById(
+            "difference"
+        ).textContent = "—";
+
+        document.getElementById(
+            "difference"
+        ).style.color =
+            "var(--text)";
+    }
+
+
+    renderTable(entries);
+}
+
+
+/* =========================================
+   TABLE
+========================================= */
+
+function renderTable(entries){
+
+    const body =
+        document.getElementById(
+            "entriesBody"
+        );
+
+    const rows =
+        Object.entries(entries)
+        .sort(
+            (a,b)=>
+                b[0].localeCompare(a[0])
+        );
+
+
+    if(rows.length === 0){
+
+        body.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    style="
+                        text-align:center;
+                        color:#596a7f;
+                        padding:35px 10px;
+                    "
+                >
+                    No entries yet
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+
+    body.innerHTML =
+        rows
+        .slice(0,10)
+        .map(
+            ([date,value])=>{
+
+                const net =
+                    Number(value || 0);
+
+                const diff =
+                    net - DAILY_TARGET;
+
+                const good =
+                    diff >= 0;
+
+                const formatted =
+                    parseDate(date)
+                    .toLocaleDateString(
+                        "en-GB",
+                        {
+                            day:"2-digit",
+                            month:"short",
+                            year:"numeric"
+                        }
+                    );
+
+
+                return `
+                    <tr>
+
+                        <td>
+                            ${formatted}
+                        </td>
+
+                        <td class="net">
+                            ${money(net)}
+                        </td>
+
+                        <td>
+                            ${money(DAILY_TARGET)}
+                        </td>
+
+                        <td
+                            class="${
+                                good
+                                ? "positive"
+                                : "negative"
+                            }"
+                        >
+                            ${
+                                good
+                                ? "+"
+                                : "−"
+                            }${money(
+                                Math.abs(diff)
+                            )}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="${
+                                    good
+                                    ? "status"
+                                    : "status status-below"
+                                }"
+                            >
+                                ${
+                                    good
+                                    ? "GOOD"
+                                    : "BELOW"
+                                }
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="delete-btn"
+                                onclick="
+                                    deleteEntry('${date}')
+                                "
+                            >
+                                Delete
+                            </button>
+
+                        </td>
+
+                    </tr>
+                `;
+
+            }
+        )
+        .join("");
+}
+
+
+/* =========================================
+   ADD
+========================================= */
+
+function addEntry(){
+
+    const date =
+        document.getElementById(
+            "entryDate"
+        ).value;
+
+    const profit =
+        Number(
+            document.getElementById(
+                "profit"
+            ).value
+        );
+
+
+    if(!date){
+
+        showToast(
+            "Select a date"
+        );
+
+        return;
+    }
+
+
+    if(
+        date < START_DATE ||
+        date > END_DATE
+    ){
+
+        showToast(
+            "Date must be inside the goal period"
+        );
+
+        return;
+    }
+
+
+    if(
+        !Number.isFinite(profit) ||
+        profit < 0
+    ){
+
+        showToast(
+            "Enter a valid net profit"
+        );
+
+        return;
+    }
+
+
+    const entries =
+        getEntries();
+
+    entries[date] =
+        profit;
+
+    saveEntries(entries);
+
+    document.getElementById(
+        "profit"
+    ).value = "";
+
+    render();
+
+    showToast(
+        "Entry saved"
+    );
+}
+
+
+/* =========================================
+   DELETE
+========================================= */
+
+function deleteEntry(date){
+
+    const entries =
+        getEntries();
+
+    delete entries[date];
+
+    saveEntries(entries);
+
+    render();
+
+    showToast(
+        "Entry deleted"
+    );
+}
+
+
+/* =========================================
+   INITIAL DATE
+========================================= */
+
+const entryDate =
+    document.getElementById(
+        "entryDate"
+    );
+
+const today =
+    getToday();
+
+const initialDate =
+    today < startDate
+    ? startDate
+    : today > endDate
+        ? endDate
+        : today;
+
+entryDate.value =
+    dateKey(initialDate);
+
+entryDate.min =
+    START_DATE;
+
+entryDate.max =
+    END_DATE;
+
+
+/* =========================================
+   EVENTS
+========================================= */
+
+entryDate.addEventListener(
+    "change",
+    render
+);
+
+document.getElementById(
+    "addButton"
+).addEventListener(
+    "click",
+    addEntry
+);
+
+document.getElementById(
+    "profit"
+).addEventListener(
+    "keydown",
+    event=>{
+        if(event.key === "Enter"){
+            addEntry();
+        }
+    }
+);
+
+
+/* =========================================
+   START
+========================================= */
+
+render();
+
+</script>
+
+</body>
+</html>
