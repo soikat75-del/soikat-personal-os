@@ -1214,11 +1214,9 @@ function escapeAttr(s){
 window.addEventListener('soikat-200d-cloud-updated',()=>{
   try{
     const fresh=loadDataSafely();
-    if(fresh && typeof fresh==='object'){
-      data=fresh;
-      render();
-      console.log('[Soikat 200D] CLOUD DATA APPLIED TO PAGE');
-    }
+    data=fresh && typeof fresh==='object' ? fresh : {};
+    render();
+    console.log('[Soikat 200D] CLOUD DATA APPLIED TO PAGE');
   }catch(e){
     console.error('[Soikat 200D] cloud refresh failed',e);
   }
