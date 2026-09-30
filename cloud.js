@@ -458,22 +458,31 @@
       const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
       if(!key)return;
 
-      // Always accept a database broadcast. The cloud row is authoritative.
-      state.lastCloudWrite[row.app]=stable(row.data);
-      writeLocal(key,row.data);
+      // Only apply genuinely new cloud data. This prevents the page's own
+      // post-save broadcast from causing a reload loop.
+      const current=readLocal(key);
+      const incoming=stable(row.data);
+      const existing=stable(current);
+      if(existing===incoming){
+        console.log('[Soikat Realtime] EVENT already applied locally');
+        return;
+      }
+
+      state.lastCloudWrite[row.app]=incoming;
+      if(!writeLocal(key,row.data)){
+        console.error('[Soikat Realtime] Failed to write incoming cloud data');
+        return;
+      }
       window.dispatchEvent(new CustomEvent('soikat-cloud-updated',{
         detail:{app:row.app,key}
       }));
 
-      // Apply the cloud row immediately. 100K GOAL's render() reads localStorage
-      // directly, so re-rendering is safer than a full page reload. 200D keeps
-      // working state in memory, so it still gets a reload.
-      if(row.app==='soikat_100k_goal'){
-        console.log('[Soikat Realtime] 100K localStorage updated, rendering now');
-        if(typeof window.render==='function') window.render();
-      }else if(row.app==='soikat_200d_plan'){
-        console.log('[Soikat Realtime] 200D cloud row received, reloading');
-        setTimeout(()=>location.reload(),50);
+      // Force the existing page to re-read the freshly written localStorage.
+      // This is intentionally a hard reload for the two existing apps so the
+      // result does not depend on their internal render/data references.
+      if(row.app==='soikat_100k_goal' || row.app==='soikat_200d_plan'){
+        console.log('[Soikat Realtime] NEW CLOUD DATA APPLIED — RELOADING');
+        setTimeout(()=>location.reload(),100);
       }else{
         refreshPageFromCloud(row.app);
       }
