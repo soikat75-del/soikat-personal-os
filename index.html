@@ -3,126 +3,839 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SOIKAT — PERSONAL OS</title>
+
 <style>
-  *{box-sizing:border-box}
-  html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
-  body{
-    background:#07090d;
-    color:#f5f7fb;
-    min-height:100vh;
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  min-height:100%;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  overflow-x:hidden;
+  color:#fff;
+  background:#05070a;
+}
+
+/* =====================================================
+   BACKGROUND
+===================================================== */
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:-25%;
+  z-index:-3;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(85,120,170,.16),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 15% 70%,
+      rgba(60,90,150,.08),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      rgba(120,80,170,.07),
+      transparent 25%
+    );
+
+  filter:blur(40px);
+
+  animation:
+    atmosphere
+    18s
+    ease-in-out
+    infinite
+    alternate;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-2;
+
+  pointer-events:none;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,.018) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.018) 1px,
+      transparent 1px
+    );
+
+  background-size:55px 55px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      transparent 80%
+    );
+}
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.wrap{
+  width:min(1240px,92%);
+  margin:auto;
+
+  padding:
+    90px 0 70px;
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero{
+  text-align:center;
+  margin-bottom:72px;
+
+  animation:
+    heroEnter
+    1s
+    cubic-bezier(.16,1,.3,1)
+    both;
+}
+
+.hero h1{
+  margin:0;
+
+  font-size:
+    clamp(
+      58px,
+      8vw,
+      108px
+    );
+
+  line-height:.9;
+
+  font-weight:900;
+
+  letter-spacing:
+    clamp(
+      8px,
+      1.4vw,
+      18px
+    );
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #dce5ef 45%,
+      #7f8da0 100%
+    );
+
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+
+  text-shadow:
+    0 0 50px
+    rgba(180,210,255,.08);
+
+  animation:
+    titleGlow
+    6s
+    ease-in-out
+    infinite;
+}
+
+.hero p{
+  margin:
+    24px 0 0;
+
+  font-size:
+    clamp(
+      11px,
+      1.2vw,
+      15px
+    );
+
+  letter-spacing:
+    clamp(
+      7px,
+      1vw,
+      12px
+    );
+
+  color:#7c899b;
+
+  font-weight:500;
+
+  animation:
+    subtitleEnter
+    1s
+    .25s
+    ease
+    both;
+}
+
+/* small line */
+
+.hero-line{
+  width:70px;
+  height:1px;
+
+  margin:
+    30px auto 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #64758b,
+      transparent
+    );
+
+  opacity:.6;
+}
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      2,
+      minmax(0,1fr)
+    );
+
+  gap:22px;
+}
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.card{
+  position:relative;
+
+  min-height:270px;
+
+  padding:34px;
+
+  overflow:hidden;
+
+  display:flex;
+
+  align-items:flex-end;
+
+  justify-content:flex-start;
+
+  border:
+    1px solid
+    rgba(120,145,175,.18);
+
+  border-radius:22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18,24,32,.96),
+      rgba(8,11,16,.98)
+    );
+
+  color:#fff;
+
+  text-decoration:none;
+
+  opacity:0;
+
+  transform:
+    translateY(35px)
+    scale(.97);
+
+  animation:
+    cardEnter
+    .8s
+    cubic-bezier(.16,1,.3,1)
+    forwards;
+
+  transition:
+    transform .45s cubic-bezier(.16,1,.3,1),
+    border-color .45s ease,
+    box-shadow .45s ease;
+}
+
+/* =====================================================
+   CARD IMAGE / EMOJI BACKGROUND
+===================================================== */
+
+.card::before{
+  content:attr(data-icon);
+
+  position:absolute;
+
+  right:-18px;
+  top:-45px;
+
+  font-size:190px;
+
+  line-height:1;
+
+  opacity:.075;
+
+  filter:
+    grayscale(1)
+    blur(.2px);
+
+  transform:
+    rotate(-8deg)
+    scale(1);
+
+  transition:
+    transform .7s cubic-bezier(.16,1,.3,1),
+    opacity .5s ease,
+    filter .5s ease;
+}
+
+/* glow */
+
+.card::after{
+  content:"";
+
+  position:absolute;
+
+  width:260px;
+  height:260px;
+
+  right:-90px;
+  top:-100px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(130,165,205,.12),
+      transparent 68%
+    );
+
+  filter:blur(10px);
+
+  opacity:.55;
+
+  transition:
+    transform .7s ease,
+    opacity .5s ease;
+}
+
+/* =====================================================
+   LIGHT SWEEP
+===================================================== */
+
+.card .shine{
+  position:absolute;
+
+  inset:0;
+
+  pointer-events:none;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(255,255,255,.08) 50%,
+      transparent 70%
+    );
+
+  transform:
+    translateX(-130%);
+}
+
+/* =====================================================
+   CARD CONTENT
+===================================================== */
+
+.card-content{
+  position:relative;
+
+  z-index:3;
+}
+
+.card-label{
+  display:block;
+
+  margin-bottom:10px;
+
+  color:#66768b;
+
+  font-size:10px;
+
+  letter-spacing:3px;
+
+  text-transform:uppercase;
+}
+
+.title{
+  display:block;
+
+  font-size:
+    clamp(
+      25px,
+      2.2vw,
+      32px
+    );
+
+  font-weight:800;
+
+  letter-spacing:-.8px;
+
+  line-height:1.05;
+
+  transition:
+    transform .4s ease,
+    letter-spacing .4s ease;
+}
+
+/* =====================================================
+   HOVER
+===================================================== */
+
+.card:hover{
+  transform:
+    translateY(-8px)
+    scale(1.012);
+
+  border-color:
+    rgba(150,175,205,.38);
+
+  box-shadow:
+    0 25px 70px
+    rgba(0,0,0,.38),
+
+    0 0 45px
+    rgba(100,135,175,.06),
+
+    inset 0 1px 0
+    rgba(255,255,255,.05);
+}
+
+.card:hover::before{
+  opacity:.14;
+
+  transform:
+    rotate(-4deg)
+    scale(1.13);
+
+  filter:
+    grayscale(0)
+    blur(0);
+}
+
+.card:hover::after{
+  opacity:.9;
+
+  transform:
+    scale(1.35);
+}
+
+.card:hover .title{
+  transform:
+    translateX(5px);
+
+  letter-spacing:-.2px;
+}
+
+.card:hover .shine{
+  animation:
+    sweep
+    .9s
+    ease;
+}
+
+/* =====================================================
+   STAGGER
+===================================================== */
+
+.card:nth-child(1){
+  animation-delay:.12s;
+}
+
+.card:nth-child(2){
+  animation-delay:.22s;
+}
+
+.card:nth-child(3){
+  animation-delay:.32s;
+}
+
+.card:nth-child(4){
+  animation-delay:.42s;
+}
+
+.card:nth-child(5){
+  animation-delay:.52s;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes atmosphere{
+
+  from{
+    transform:
+      translate3d(-2%,-1%,0)
+      scale(1);
   }
+
+  to{
+    transform:
+      translate3d(2%,2%,0)
+      scale(1.08);
+  }
+}
+
+@keyframes heroEnter{
+
+  from{
+    opacity:0;
+
+    transform:
+      translateY(-25px)
+      scale(.96);
+
+    filter:blur(8px);
+  }
+
+  to{
+    opacity:1;
+
+    transform:
+      translateY(0)
+      scale(1);
+
+    filter:blur(0);
+  }
+}
+
+@keyframes titleGlow{
+
+  0%,100%{
+    text-shadow:
+      0 0 35px
+      rgba(180,210,255,.04);
+  }
+
+  50%{
+    text-shadow:
+      0 0 65px
+      rgba(180,210,255,.13);
+  }
+}
+
+@keyframes subtitleEnter{
+
+  from{
+    opacity:0;
+
+    letter-spacing:15px;
+  }
+
+  to{
+    opacity:1;
+
+    letter-spacing:
+      clamp(
+        7px,
+        1vw,
+        12px
+      );
+  }
+}
+
+@keyframes cardEnter{
+
+  from{
+    opacity:0;
+
+    transform:
+      translateY(35px)
+      scale(.97);
+  }
+
+  to{
+    opacity:1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes sweep{
+
+  from{
+    transform:
+      translateX(-130%);
+  }
+
+  to{
+    transform:
+      translateX(130%);
+  }
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer{
+  text-align:center;
+
+  padding:
+    55px 0 25px;
+
+  color:#465467;
+
+  font-size:11px;
+
+  letter-spacing:.5px;
+
+  animation:
+    footerEnter
+    1s
+    1s
+    ease
+    both;
+}
+
+@keyframes footerEnter{
+
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:700px){
+
   .wrap{
-    width:min(1200px,94%);
-    margin:0 auto;
-    padding:46px 0 70px;
+    width:90%;
+    padding-top:55px;
   }
-  .brand{
-    text-align:center;
-    margin-bottom:54px;
+
+  .hero{
+    margin-bottom:45px;
   }
-  .brand h1{
-    margin:0;
-    font-size:40px;
-    line-height:1;
-    letter-spacing:7px;
-    font-weight:800;
-  }
-  .brand p{
-    margin:22px 0 0;
-    color:#78869a;
-    font-size:14px;
-    letter-spacing:7px;
-  }
+
   .grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:22px;
+    grid-template-columns:1fr;
   }
+
   .card{
-    position:relative;
-    min-height:212px;
-    padding:34px 36px;
-    border:1px solid #202a37;
-    border-radius:15px;
-    background:linear-gradient(145deg,#10141a,#0b0e13);
-    text-decoration:none;
-    color:#fff;
-    display:flex;
-    align-items:flex-end;
-    overflow:hidden;
-    transition:border-color .2s ease,transform .2s ease,background .2s ease;
+    min-height:200px;
+    padding:28px;
   }
-  .card:hover{
-    transform:translateY(-2px);
-    border-color:#344253;
-    background:linear-gradient(145deg,#121821,#0c1016);
+
+  .card::before{
+    font-size:145px;
   }
-  .number{
-    position:absolute;
-    top:29px;
-    right:31px;
-    color:#65748a;
-    font-size:13px;
-    letter-spacing:.5px;
-  }
+
   .title{
-    font-size:24px;
-    font-weight:700;
-    letter-spacing:-.4px;
+    font-size:26px;
   }
-  footer{
-    text-align:center;
-    color:#56657a;
-    font-size:11px;
-    padding:40px 0 24px;
+}
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
   }
-  @media(max-width:700px){
-    .wrap{padding-top:32px}
-    .brand{margin-bottom:38px}
-    .brand h1{font-size:31px;letter-spacing:5px}
-    .brand p{font-size:11px;letter-spacing:5px}
-    .grid{grid-template-columns:1fr}
-    .card{min-height:170px}
-  }
+}
 </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <header class="brand">
-      <h1>SOIKAT</h1>
-      <p>PERSONAL OS</p>
-    </header>
 
-    <section class="grid">
-      <a class="card" href="goal.html">
-        <span class="number">01</span>
-        <span class="title">100K GOAL</span>
-      </a>
+<main class="wrap">
 
-      <a class="card" href="study.html">
-        <span class="number">02</span>
-        <span class="title">200D PLAN</span>
-      </a>
+  <!-- HERO -->
 
-      <a class="card" href="todo-notes.html">
-        <span class="number">03</span>
-        <span class="title">TODO + NOTES</span>
-      </a>
+  <header class="hero">
 
-      <a class="card" href="reports.html">
-        <span class="number">04</span>
-        <span class="title">REPORTS</span>
-      </a>
+    <h1>SOIKAT</h1>
 
-      <div class="card" aria-hidden="true">
-        <span class="number">05</span>
-        <span class="title">...</span>
+    <p>PERSONAL OS</p>
+
+    <div class="hero-line"></div>
+
+  </header>
+
+
+  <!-- DASHBOARD -->
+
+  <section class="grid">
+
+    <a
+      class="card"
+      href="goal.html"
+      data-icon="🎯"
+    >
+
+      <div class="shine"></div>
+
+      <div class="card-content">
+
+        <span class="card-label">
+          FINANCIAL
+        </span>
+
+        <span class="title">
+          100K GOAL
+        </span>
+
       </div>
-    </section>
-  </main>
 
-  <footer>Built with ❤️ by Soikat</footer>
-  <script src="cloud.js?v=5"></script>
+    </a>
+
+
+    <a
+      class="card"
+      href="study.html"
+      data-icon="📚"
+    >
+
+      <div class="shine"></div>
+
+      <div class="card-content">
+
+        <span class="card-label">
+          STUDY
+        </span>
+
+        <span class="title">
+          200D PLAN
+        </span>
+
+      </div>
+
+    </a>
+
+
+    <a
+      class="card"
+      href="todo-notes.html"
+      data-icon="✓"
+    >
+
+      <div class="shine"></div>
+
+      <div class="card-content">
+
+        <span class="card-label">
+          ORGANIZE
+        </span>
+
+        <span class="title">
+          TODO + NOTES
+        </span>
+
+      </div>
+
+    </a>
+
+
+    <a
+      class="card"
+      href="reports.html"
+      data-icon="📊"
+    >
+
+      <div class="shine"></div>
+
+      <div class="card-content">
+
+        <span class="card-label">
+          INSIGHTS
+        </span>
+
+        <span class="title">
+          REPORTS
+        </span>
+
+      </div>
+
+    </a>
+
+
+    <div
+      class="card"
+      data-icon="+"
+      aria-hidden="true"
+    >
+
+      <div class="shine"></div>
+
+      <div class="card-content">
+
+        <span class="card-label">
+          MORE
+        </span>
+
+        <span class="title">
+          ...
+        </span>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer>
+  Built with ❤️ by Soikat
+</footer>
+
+
+<script src="cloud.js?v=5"></script>
+
 </body>
 </html>
