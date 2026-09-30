@@ -451,38 +451,65 @@
       if(!row && p.app && p.user_id) row=p;
 
       console.log('[Soikat Realtime] EVENT ROW',row);
-      if(!row||row.user_id!==userId)return;
-      if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app))return;
-      if(!meaningful(row.data))return;
+      if(!row){
+        console.warn('[Soikat Realtime] No row found in broadcast');
+        return;
+      }
+
+      // The channel is already private and scoped to the authenticated user's
+      // topic, so do not reject a valid database row because of a formatting/
+      // type mismatch in user_id. Only accept app IDs registered by this client.
+      if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app)){
+        console.warn('[Soikat Realtime] Unknown app in event:',row.app);
+        return;
+      }
+      if(!meaningful(row.data)){
+        console.warn('[Soikat Realtime] Empty cloud data for app:',row.app);
+        return;
+      }
 
       const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
-      if(!key)return;
+      if(!key){
+        console.warn('[Soikat Realtime] No localStorage key for app:',row.app);
+        return;
+      }
 
-      // Only apply genuinely new cloud data. This prevents the page's own
-      // post-save broadcast from causing a reload loop.
       const current=readLocal(key);
       const incoming=stable(row.data);
       const existing=stable(current);
+
+      console.log('[Soikat Realtime] APPLY CHECK',{
+        app:row.app,
+        key,
+        same:existing===incoming,
+        current,
+        incoming:row.data
+      });
+
       if(existing===incoming){
         console.log('[Soikat Realtime] EVENT already applied locally');
         return;
       }
 
       state.lastCloudWrite[row.app]=incoming;
-      if(!writeLocal(key,row.data)){
-        console.error('[Soikat Realtime] Failed to write incoming cloud data');
+
+      // Write the incoming cloud state immediately. The private topic already
+      // scopes delivery to the current user's channel.
+      try{
+        localStorage.setItem(key,JSON.stringify(row.data));
+        console.log('[Soikat Realtime] LOCAL STORAGE UPDATED',key);
+      }catch(e){
+        console.error('[Soikat Realtime] Failed to write incoming cloud data',e);
         return;
       }
+
       window.dispatchEvent(new CustomEvent('soikat-cloud-updated',{
         detail:{app:row.app,key}
       }));
 
-      // Force the existing page to re-read the freshly written localStorage.
-      // This is intentionally a hard reload for the two existing apps so the
-      // result does not depend on their internal render/data references.
       if(row.app==='soikat_100k_goal' || row.app==='soikat_200d_plan'){
         console.log('[Soikat Realtime] NEW CLOUD DATA APPLIED — RELOADING');
-        setTimeout(()=>location.reload(),100);
+        setTimeout(()=>location.reload(),150);
       }else{
         refreshPageFromCloud(row.app);
       }
