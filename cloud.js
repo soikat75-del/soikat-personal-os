@@ -438,7 +438,12 @@
         window.dispatchEvent(new CustomEvent('soikat-cloud-updated',{detail:{app:row.app,key}}));
         refreshPageFromCloud(row.app);
       })
-      .subscribe();
+      .subscribe((status, err)=>{
+        console.log('[Soikat Realtime]', status, err || '');
+        if(status==='SUBSCRIBED') setStatus('Realtime on','online');
+        else if(status==='CHANNEL_ERROR') setStatus('Realtime error','error');
+        else if(status==='TIMED_OUT') setStatus('Realtime timeout','error');
+      });
   }
 
   async function boot(){
