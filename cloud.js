@@ -465,9 +465,14 @@
         detail:{app:row.app,key}
       }));
 
-      // Force the existing page to re-read the freshly written localStorage.
-      // This avoids depending on the original page's render implementation.
-      if(row.app==='soikat_100k_goal' || row.app==='soikat_200d_plan'){
+      // Apply the cloud row immediately. 100K GOAL's render() reads localStorage
+      // directly, so re-rendering is safer than a full page reload. 200D keeps
+      // working state in memory, so it still gets a reload.
+      if(row.app==='soikat_100k_goal'){
+        console.log('[Soikat Realtime] 100K localStorage updated, rendering now');
+        if(typeof window.render==='function') window.render();
+      }else if(row.app==='soikat_200d_plan'){
+        console.log('[Soikat Realtime] 200D cloud row received, reloading');
         setTimeout(()=>location.reload(),50);
       }else{
         refreshPageFromCloud(row.app);
