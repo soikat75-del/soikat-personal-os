@@ -20,7 +20,7 @@ header{display:flex;justify-content:space-between;align-items:center;border-bott
 .top-actions{display:flex;gap:8px;flex-wrap:wrap}
 button,.btn{border:1px solid var(--line);background:#0c1422;color:var(--text);border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:700}
 button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
-.hero{display:grid;grid-template-columns:1.45fr .75fr;gap:16px}
+.hero{display:grid;grid-template-columns:1fr;gap:16px}
 .card{background:linear-gradient(180deg,#0e1727,#0a111e);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 12px 35px #0004}
 .kicker{font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:800}
 .big{font-size:34px;font-weight:900;margin:8px 0}
@@ -31,8 +31,7 @@ button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
 .stat{background:#0b1321;border:1px solid var(--line);border-radius:10px;padding:12px}
 .stat b{display:block;font-size:20px;margin-top:5px}.stat small{color:var(--muted)}
-.report{border-left:3px solid var(--green)}
-.report h2{margin:5px 0 7px;font-size:18px}.report p{color:var(--muted);font-size:13px;line-height:1.55;margin:0}
+
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
 .section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
 .section-title h2{margin:0;font-size:16px}.tag{font-size:10px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);padding:5px 7px;border-radius:7px}
@@ -48,7 +47,6 @@ button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
 .empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
 .month-nav{display:flex;gap:8px;align-items:center}.month-nav button{padding:7px 10px}
 .month-name{min-width:135px;text-align:center;font-weight:800}
-.month-list{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .month-item{border:1px solid var(--line);border-radius:9px;padding:11px;background:#0a1220;cursor:pointer}
 .month-item.active{border-color:var(--blue);box-shadow:0 0 0 1px #5aa7ff33 inset}
 .month-item b{display:block;font-size:12px}.month-item span{font-size:10px;color:var(--muted)}
@@ -59,12 +57,63 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .add{width:100%;margin-top:9px;background:#14253d;border-color:#31547e}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
 .cal-head{font-size:9px;text-align:center;color:var(--muted);padding:5px}
-.cal-day{min-height:58px;border:1px solid var(--line);border-radius:7px;padding:7px;background:#0a1220;cursor:pointer}
-.cal-day:hover{border-color:#3d5a80}.cal-day.today{box-shadow:0 0 0 1px var(--blue) inset}.cal-day.done{background:#0d2a21;border-color:#1d7358}
-.cal-day.partial{background:#282310;border-color:#75651c}.cal-day.missed{background:#2a1118;border-color:#71313d}
+.cal-day{min-height:66px;border:1px solid var(--line);border-radius:7px;padding:7px;background:#0a1220;cursor:pointer;transition:.15s}
+.cal-day:hover{border-color:#3d5a80}
+.cal-day.today{box-shadow:0 0 0 2px var(--blue) inset}
+.cal-day.done{background:#0d2a21;border-color:#1d7358}
+.cal-day.partial{background:#282310;border-color:#75651c}
+.cal-day.missed{background:#2a1118;border-color:#71313d}
+.cal-day.pending{background:#0a1220;border-color:#33425a}
+.cal-day.empty{background:#0a1220;border-color:#1b2638;opacity:.75}
 .cal-day .n{font-size:11px;font-weight:800}.cal-day .mini{font-size:9px;color:var(--muted);margin-top:6px}
+.cal-day.done .mini{color:var(--green)}
+.cal-day.partial .mini{color:var(--orange)}
+.cal-day.missed .mini{color:var(--red)}
+.cal-day.pending .mini{color:var(--muted)}
+.cal-status{font-size:7px;letter-spacing:.08em;margin-top:4px;font-weight:800;color:var(--muted)}
+.cal-day.done .cal-status{color:var(--green)}
+.cal-day.partial .cal-status{color:var(--orange)}
+.cal-day.missed .cal-status{color:var(--red)}
+.cal-day.pending .cal-status{color:var(--muted)}
+
+.cal-day.outside{opacity:.28;cursor:default;background:#070b14}
+.cal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--muted);font-size:9px;letter-spacing:.05em}
+.cal-legend span{display:flex;align-items:center;gap:5px}
+.lg{width:8px;height:8px;border-radius:2px;border:1px solid var(--line);display:inline-block}
+.lg.done{background:#0d2a21;border-color:#1d7358}
+.lg.partial{background:#282310;border-color:#75651c}
+.lg.missed{background:#2a1118;border-color:#71313d}
+.lg.today{box-shadow:0 0 0 1px var(--blue) inset}
+.lg.pending{background:#0a1220;border-color:#33425a}
+.selected-day{margin-top:10px;border:1px solid var(--line);border-radius:9px;padding:11px;background:#0a1220;min-height:20px}
+.selected-day .sd-head{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:800}
+.selected-day .sd-meta{color:var(--muted);font-size:10px;margin-top:5px}
+.selected-day .sd-list{margin-top:8px;display:grid;gap:5px}
+.selected-day .sd-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #162238;font-size:11px}
+.sd-toggle{padding:6px 8px;font-size:9px;white-space:nowrap;border-radius:7px}
+.delete-routine{border:1px solid #71313d;color:var(--red);background:#160c10;padding:5px 8px;font-size:8px;border-radius:6px;cursor:pointer}
+.delete-routine:hover{border-color:var(--red)}
+.routine-item{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.routine-check{display:flex;align-items:center;gap:9px;flex:1;cursor:pointer}
+.routine-check .topic{white-space:pre-line}
+
+
+.sd-toggle.checked{border-color:#1d7358;color:var(--green);background:#0d2a21}
+
+.selected-day .sd-item em{font-style:normal;color:var(--muted)}
+
 .rev{margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#0a1220}
 .rev-head{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.rev small{display:block;color:var(--muted);margin-top:5px}
+.revision-list{margin-top:8px;display:grid;gap:7px;max-height:360px;overflow:auto}
+.revision-item{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;
+  padding:9px 0;border-top:1px solid #162238;cursor:pointer}
+.revision-item input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.revision-item .topic{font-size:12px}
+.revision-date{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
+.revision-group-title{font-size:9px;letter-spacing:.12em;color:var(--orange);font-weight:800;margin-top:12px;padding-bottom:6px;border-bottom:1px solid #162238}
+.pending-item{cursor:default}
+
+
 .modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
 .modal.open{display:flex}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#0d1524;border:1px solid var(--line);border-radius:14px;padding:18px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
@@ -72,7 +121,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:8px}
 footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 @media(max-width:850px){.hero,.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.wrap{padding:18px 12px}.stats{grid-template-columns:1fr 1fr}.month-list{grid-template-columns:1fr 1fr}.cal-day{min-height:48px;padding:5px}.status{display:none}.big{font-size:28px}}
+@media(max-width:560px){.wrap{padding:18px 12px}.stats{grid-template-columns:1fr 1fr}.cal-day{min-height:48px;padding:5px}.status{display:none}.big{font-size:28px}}
 </style>
 </head>
 <body>
@@ -84,7 +133,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
   </div>
   <div class="top-actions">
     <button onclick="openBulk()">SET ROUTINE</button>
-    <button onclick="resetAll()">RESET</button>
+    <button onclick="syncTrustedDate(true)">SYNC DATE</button>
   </div>
 </header>
 
@@ -96,23 +145,39 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
     <div class="meta"><span id="startText"></span><span id="endText"></span></div>
     <div class="stats">
       <div class="stat"><small>DAYS LEFT</small><b id="daysLeft">200</b></div>
-      <div class="stat"><small>STUDY DONE</small><b id="studyDone">0%</b></div>
-      <div class="stat"><small>STUDY LEFT</small><b id="studyLeft">0</b></div>
-      <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b></div>
+      <div class="stat"><small>STUDY DONE</small><b id="studyDone">0 <span class="metric-sub">(0%)</span></b></div>
+      <div class="stat"><small>STUDY LEFT</small><b id="studyLeft">200 <span class="metric-sub">(100%)</span></b></div>
+      <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b><small class="metric-sub">pending studies</small></div>
     </div>
   </div>
-  <div class="card report" id="reportCard">
-    <div class="kicker">PROGRESS REPORT</div>
-    <h2 id="reportTitle">GOOD</h2>
-    <p id="reportText">Set your routine and start completing studies.</p>
-  </div>
+  <div class="sync-status" id="dateSyncStatus">Date source: checking…</div>
 </section>
 
 <section class="grid">
-  <div class="card">
-    <div class="section-title"><h2>ROUTINE</h2><span class="tag" id="selectedDateLabel">TODAY</span></div>
-    <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
-    <div id="routineList"></div>
+  <div>
+    <div class="card">
+      <div class="section-title"><h2>ROUTINE</h2><span class="tag" id="selectedDateLabel">TODAY</span></div>
+      <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
+      <div id="routineList"></div>
+    </div>
+
+    
+
+    <div class="card" style="margin-top:12px">
+      <div class="section-title">
+        <h2>200D CALENDAR</h2>
+        <div class="month-nav"><button onclick="changeMonth(-1)">‹</button><div class="month-name" id="calMonth"></div><button onclick="changeMonth(1)">›</button></div>
+      </div>
+      <div class="calendar" id="calendar"></div>
+      <div class="cal-legend">
+        <span><i class="lg done"></i> ALL DONE</span>
+        <span><i class="lg partial"></i> PARTIAL</span>
+        <span><i class="lg missed"></i> MISSED</span>
+        <span><i class="lg today"></i> TODAY</span>
+      <span><i class="lg pending"></i> PENDING</span>
+      </div>
+      <div class="selected-day" id="selectedDayInfo"></div>
+    </div>
   </div>
 
   <div>
@@ -127,28 +192,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
   </div>
 </section>
 
-<section class="grid">
-  <div class="card">
-    <div class="section-title">
-      <h2>200D CALENDAR</h2>
-      <div class="month-nav"><button onclick="changeMonth(-1)">‹</button><div class="month-name" id="calMonth"></div><button onclick="changeMonth(1)">›</button></div>
-    </div>
-    <div class="calendar" id="calendar"></div>
-  </div>
 
-  <div class="card">
-    <div class="section-title"><h2>ROUTINE SETUP</h2><span class="tag">2–3 MONTHS AT ONCE</span></div>
-    <div class="form-grid">
-      <input id="dateInput" type="date">
-      <input id="subjectInput" placeholder="Subject">
-      <input id="topicInput" class="full" placeholder="Topic / Study">
-    </div>
-    <button class="add" onclick="addOne()">+ ADD TO ROUTINE</button>
-    <div class="note">তুমি চাইলে একদিনে একাধিক Study যোগ করতে পারবে। Routine আগে থেকেই সেট থাকবে; অসম্পূর্ণ Study পরের দিনের actual routine-এ carry হবে।</div>
-    <div style="margin-top:16px" class="section-title"><h2>SELECTED MONTH</h2><span class="tag" id="setupMonth"></span></div>
-    <div class="month-list" id="monthList"></div>
-  </div>
-</section>
 
 <footer>Built with love by Soikat</footer>
 </div>
@@ -156,7 +200,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 <div class="modal" id="bulkModal">
   <div class="modal-box">
     <div class="modal-head"><h2 style="margin:0;font-size:17px">SET ROUTINE IN BULK</h2><button onclick="closeBulk()">×</button></div>
-    <textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
+    <div class="note">একই Date + Subject-এর নিচে আলাদা লাইনে আরও Topic লিখতে পারবে; প্রতিটি line আলাদা Study হবে।</div><textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
 02 Oct 2026 | বাংলা | সমাস
 03 Oct 2026 | English | Tense
 04 Oct 2026 | গণিত | শতকরা"></textarea>
@@ -169,19 +213,98 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 const START = new Date(2026,9,1);
 const END = new Date(2027,3,18);
 const DAYS = 200;
-const KEY = 'soikat_200d_plan_v1';
-let data = JSON.parse(localStorage.getItem(KEY) || '{"routine":{},"done":{},"weekly":{},"monthly":{}}');
+const KEY = 'soikat_200d_plan_v2';
+let data = JSON.parse(localStorage.getItem(KEY) || '{"routine":{},"done":{},"weekly":{},"monthly":{},"weeklyRevision":{},"monthlyRevision":{}}');
+data.routine ||= {};
+data.done ||= {};
+data.weekly ||= {};
+data.monthly ||= {};
+data.weeklyRevision ||= {};
+data.monthlyRevision ||= {};
+let trustedOffsetMs = Number(localStorage.getItem(KEY+'_trusted_offset_ms') || 0);
+let trustedAtMs = Number(localStorage.getItem(KEY+'_trusted_at_ms') || 0);
+let trustedSource = localStorage.getItem(KEY+'_trusted_source') || 'none';
 let selected = new Date();
 let calCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
 
-function iso(d){return d.toISOString().slice(0,10)}
+function pad(n){return String(n).padStart(2,'0')}
+function iso(d){
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
 function cloneDate(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function inPlan(d){return d>=START && d<=END}
 function fmt(d){return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function displayDate(isoDate){
+  const d=new Date(isoDate+'T00:00:00');
+  return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+}
 function dayIndex(d){return Math.floor((cloneDate(d)-START)/86400000)+1}
 function allDates(){let a=[];for(let d=cloneDate(START);d<=END;d.setDate(d.getDate()+1))a.push(cloneDate(d));return a}
 function entries(date){return data.routine[iso(date)]||[]}
+function dhakaDateFromInstant(ms){
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'
+  }).formatToParts(new Date(ms));
+  const get=t=>parts.find(p=>p.type===t)?.value;
+  return new Date(Number(get('year')),Number(get('month'))-1,Number(get('day')));
+}
+function trustedNowMs(){
+  // Best available clock:
+  // 1) freshly synced trusted internet time, corrected for local clock offset
+  // 2) previously synced offset, still usable offline
+  // 3) device clock as a last resort
+  return Date.now() + (Number.isFinite(trustedOffsetMs) ? trustedOffsetMs : 0);
+}
+function todayDhaka(){
+  return dhakaDateFromInstant(trustedNowMs());
+}
+function saveTrustedClock(serverMs, source){
+  trustedOffsetMs=serverMs-Date.now();
+  trustedAtMs=Date.now();
+  trustedSource=source;
+  localStorage.setItem(KEY+'_trusted_offset_ms', String(trustedOffsetMs));
+  localStorage.setItem(KEY+'_trusted_at_ms', String(trustedAtMs));
+  localStorage.setItem(KEY+'_trusted_source', source);
+}
+async function syncTrustedDate(manual=false){
+  const endpoints=[
+    ['timeapi.io','https://timeapi.io/api/Time/current/zone?timeZone=Asia%2FDhaka',
+      async r=>new Date((await r.json()).dateTime).getTime()],
+    ['WorldTimeAPI','https://worldtimeapi.org/api/timezone/Asia/Dhaka',
+      async r=>(await r.json()).unixtime*1000]
+  ];
+  for(const [name,url,parse] of endpoints){
+    try{
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(),5000);
+      const r=await fetch(url,{cache:'no-store',signal:controller.signal});
+      clearTimeout(timer);
+      if(!r.ok)continue;
+      const ms=await parse(r);
+      if(Number.isFinite(ms)){
+        saveTrustedClock(ms,name);
+        updateDateSyncStatus();
+        if(manual) render();
+        return true;
+      }
+    }catch(e){}
+  }
+  updateDateSyncStatus();
+  if(manual) render();
+  return false;
+}
+function updateDateSyncStatus(){
+  const el=document.getElementById('dateSyncStatus');
+  if(!el)return;
+  const age=trustedAtMs?Math.max(0,Date.now()-trustedAtMs):0;
+  if(trustedAtMs){
+    const days=Math.floor(age/86400000);
+    el.innerHTML='Date source: <strong>trusted sync cached</strong> · '+(days?days+'d ago':'recent')+' · works offline with saved offset';
+  }else{
+    el.textContent='Date source: device clock until first trusted sync';
+  }
+}
 
 function actualItems(date){
   const planned=entries(date).map((x,i)=>({...x,plannedDate:iso(date),sourceIndex:i,carry:false}));
@@ -217,102 +340,424 @@ function actualItems(date){
 function itemId(k,i){return k+'#'+i}
 
 function render(){
-  const now=new Date();
+  const now=todayDhaka();
   let current=inPlan(now)?cloneDate(now):selected;
   if(current<START) current=cloneDate(START);
   if(current>END) current=cloneDate(END);
   selected=current;
 
   const idx=dayIndex(current);
-  document.getElementById('dayNo').textContent=Math.max(1,Math.min(200,idx));
-  document.getElementById('daysLeft').textContent=Math.max(0,DAYS-Math.max(0,idx));
-  document.getElementById('bar').style.width=Math.min(100,Math.max(0,idx/DAYS*100))+'%';
+  const dayNo=Math.max(1,Math.min(DAYS,idx));
+  const daysLeft=Math.max(0,DAYS-dayNo);
+
+  document.getElementById('dayNo').textContent=dayNo;
+  document.getElementById('daysLeft').textContent=daysLeft;
+  document.getElementById('bar').style.width=Math.min(100,Math.max(0,dayNo/DAYS*100))+'%';
   document.getElementById('startText').textContent='01 Oct 2026';
   document.getElementById('endText').textContent='18 Apr 2027';
 
-  const all=allDates(), planned=all.flatMap(d=>entries(d).map((x,i)=>({x,d,i})));
-  const done=planned.filter(o=>data.done[itemId(iso(o.d),o.i)]).length;
-  const total=planned.length;
-  const pct=total?Math.round(done/total*100):0;
-  document.getElementById('studyDone').textContent=pct+'%';
-  document.getElementById('studyLeft').textContent=Math.max(0,total-done);
-  let carry=actualItems(current).filter(x=>x.carry && !data.done[itemId(x.plannedDate,x.sourceIndex)]).length;
-  document.getElementById('carryCount').textContent=carry;
+  // Study progress is FIXED against 200 plan days, as requested.
+  // A day counts as completed when every planned study for that day is checked.
+  const all=allDates();
+  const completedDays=all.filter(d=>{
+    const list=entries(d);
+    return list.length>0 && list.every((x,i)=>!!data.done[itemId(iso(d),i)]);
+  }).length;
+  const completedPct=Math.round(completedDays/DAYS*100);
+  const studyLeft=Math.max(0,DAYS-completedDays);
+  const studyLeftPct=Math.round(studyLeft/DAYS*100);
 
-  let title='GOOD', text='Routine অনুযায়ী পড়াশোনা ঠিকঠাক চলছে।';
-  const due=planned.filter(o=>o.d<=current).length;
-  const dueDone=planned.filter(o=>o.d<=current && data.done[itemId(iso(o.d),o.i)]).length;
-  const duePct=due?dueDone/due*100:100;
-  if(total===0){title='SET ROUTINE';text='আগে ২–৩ মাসের Daily Routine সেট করো, তারপর progress report নিজে থেকে কাজ করবে.'}
-  else if(carry>=5 || duePct<60){title='BEHIND';text='অনেকগুলো Study বাকি আছে। Carry-forward ও completion gap বেড়েছে।'}
-  else if(carry>0 || duePct<85){title='NEEDS ATTENTION';text='কিছু Study বাকি আছে। Routine অনুযায়ী catch up করার জায়গা আছে।'}
-  document.getElementById('reportTitle').textContent=title;
-  document.getElementById('reportText').textContent=text;
+  document.getElementById('studyDone').innerHTML=
+    completedDays+' <span class="metric-sub">('+completedPct+'%)</span>';
+  document.getElementById('studyLeft').innerHTML=
+    studyLeft+' <span class="metric-sub">('+studyLeftPct+'%)</span>';
+
+  // Carry Forward = ONLY unfinished studies from dates before the selected/current day.
+  // The current day's pending studies are intentionally NOT counted here.
+  const carryItems = getPreviousPendingStudies(current);
+  const carryCount = carryItems.length;
+  document.getElementById('carryCount').textContent=carryCount;
+
 
   document.getElementById('routineDate').textContent=fmt(current);
   document.getElementById('routineDay').textContent='DAY '+idx+' / 200';
   document.getElementById('selectedDateLabel').textContent=iso(current)===iso(now)?'TODAY':'SELECTED';
-  renderRoutine(current); renderWeekly(current); renderMonthly(current); renderCalendar(); renderMonths();
+
+  renderRoutine(current);
+  renderWeekly(current);
+  renderMonthly(current);
+  renderCalendar();
+  updateDateSyncStatus();
 }
-function renderRoutine(d){
-  const box=document.getElementById('routineList'), items=actualItems(d);
-  if(!items.length){box.innerHTML='<div class="empty">No study set for this day.</div>';return}
-  box.innerHTML=items.map((x)=>{
-    const id=itemId(x.plannedDate,x.sourceIndex), checked=!!data.done[id];
-    return `<label class="study-row">
-      <input class="check" type="checkbox" ${checked?'checked':''} onchange="toggleDone('${id}',this.checked)">
-      <div><div class="subject">${escapeHtml(x.subject||'Study')}</div><div class="topic">${escapeHtml(x.topic||'Untitled')}</div>${x.carry?'<div class="carry">↳ CARRY FORWARD</div>':''}</div>
-      <div class="status ${checked?'done':''}">${checked?'COMPLETED':'PENDING'}</div>
-    </label>`;
-  }).join('');
-}
-function toggleDone(id,v){data.done[id]=v;if(!v)delete data.done[id];save();render()}
-function renderWeekly(d){
-  const start=cloneDate(d); const day=(start.getDay()+6)%7; start.setDate(start.getDate()-day);
-  let items=[];
-  for(let i=0;i<7;i++){let x=cloneDate(start);x.setDate(x.getDate()+i);if(inPlan(x))items.push(...entries(x).map((e,j)=>({e,k:itemId(iso(x),j)})))}
-  document.getElementById('weekLabel').textContent=fmt(start).slice(0,6)+' WEEK';
-  const box=document.getElementById('weeklyList');
-  if(!items.length){box.innerHTML='<div class="empty">No studies in this week.</div>';return}
-  const done=items.filter(x=>data.done[x.k]).length;
-  box.innerHTML=`<div class="rev"><div class="rev-head"><span>${done}/${items.length} COMPLETED</span><span>${Math.round(done/items.length*100)}%</span></div><small>Weekly revision follows the studies planned in this week. Tick them after revision.</small></div>`;
-}
-function renderMonthly(d){
-  const key=d.getFullYear()+'-'+d.getMonth();
-  let items=[];
-  const last=new Date(d.getFullYear(),d.getMonth()+1,0);
-  for(let x=cloneDate(new Date(d.getFullYear(),d.getMonth(),1));x<=last;x.setDate(x.getDate()+1))
-    if(inPlan(x))items.push(...entries(x).map((e,j)=>({e,k:itemId(iso(x),j)})));
-  const done=items.filter(x=>data.done[x.k]).length;
-  document.getElementById('monthLabel').textContent=d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
-  document.getElementById('monthlyList').innerHTML=`<div class="rev"><div class="rev-head"><span>${done}/${items.length} COMPLETED</span><span>${items.length?Math.round(done/items.length*100):0}%</span></div><small>Monthly revision tracks the completed study set for this month.</small></div>`;
-}
-function renderCalendar(){
-  const box=document.getElementById('calendar'), y=calCursor.getFullYear(),m=calCursor.getMonth();
-  document.getElementById('calMonth').textContent=calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
-  let h=['MON','TUE','WED','THU','FRI','SAT','SUN'].map(x=>`<div class="cal-head">${x}</div>`).join('');
-  let first=new Date(y,m,1), offset=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
-  for(let i=0;i<offset;i++)h+='<div></div>';
-  for(let n=1;n<=days;n++){
-    const d=new Date(y,m,n), k=iso(d), list=entries(d), done=list.filter((x,i)=>data.done[itemId(k,i)]).length;
-    let cls=''; if(list.length&&done===list.length)cls='done'; else if(done>0)cls='partial'; else if(list.length&&d<new Date()&&done<list.length)cls='missed';
-    if(iso(d)===iso(new Date()))cls+=' today';
-    h+=`<div class="cal-day ${cls}" onclick="selectDate('${k}')"><div class="n">${n}</div><div class="mini">${list.length?done+'/'+list.length:'—'}</div></div>`;
+
+function getPreviousPendingStudies(current){
+  const pending=[];
+  for(let d=cloneDate(START); d<current; d.setDate(d.getDate()+1)){
+    const k=iso(d);
+    const list=entries(d);
+    list.forEach((item,i)=>{
+      if(!data.done[itemId(k,i)]){
+        pending.push({
+          ...item,
+          plannedDate:k,
+          sourceIndex:i,
+          carry:true
+        });
+      }
+    });
   }
-  box.innerHTML=h;
+  return pending;
 }
-function selectDate(k){selected=new Date(k+'T00:00:00');calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);document.getElementById('dateInput').value=k;render()}
-function changeMonth(n){calCursor.setMonth(calCursor.getMonth()+n);renderCalendar()}
-function renderMonths(){
-  const box=document.getElementById('monthList'), arr=[];
-  let d=cloneDate(START);
-  while(d<=END){arr.push(new Date(d.getFullYear(),d.getMonth(),1));d.setMonth(d.getMonth()+1)}
-  document.getElementById('setupMonth').textContent=calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
-  box.innerHTML=arr.map(m=>{
-    const active=m.getFullYear()===calCursor.getFullYear()&&m.getMonth()===calCursor.getMonth();
-    return `<div class="month-item ${active?'active':''}" onclick="calCursor=new Date(${m.getFullYear()},${m.getMonth()},1);renderCalendar();renderMonths()"><b>${m.toLocaleDateString('en-US',{month:'long'})}</b><span>${m.getFullYear()}</span></div>`;
+
+function renderRoutine(d){
+  const box=document.getElementById('routineList');
+  const k=iso(d);
+  const list=entries(d);
+
+  if(!list.length){
+    box.innerHTML='<div class="empty">এই দিনে কোনো Study নেই।</div>';
+    return;
+  }
+
+  box.innerHTML=list.map((x,i)=>{
+    const id=itemId(k,i);
+    const checked=!!data.done[id];
+
+    return `<div class="routine-item">
+      <label class="routine-check">
+        <input type="checkbox" ${checked?'checked':''}
+          onchange="toggleDone('${id}',this.checked)">
+        <span>
+          <span class="subject">${escapeHtml(x.subject||'Study')}</span>
+          <span class="topic">${escapeHtml(x.topic||'Untitled')}</span>
+        </span>
+      </label>
+      <button class="delete-routine" onclick="deleteRoutineItem('${k}',${i})">DELETE</button>
+    </div>`;
   }).join('');
 }
+
+function deleteRoutineItem(dateKey,index){
+  const list=data.routine[dateKey]||[];
+  if(index<0 || index>=list.length) return;
+
+  const item=list[index];
+  if(!confirm(`Delete this study?\n\n${item.subject||'Study'} — ${item.topic||'Untitled'}`)) return;
+
+  const rebuild=(source)=>{
+    const out={};
+    const prefix=dateKey+'__';
+    Object.keys(source||{}).forEach(id=>{
+      if(!id.startsWith(prefix)){
+        out[id]=source[id];
+        return;
+      }
+      const oldIndex=Number(id.slice(prefix.length));
+      if(Number.isNaN(oldIndex) || oldIndex<index) out[id]=source[id];
+      else if(oldIndex>index) out[itemId(dateKey,oldIndex-1)]=source[id];
+    });
+    return out;
+  };
+
+  data.done=rebuild(data.done);
+  data.weeklyRevision=rebuild(data.weeklyRevision);
+  data.monthlyRevision=rebuild(data.monthlyRevision);
+
+  list.splice(index,1);
+  if(list.length) data.routine[dateKey]=list;
+  else delete data.routine[dateKey];
+
+  save();
+  render();
+}
+
+function renderWeekly(d){
+  // Weekly cycle: Saturday -> Friday. Friday is the revision day.
+  const start=cloneDate(d);
+  const day=start.getDay();
+  const daysFromSaturday=(day+1)%7;
+  start.setDate(start.getDate()-daysFromSaturday);
+
+  const end=cloneDate(start);
+  end.setDate(end.getDate()+6);
+
+  const items=getStudiesInRange(start,end);
+  const box=document.getElementById('weeklyList');
+
+  document.getElementById('weekLabel').textContent=
+    fmt(start).slice(0,6)+' → '+fmt(end).slice(0,6);
+
+  if(!items.length){
+    box.innerHTML='<div class="empty">এই সপ্তাহে কোনো Study নেই।</div>';
+    return;
+  }
+
+  // HEADER COUNT = ONLY the revision checkboxes in THIS LIST.
+  // Checked = DONE, unchecked = PENDING.
+  const completedCount=items.reduce((n,x)=>n+(data.weeklyRevision[x.studyId]===true?1:0),0);
+  const pendingCount=items.length-completedCount;
+
+  // Revision checkbox is ONLY for marking the topic as revised.
+  const pendingRoutine=items.filter(x=>!x.completed);
+  const completedRoutine=items.filter(x=>x.completed);
+
+  box.innerHTML=`
+    <div class="rev">
+      <div class="rev-head">
+        <span>${pendingCount} PENDING</span>
+        <span>${completedCount}/${items.length} DONE</span>
+      </div>
+      <small>Saturday → Friday · Friday = revision day · checkbox = revision done</small>
+    </div>
+
+    ${pendingRoutine.length ? `
+      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
+      <div class="revision-list">
+        ${pendingRoutine.map(x=>{
+          const revised=!!data.weeklyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('weeklyRevision','${x.studyId}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+
+    ${completedRoutine.length ? `
+      <div class="revision-group-title">COMPLETED — REVISION</div>
+      <div class="revision-list">
+        ${completedRoutine.map(x=>{
+          const revised=!!data.weeklyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('weeklyRevision','${x.studyId}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+  `;
+}
+
+function toggleRevision(type,id,value){
+  if(type!=='weeklyRevision' && type!=='monthlyRevision') return;
+
+  data[type] ||= {};
+
+  if(value===true){
+    data[type][id]=true;
+  }else{
+    delete data[type][id];
+  }
+
+  save();
+  render();
+}
+
+function renderMonthly(d){
+  const start=new Date(d.getFullYear(),d.getMonth(),1);
+  const end=new Date(d.getFullYear(),d.getMonth()+1,0);
+  const items=getStudiesInRange(start,end);
+
+  document.getElementById('monthLabel').textContent=
+    d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+
+  const box=document.getElementById('monthlyList');
+
+  if(!items.length){
+    box.innerHTML='<div class="empty">এই মাসে কোনো Study নেই।</div>';
+    return;
+  }
+
+  // HEADER COUNT = ONLY the revision checkboxes in THIS LIST.
+  // Checked = DONE, unchecked = PENDING.
+  const completedCount=items.reduce((n,x)=>n+(data.monthlyRevision[x.studyId]===true?1:0),0);
+  const pendingCount=items.length-completedCount;
+
+  const pendingRoutine=items.filter(x=>!x.completed);
+  const completedRoutine=items.filter(x=>x.completed);
+
+  box.innerHTML=`
+    <div class="rev">
+      <div class="rev-head">
+        <span>${pendingCount} PENDING</span>
+        <span>${completedCount}/${items.length} DONE</span>
+      </div>
+      <small>Checkbox = revision done</small>
+    </div>
+
+    ${pendingRoutine.length ? `
+      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
+      <div class="revision-list">
+        ${pendingRoutine.map(x=>{
+          const revised=!!data.monthlyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('monthlyRevision','${x.studyId}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+
+    ${completedRoutine.length ? `
+      <div class="revision-group-title">COMPLETED — REVISION</div>
+      <div class="revision-list">
+        ${completedRoutine.map(x=>{
+          const revised=!!data.monthlyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('monthlyRevision','${x.studyId}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+  `;
+}
+
+function calendarStatus(d){
+  const k=iso(d);
+  const list=entries(d);
+  const total=list.length;
+  const done=list.filter((x,i)=>data.done[itemId(k,i)]===true).length;
+  const todayKey=iso(todayDhaka());
+  const isToday=k===todayKey;
+
+  if(!inPlan(d)) return {type:'outside',done,total,isToday};
+  if(isToday){
+    if(total===0) return {type:'empty',done,total,isToday:true};
+    if(done===total) return {type:'done',done,total,isToday:true};
+    if(done>0) return {type:'partial',done,total,isToday:true};
+    return {type:'pending',done,total,isToday:true};
+  }
+
+  if(k<todayKey && total>0 && done<total){
+    return {type:'missed',done,total,isToday:false};
+  }
+
+  if(total===0) return {type:'empty',done,total,isToday:false};
+  if(done===total) return {type:'done',done,total,isToday:false};
+  if(done>0) return {type:'partial',done,total,isToday:false};
+  return {type:'pending',done,total,isToday:false};
+}
+
+function renderCalendar(){
+  const box=document.getElementById('calendar');
+  const y=calCursor.getFullYear(),m=calCursor.getMonth();
+  document.getElementById('calMonth').textContent=
+    calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
+
+  let h=['MON','TUE','WED','THU','FRI','SAT','SUN']
+    .map(x=>`<div class="cal-head">${x}</div>`).join('');
+
+  const first=new Date(y,m,1);
+  const offset=(first.getDay()+6)%7;
+  const days=new Date(y,m+1,0).getDate();
+
+  for(let i=0;i<offset;i++)h+='<div></div>';
+
+  for(let n=1;n<=days;n++){
+    const d=new Date(y,m,n), k=iso(d);
+    const st=calendarStatus(d);
+
+    let cls='cal-day '+st.type;
+    if(st.isToday) cls+=' today';
+
+    const label={
+      done:'ALL DONE',
+      partial:'PARTIAL',
+      missed:'MISSED',
+      pending:'PENDING',
+      empty:'NO STUDY',
+      outside:''
+    }[st.type];
+
+    const mini=st.total ? `${st.done}/${st.total}` : '—';
+    const statusText=st.total ? label : '';
+
+    h+=`<div class="${cls}" ${st.type!=='outside'?`onclick="selectDate('${k}')"`:''} title="${statusText}">
+      <div class="n">${n}</div>
+      <div class="mini">${mini}</div>
+      ${st.total?`<div class="cal-status">${label}</div>`:''}
+    </div>`;
+  }
+
+  box.innerHTML=h;
+  renderSelectedDay();
+}
+
+function renderSelectedDay(){
+  const box=document.getElementById('selectedDayInfo');
+  if(!box)return;
+  const d=selected;
+  const list=actualItems(d);
+  const planned=entries(d);
+  const done=planned.filter((x,i)=>data.done[itemId(iso(d),i)]).length;
+  const status=planned.length ? (done===planned.length ? 'ALL DONE' : done ? 'PARTIAL' : 'PENDING') : 'NO ROUTINE';
+
+  let html=`<div class="sd-head"><span>${fmt(d)}</span><span>${status}</span></div>
+    <div class="sd-meta">DAY ${dayIndex(d)} / 200 · ${done}/${planned.length} completed · ${displayDate(iso(d))}</div>`;
+
+  if(!list.length){
+    html+='<div class="sd-meta">এই দিনে কোনো Study set করা নেই।</div>';
+  }else{
+    html+='<div class="sd-list">'+list.map(x=>{
+      const id=itemId(x.plannedDate,x.sourceIndex);
+      const checked=!!data.done[id];
+      return `<div class="sd-item">
+        <div>
+          <div>${escapeHtml(x.subject||'Study')} — ${escapeHtml(x.topic||'Untitled')}${x.carry?' <em>↳ CARRY</em>':''}</div>
+          <div class="revision-date">${checked?'COMPLETED':'PENDING'}</div>
+        </div>
+        <button class="sd-toggle ${checked?'checked':''}" onclick="toggleDoneFromCalendar('${id}')">
+          ${checked?'✓ COMPLETED':'MARK DONE'}
+        </button>
+      </div>`;
+    }).join('')+'</div>';
+  }
+
+  box.innerHTML=html;
+}
+
+function toggleDoneFromCalendar(id){
+  if(data.done[id]) delete data.done[id];
+  else data.done[id]=true;
+  save();
+  render();
+}
+
+function selectDate(k){
+  const d=new Date(k+'T00:00:00');
+  if(!inPlan(d))return;
+  selected=d;
+  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+  document.getElementById('dateInput').value=k;
+  render();
+}
+
+function changeMonth(n){
+  calCursor.setMonth(calCursor.getMonth()+n);
+  renderCalendar();
+}
+
 function addOne(){
   const date=document.getElementById('dateInput').value, subject=document.getElementById('subjectInput').value.trim(), topic=document.getElementById('topicInput').value.trim();
   if(!date||!subject||!topic)return alert('Date, Subject and Topic — তিনটাই দিতে হবে।');
@@ -322,19 +767,80 @@ function addOne(){
 }
 function openBulk(){document.getElementById('bulkModal').classList.add('open')}
 function closeBulk(){document.getElementById('bulkModal').classList.remove('open')}
-function importBulk(){
-  const lines=document.getElementById('bulkInput').value.split(/\n/).map(x=>x.trim()).filter(Boolean);let added=0,bad=0;
-  lines.forEach(line=>{
-    const p=line.split('|').map(x=>x.trim()); if(p.length<3){bad++;return}
-    const d=new Date(p[0]); if(isNaN(d)||!inPlan(d)){bad++;return}
-    const k=iso(d);data.routine[k]??=[];data.routine[k].push({subject:p[1],topic:p.slice(2).join(' | ')});added++;
-  });
-  save();closeBulk();render();alert(added+' study added.'+(bad?' '+bad+' line skipped.':''));
+function parsePlanDate(s){
+  const raw=String(s).trim();
+  const m=raw.match(/^(\\d{1,2})\\s+([A-Za-z]{3,9})\\s+(\\d{4})$/);
+  if(!m)return new Date(raw);
+  const months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const mi=months.indexOf(m[2].slice(0,3).toLowerCase());
+  if(mi<0)return null;
+  return new Date(Number(m[3]),mi,Number(m[1]));
 }
-function resetAll(){if(confirm('200D Plan-এর সব routine এবং progress মুছে ফেলবে?')){data={routine:{},done:{},weekly:{},monthly:{}};save();render()}}
+function parseRoutineBulk(raw){
+  const lines=String(raw||'').split(/\r?\n/);
+  const result=[];
+  let current=null;
+
+  for(const rawLine of lines){
+    const line=rawLine.trim();
+    if(!line) continue;
+
+    const parts=line.split('|').map(x=>x.trim());
+    const parsedDate=parts.length>=3 ? parsePlanDate(parts[0]) : null;
+
+    // A line containing Date | Subject | starts a NEW study.
+    if(parts.length>=3 && parsedDate && inPlan(parsedDate)){
+      if(current) result.push(current);
+
+      current={
+        date:iso(parsedDate),
+        subject:parts[1]||'Study',
+        topic:parts.slice(2).join(' | ').trim()
+      };
+      continue;
+    }
+
+    // Following lines belong to the SAME topic.
+    // Preserve line breaks inside the topic.
+    if(current){
+      current.topic += (current.topic ? '\\n' : '') + line;
+    }
+  }
+
+  if(current) result.push(current);
+  return result;
+}
+
+function importBulk(){
+  const rows=parseRoutineBulk(document.getElementById('bulkInput').value);
+  if(!rows.length){
+    alert('কোনো valid routine পাওয়া যায়নি। Format: 01 Oct 2026 | Bangla | Topic');
+    return;
+  }
+
+  rows.forEach(row=>{
+    data.routine[row.date] ||= [];
+    data.routine[row.date].push({
+      subject:row.subject,
+      topic:row.topic
+    });
+  });
+
+  save();
+  closeBulk();
+  render();
+  alert(rows.length+'টি Study routine-এ যোগ হয়েছে।');
+}
+
+function resetAll(){if(confirm('200D Plan-এর সব routine এবং progress মুছে ফেলবে?')){data={routine:{},done:{},weekly:{},monthly:{},weeklyRevision:{},monthlyRevision:{}};save();render()}}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-document.getElementById('dateInput').value=iso(inPlan(new Date())?new Date():START);
+const bootDate=todayDhaka();
+selected=cloneDate(inPlan(bootDate)?bootDate:START);
+calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+document.getElementById('dateInput').value=iso(selected);
 render();
+syncTrustedDate(false);
+setInterval(()=>{ syncTrustedDate(false); render(); }, 15*60*1000);
 </script>
 </body>
 </html>
