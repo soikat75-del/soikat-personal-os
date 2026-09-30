@@ -87,7 +87,22 @@
   }
 
   function stable(v){
-    try{return JSON.stringify(v, Object.keys(v||{}).sort());}catch(e){return String(v);}
+    try{
+      const normalize=(value)=>{
+        if(Array.isArray(value)) return value.map(normalize);
+        if(value && typeof value==='object'){
+          const out={};
+          Object.keys(value).sort().forEach(k=>{
+            out[k]=normalize(value[k]);
+          });
+          return out;
+        }
+        return value;
+      };
+      return JSON.stringify(normalize(v));
+    }catch(e){
+      return String(v);
+    }
   }
 
   function readLocal(key){
@@ -575,7 +590,7 @@
   }
 
   window.SoikatCloud={
-    version:'1.1.0',
+    version:'1.1.1',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
