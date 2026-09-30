@@ -226,18 +226,6 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
     padding-right:4px;
   }
 
-  .routine-complete{
-    min-height:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    color:var(--green);
-    font-size:14px;
-    font-weight:800;
-    padding:20px;
-  }
-
   .calendar-card .calendar{
     flex:1;
     min-height:0;
@@ -283,6 +271,29 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
   .header-brand{font-size:10px}
   .header-range{font-size:8px}
 }
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:28px;
+  transform:translateX(-50%);
+  z-index:9999;
+  padding:9px 14px;
+  border-radius:8px;
+  background:#f5f7fa;
+  color:#111827;
+  font-size:12px;
+  font-weight:600;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease, transform .18s ease;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(-2px);
+}
+
 </style>
 </head>
 <body>
@@ -347,7 +358,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 
 
 
-<footer>Built with ❤️ by Soikat</footer>
+<footer>Built with love by Soikat</footer>
 </div>
 
 <div class="modal" id="bulkModal">
@@ -697,34 +708,17 @@ function renderRoutine(d){
     return;
   }
 
-  // Completed studies disappear from the Routine view.
-  // They remain safely stored in data.done and continue to
-  // participate in Calendar / Weekly / Monthly calculations.
-  const pending=list
-    .map((x,i)=>({x,i}))
-    .filter(({x,i})=>data.done[studyId(x,k,i)]!==true);
-
-  if(!pending.length){
-    const todayKey=iso(todayDhaka());
-    const message=
-      k===todayKey
-        ? 'আজকের Study সম্পন্ন হয়েছে ✓'
-        : 'এই দিনের Study সম্পন্ন হয়েছে ✓';
-
-    box.innerHTML=`<div class="routine-complete">${message}</div>`;
-    return;
-  }
-
-  box.innerHTML=pending.map(({x,i})=>{
+  box.innerHTML=list.map((x,i)=>{
     const id=studyId(x,k,i);
+    const checked=data.done[id]===true;
 
     return `<div class="routine-item" data-study-id="${escapeAttr(id)}" data-date="${escapeAttr(k)}">
 
       <button
         type="button"
-        class="routine-action check-action"
-        title="Complete"
-        aria-label="Complete"
+        class="routine-action check-action ${checked?'done':''}"
+        title="${checked?'Undo':'Complete'}"
+        aria-label="${checked?'Undo':'Complete'}"
         onclick="toggleRoutineById(this)"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1146,6 +1140,23 @@ function parseRoutineBulk(raw){
   return result;
 }
 
+
+function showToast(message){
+  let toast=document.getElementById('soikatToast');
+  if(!toast){
+    toast=document.createElement('div');
+    toast.id='soikatToast';
+    toast.className='toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent=message;
+  toast.classList.add('show');
+  clearTimeout(window.__soikatToastTimer);
+  window.__soikatToastTimer=setTimeout(()=>{
+    toast.classList.remove('show');
+  },1800);
+}
+
 function importBulk(){
   const input=document.getElementById('bulkInput');
   const rows=parseRoutineBulk(input.value);
@@ -1170,7 +1181,7 @@ function importBulk(){
   input.value='';
   render();
 
-  alert(rows.length+'টি Study routine-এ যোগ হয়েছে।');
+  showToast('Routine Inserted');
 }
 
 function escapeHtml(s){
@@ -1207,21 +1218,6 @@ function escapeAttr(s){
   return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
-// Cloud realtime bridge for 200D PLAN.
-// cloud.js writes the incoming cloud state to the existing localStorage key,
-// then emits this event. Re-read that same key into the page's in-memory
-// `data` object so the original UI can render the new state without a reload.
-window.addEventListener('soikat-200d-cloud-updated',()=>{
-  try{
-    const fresh=loadDataSafely();
-    data=fresh && typeof fresh==='object' ? fresh : {};
-    render();
-    console.log('[Soikat 200D] CLOUD DATA APPLIED TO PAGE');
-  }catch(e){
-    console.error('[Soikat 200D] cloud refresh failed',e);
-  }
-});
-
 // Initial state.
 const bootDate=todayDhaka();
 selected=cloneDate(inPlan(bootDate)?bootDate:START);
@@ -1238,6 +1234,5 @@ setInterval(()=>{
   render();
 },15*60*1000);
 </script>
-  <script src="cloud.js?v=5"></script>
 </body>
 </html>
