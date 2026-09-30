@@ -434,39 +434,47 @@
     }
 
     const userId=state.session.user.id;
+    const topic='soikat-cloud:'+userId;
     console.log('[Soikat Realtime] USER ID:',userId);
+    console.log('[Soikat Realtime] TOPIC:',topic);
 
-    // Use database Broadcast instead of postgres_changes.
-    // The database trigger sends cloud_sync messages to this user's private topic.
-    state.channel=state.client
-      .channel('soikat-cloud:'+userId,{config:{private:true}})
-      .on('broadcast',{event:'cloud_sync'},message=>{
-        console.log('[Soikat Realtime] BROADCAST EVENT',message);
+    const channel=state.client.channel(topic,{config:{private:true}});
 
-        const row=message?.payload;
-        if(!row||row.user_id!==userId)return;
-        if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app))return;
-        if(!meaningful(row.data))return;
+    const handleBroadcast=(message)=>{
+      console.log('[Soikat Realtime] BROADCAST EVENT',message);
 
-        const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
-        if(!key)return;
+      const p=message?.payload||{};
+      // realtime.broadcast_changes() puts the changed row in payload.record.
+      const row=p.record || p.new || p;
+      if(!row||row.user_id!==userId)return;
+      if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app))return;
+      if(!meaningful(row.data))return;
 
-        const incoming=stable(row.data);
-        if(state.lastCloudWrite[row.app]===incoming)return;
+      const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
+      if(!key)return;
 
-        state.lastCloudWrite[row.app]=incoming;
-        writeLocal(key,row.data);
-        window.dispatchEvent(new CustomEvent('soikat-cloud-updated',{
-          detail:{app:row.app,key}
-        }));
-        refreshPageFromCloud(row.app);
-      })
+      const incoming=stable(row.data);
+      if(state.lastCloudWrite[row.app]===incoming)return;
+
+      state.lastCloudWrite[row.app]=incoming;
+      writeLocal(key,row.data);
+      window.dispatchEvent(new CustomEvent('soikat-cloud-updated',{
+        detail:{app:row.app,key}
+      }));
+      refreshPageFromCloud(row.app);
+    };
+
+    channel
+      .on('broadcast',{event:'INSERT'},handleBroadcast)
+      .on('broadcast',{event:'UPDATE'},handleBroadcast)
       .subscribe((status,err)=>{
         console.log('[Soikat Realtime]',status,err||'');
         if(status==='SUBSCRIBED')setStatus('Realtime on','online');
         else if(status==='CHANNEL_ERROR')setStatus('Realtime error','error');
         else if(status==='TIMED_OUT')setStatus('Realtime timeout','error');
       });
+
+    state.channel=channel;
   }
 
   async function boot(){
@@ -507,7 +515,7 @@
   }
 
   window.SoikatCloud={
-    version:'1.1.0',
+    version:'1.0.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
