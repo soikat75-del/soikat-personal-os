@@ -130,6 +130,102 @@ footer{text-align:center;color:#56657a;font-size:11px;padding:40px 0 24px}
   .day .day-income{font-size:8px}
 }
 
+
+/* ===== COMPACT UI FINISH ===== */
+.topbar{height:58px}
+.title{padding:20px 0 14px}
+.kicker{margin-bottom:5px}
+h1{font-size:29px}
+.period{margin-top:4px;font-size:12px}
+.goal{padding:18px;border-radius:13px}
+.amount{font-size:34px}
+.bar{height:8px;margin-top:14px}
+.goal-bottom{margin-top:7px;font-size:11px}
+.main-grid{gap:10px;margin-top:10px}
+.panel{padding:15px;border-radius:12px}
+.panel-head{margin-bottom:12px}
+.panel-title{font-size:15px}
+.calendar-panel{padding:16px}
+.calendar-head{margin-bottom:10px}
+.month-title{font-size:15px}
+.calendar-grid{gap:4px}
+.weekdays,.calendar-grid{gap:4px}
+.weekdays div{padding-bottom:4px;font-size:9px}
+.day{min-height:43px;border-radius:7px;font-size:11px}
+.day .day-income{bottom:4px;font-size:8px}
+.calendar-legend{gap:9px;margin-top:8px;font-size:9px}
+.overview{margin-top:10px}
+.overview-top{margin-bottom:10px}
+.pace-number{font-size:29px}
+.pace-bar{height:8px;margin:7px 0 5px}
+.metric-grid{gap:6px}
+.metric{padding:9px}
+.metric strong{margin-top:4px;font-size:13px}
+.report{margin-top:8px;padding:9px 11px}
+.entry-layout{gap:6px}
+.mini{padding:8px}
+input{padding:10px;margin-bottom:10px}
+button{padding:10px}
+.recent-panel{margin-top:10px}
+td{padding:9px 7px}
+footer{padding:24px 0 16px}
+.calendar-month-link{margin-left:7px;font-size:9px}
+.monthly-report-btn{
+  width:auto;
+  padding:5px 8px;
+  margin-left:7px;
+  background:transparent;
+  border:1px solid #29425e;
+  color:#8eb6df;
+  font-size:9px;
+  font-weight:600;
+  border-radius:7px;
+}
+.monthly-report-btn:hover{background:#102238;color:#fff;filter:none}
+
+/* Monthly report modal */
+.report-modal{
+  position:fixed;inset:0;z-index:10000;
+  display:none;align-items:center;justify-content:center;
+  padding:18px;background:rgba(0,0,0,.68);
+}
+.report-modal.open{display:flex}
+.report-box{
+  width:min(620px,100%);max-height:86vh;overflow:auto;
+  background:#0d1927;border:1px solid #29425e;border-radius:13px;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);padding:16px;
+}
+.report-box-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-bottom:12px;
+}
+.report-box-title{font-size:16px;font-weight:700}
+.report-close{
+  width:30px;height:30px;padding:0;background:#0a1521;
+  border:1px solid #26384e;color:#aebbd0;font-size:17px;
+}
+.report-summary{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;
+}
+.report-stat{
+  background:#09131e;border:1px solid #1c2b3e;border-radius:8px;padding:8px;
+}
+.report-stat span{display:block;color:#74859b;font-size:9px}
+.report-stat strong{display:block;margin-top:4px;font-size:13px}
+.report-list{border-top:1px solid #1c2b3e}
+.report-row{
+  display:grid;grid-template-columns:85px 1fr 80px;
+  gap:8px;align-items:center;padding:8px 0;
+  border-bottom:1px solid #182638;font-size:11px;
+}
+.report-row .r-date{color:#8191a7}
+.report-row .r-net{color:var(--green);font-weight:700;text-align:right}
+.report-note{color:#8191a7;font-size:10px;margin-top:9px}
+@media(max-width:600px){
+  .report-summary{grid-template-columns:repeat(2,1fr)}
+  .report-row{grid-template-columns:72px 1fr 70px}
+}
+
 </style>
 
 
@@ -146,7 +242,7 @@ footer{text-align:center;color:#56657a;font-size:11px;padding:40px 0 24px}
 <section class="title">
  <div>
   <div class="kicker">Personal Target</div>
-  <h1>৳1,00,000</h1>
+  <h1>100K GOAL</h1>
   <div class="period">457 day target period · Fixed daily target ৳220</div>
  </div>
  <div class="pill">৳220 / DAY</div>
@@ -166,7 +262,7 @@ footer{text-align:center;color:#56657a;font-size:11px;padding:40px 0 24px}
  <div>
   <div class="panel calendar-panel">
    <div class="calendar-head">
-    <div><span class="month-title" id="calendarTitle">October 2026</span><a class="calendar-month-link" href="monthly-report.html">Monthly Report →</a></div>
+    <div><span class="month-title" id="calendarTitle">October 2026</span><button class="monthly-report-btn" id="monthlyReportBtn" type="button">Monthly Report →</button></div>
     <div class="calendar-nav">
      <button class="nav-btn" id="prevMonth">‹</button>
      <button class="nav-btn" id="nextMonth">›</button>
@@ -252,6 +348,24 @@ footer{text-align:center;color:#56657a;font-size:11px;padding:40px 0 24px}
 </section>
 
 <footer>Built with ❤️ by Soikat</footer>
+</div>
+
+
+<div class="report-modal" id="reportModal">
+  <div class="report-box">
+    <div class="report-box-head">
+      <div class="report-box-title" id="reportTitle">Monthly Report</div>
+      <button class="report-close" type="button" onclick="closeMonthlyReport()">×</button>
+    </div>
+    <div class="report-summary">
+      <div class="report-stat"><span>MONTHLY TARGET</span><strong id="reportTarget">৳0</strong></div>
+      <div class="report-stat"><span>ACTUAL</span><strong id="reportActual">৳0</strong></div>
+      <div class="report-stat"><span>ACHIEVEMENT</span><strong id="reportAchievement">0%</strong></div>
+      <div class="report-stat"><span>AVERAGE / DAY</span><strong id="reportAverage">৳0</strong></div>
+    </div>
+    <div class="report-list" id="reportList"></div>
+    <div class="report-note" id="reportNote"></div>
+  </div>
 </div>
 
 <div class="day-tooltip" id="dayTooltip"></div>
@@ -422,6 +536,61 @@ function moveDayTooltip(event){
 function hideDayTooltip(){
   document.getElementById("dayTooltip").classList.remove("show");
 }
+
+
+function openMonthlyReport(){
+  const {start,end,days}=monthRange(calendarDate);
+  const e=getEntries();
+  const rows=Object.entries(e)
+    .map(([date,value])=>({date,value:Number(value||0),d:parseDate(date)}))
+    .filter(x=>x.d>=start && x.d<=end)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+
+  const total=rows.reduce((s,x)=>s+x.value,0);
+  const target=days*DAILY_TARGET;
+  const achievement=target?total/target*100:0;
+  const average=rows.length?total/rows.length:0;
+
+  document.getElementById("reportTitle").textContent=
+    `Monthly Report · ${start.toLocaleDateString("en-US",{month:"long",year:"numeric"})}`;
+  document.getElementById("reportTarget").textContent=money(target);
+  document.getElementById("reportActual").textContent=money(total);
+  document.getElementById("reportAchievement").textContent=percent(achievement);
+  document.getElementById("reportAverage").textContent=money(average);
+
+  const list=document.getElementById("reportList");
+  if(!rows.length){
+    list.innerHTML=`<div style="padding:18px 0;text-align:center;color:#596a7f;font-size:11px">No entries for this month.</div>`;
+  }else{
+    list.innerHTML=rows.map(x=>{
+      const diff=x.value-DAILY_TARGET;
+      const ach=x.value/DAILY_TARGET*100;
+      const status=ach>=100?"GOOD":ach>=80?"PARTIAL":"BELOW";
+      const cls=ach>=100?"positive":ach>=80?"":"negative";
+      return `<div class="report-row">
+        <span class="r-date">${x.d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</span>
+        <span>${status}</span>
+        <span class="r-net ${cls}">${money(x.value)}</span>
+      </div>`;
+    }).join("");
+  }
+
+  const daysWithEntry=rows.length;
+  const positiveDays=rows.filter(x=>x.value>=DAILY_TARGET).length;
+  document.getElementById("reportNote").textContent=
+    `${daysWithEntry} day${daysWithEntry===1?"":"s"} with entries · ${positiveDays} day${positiveDays===1?"":"s"} met the ৳${DAILY_TARGET} daily target.`;
+
+  document.getElementById("reportModal").classList.add("open");
+}
+
+function closeMonthlyReport(){
+  document.getElementById("reportModal").classList.remove("open");
+}
+
+document.getElementById("monthlyReportBtn").addEventListener("click",openMonthlyReport);
+document.getElementById("reportModal").addEventListener("click",e=>{
+  if(e.target.id==="reportModal") closeMonthlyReport();
+});
 
 function selectCalendarDate(key){document.getElementById("entryDate").value=key;calendarDate=parseDate(key);render()}
 function addEntry(){
