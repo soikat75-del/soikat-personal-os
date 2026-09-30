@@ -14,8 +14,14 @@
 
   // Add future apps here. Their existing localStorage keys do not need to change.
   const APPS = {
-    'soikat_1l_goal_entries_v4': '100k_goal',
+    'soikat_1l_goal_entries_v4': 'soikat_100k_goal',
     'soikat_200d_plan_v2': '200d_plan'
+  };
+
+  // One-time cleanup for the earlier 100K cloud app id. The old row is
+  // merged into the canonical soikat_100k_goal row before it is removed.
+  const LEGACY_APPS = {
+    'soikat_100k_goal': ['100k_goal']
   };
 
   const state = {
@@ -268,32 +274,104 @@
       data:payload,
       updated_at:stamp
     },{onConflict:'user_id,app'});
-    if(!error)state.lastCloudWrite[app]=stable(payload);
-    return !error;
+    if(error){
+      console.error('[Soikat Cloud] write failed',app,error);
+      return false;
+    }
+    state.lastCloudWrite[app]=stable(payload);
+    return true;
+  }
+
+  async function migrateLegacyRows(app,canonicalData){
+    const legacyNames=LEGACY_APPS[app]||[];
+    if(!legacyNames.length || !state.session) return canonicalData;
+
+    let merged=clone(canonicalData);
+    for(const legacyApp of legacyNames){
+      const result=await state.client.from(TABLE)
+        .select('user_id,app,data,updated_at')
+        .eq('user_id',state.session.user.id)
+        .eq('app',legacyApp)
+        .maybeSingle();
+
+      if(result.error){
+        console.warn('[Soikat Cloud] legacy lookup failed',legacyApp,result.error);
+        continue;
+      }
+
+      if(!result.data) continue;
+      const legacyData=result.data.data;
+      if(meaningful(legacyData)){
+        merged=mergeData(legacyData,merged); // canonical values win conflicts
+      }
+
+      // Remove the legacy row only after the canonical row has been safely
+      // written below by the caller. Deletion itself is intentionally done
+      // there, after successful upsert.
+    }
+    return merged;
+  }
+
+  async function deleteLegacyRows(app){
+    const legacyNames=LEGACY_APPS[app]||[];
+    if(!legacyNames.length || !state.session) return;
+    for(const legacyApp of legacyNames){
+      const {error}=await state.client.from(TABLE)
+        .delete()
+        .eq('user_id',state.session.user.id)
+        .eq('app',legacyApp);
+      if(error) console.warn('[Soikat Cloud] legacy delete failed',legacyApp,error);
+    }
   }
 
   async function syncApp(key,app){
     if(!state.session||!state.client)return;
     const local=readLocal(key);
     const result=await fetchCloud(key,app);
-    if(result.error){console.warn('[Soikat Cloud]',app,result.error);return;}
-    const cloud=result.row?.data;
+    if(result.error){
+      console.error('[Soikat Cloud] read failed',app,result.error);
+      setStatus('Cloud error','error');
+      return;
+    }
+
+    let cloud=result.row?.data;
+
+    // Migrate the earlier duplicate 100K app id into the canonical row.
+    if(app==='soikat_100k_goal'){
+      cloud=await migrateLegacyRows(app,cloud);
+    }
 
     if(meaningful(cloud)){
       const merged=mergeData(local,cloud);
       writeLocal(key,merged);
-      // If local had useful data too, merge it into cloud so first migration is non-destructive.
-      if(meaningful(local) && stable(merged)!==stable(cloud)) await pushCloud(key,app,merged);
+
+      // Ensure the canonical cloud row contains both old and current data.
+      if(!result.row || meaningful(local) || stable(merged)!==stable(result.row.data)){
+        const ok=await pushCloud(key,app,merged);
+        if(!ok){
+          console.error('[Soikat Cloud] canonical write failed',app);
+          setStatus('Cloud write failed','error');
+          return;
+        }
+      }
+
       state.lastCloudWrite[app]=stable(merged);
+
+      // Only after the canonical row is safely stored, remove the duplicate.
+      if(app==='soikat_100k_goal') await deleteLegacyRows(app);
     }else if(meaningful(local)){
-      await pushCloud(key,app,local);
+      const ok=await pushCloud(key,app,local);
+      if(!ok){
+        console.error('[Soikat Cloud] initial write failed',app);
+        setStatus('Cloud write failed','error');
+      }
     }
   }
 
   function refreshPageFromCloud(app){
     try{
       // 100K GOAL reads localStorage inside render(), so direct render is enough.
-      if(app==='100k_goal' && typeof window.render==='function'){
+      if(app==='soikat_100k_goal' && typeof window.render==='function'){
         window.render();
         return;
       }
