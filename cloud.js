@@ -87,22 +87,7 @@
   }
 
   function stable(v){
-    try{
-      const normalize=(value)=>{
-        if(Array.isArray(value)) return value.map(normalize);
-        if(value && typeof value==='object'){
-          const out={};
-          Object.keys(value).sort().forEach(k=>{
-            out[k]=normalize(value[k]);
-          });
-          return out;
-        }
-        return value;
-      };
-      return JSON.stringify(normalize(v));
-    }catch(e){
-      return String(v);
-    }
+    try{return JSON.stringify(v, Object.keys(v||{}).sort());}catch(e){return String(v);}
   }
 
   function readLocal(key){
@@ -281,7 +266,8 @@
   async function pushCloud(key,app,payload){
     const user=state.session?.user;
     if(!user||!state.client)return false;
-    if(!meaningful(payload))return false; // Never replace cloud data with empty local data.
+    // Empty objects are valid cloud states: they represent an intentional full deletion.
+    if(payload===null || payload===undefined) payload={};
     const stamp=new Date().toISOString();
     const {error}=await state.client.from(TABLE).upsert({
       user_id:user.id,
@@ -341,6 +327,7 @@
 
   async function syncApp(key,app){
     if(!state.session||!state.client)return;
+
     const local=readLocal(key);
     const result=await fetchCloud(key,app);
     if(result.error){
@@ -349,38 +336,51 @@
       return;
     }
 
-    let cloud=result.row?.data;
+    let cloud=result.row ? clone(result.row.data || {}) : null;
 
     // Migrate the earlier duplicate 100K app id into the canonical row.
     if(app==='soikat_100k_goal'){
       cloud=await migrateLegacyRows(app,cloud);
     }
 
-    if(meaningful(cloud)){
-      const merged=mergeData(local,cloud);
-      writeLocal(key,merged);
+    /*
+      IMPORTANT SYNC RULE
+      -------------------
+      Once a canonical cloud row exists, CLOUD IS AUTHORITATIVE.
+      Never merge local data back into an existing cloud row.
+      A missing item on the local device is often an intentional deletion;
+      merging would resurrect that item from the cloud.
 
-      // Ensure the canonical cloud row contains both old and current data.
-      if(!result.row || meaningful(local) || stable(merged)!==stable(result.row.data)){
-        const ok=await pushCloud(key,app,merged);
+      If no canonical row exists yet, this is first-time migration, so the
+      existing local data is allowed to create the cloud row.
+    */
+    if(result.row || meaningful(cloud)){
+      const cloudState=cloud || {};
+      writeLocal(key,cloudState);
+      state.lastCloudWrite[app]=stable(cloudState);
+
+      // If legacy 100K data was found, write the migrated canonical state.
+      if(app==='soikat_100k_goal' && stable(cloudState)!==stable(result.row?.data || {})){
+        const ok=await pushCloud(key,app,cloudState);
         if(!ok){
-          console.error('[Soikat Cloud] canonical write failed',app);
+          console.error('[Soikat Cloud] canonical migration write failed',app);
           setStatus('Cloud write failed','error');
           return;
         }
+        await deleteLegacyRows(app);
       }
-
-      state.lastCloudWrite[app]=stable(merged);
-
-      // Only after the canonical row is safely stored, remove the duplicate.
-      if(app==='soikat_100k_goal') await deleteLegacyRows(app);
-    }else if(meaningful(local)){
-      const ok=await pushCloud(key,app,local);
-      if(!ok){
-        console.error('[Soikat Cloud] initial write failed',app);
-        setStatus('Cloud write failed','error');
-      }
+      return;
     }
+
+    // No cloud row exists: create it from the current device's local state.
+    const initial=meaningful(local) ? local : {};
+    const ok=await pushCloud(key,app,initial);
+    if(!ok){
+      console.error('[Soikat Cloud] initial write failed',app);
+      setStatus('Cloud write failed','error');
+      return;
+    }
+    state.lastCloudWrite[app]=stable(initial);
   }
 
   function refreshPageFromCloud(app){
@@ -480,10 +480,8 @@
         console.warn('[Soikat Realtime] Unknown app in event:',row.app);
         return;
       }
-      if(!meaningful(row.data)){
-        console.warn('[Soikat Realtime] Empty cloud data for app:',row.app);
-        return;
-      }
+      // Empty object is a valid event: it means the user intentionally cleared the app.
+      if(row.data===null || row.data===undefined) row.data={};
 
       const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
       if(!key){
@@ -590,7 +588,7 @@
   }
 
   window.SoikatCloud={
-    version:'1.1.1',
+    version:'1.1.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
