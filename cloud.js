@@ -489,7 +489,12 @@
       });
 
       if(existing===incoming){
-        console.log('[Soikat Realtime] EVENT already applied locally');
+        console.log('[Soikat Realtime] EVENT already in localStorage — refreshing page state');
+        if(row.app==='soikat_200d_plan'){
+          window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
+        }else if(row.app==='soikat_100k_goal'){
+          if(typeof window.render==='function') window.render();
+        }
         return;
       }
 
