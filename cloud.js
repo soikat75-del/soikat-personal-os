@@ -417,8 +417,14 @@
     Storage.prototype.setItem=wrapped;
   }
 
-  function installRealtime(){
+  async function installRealtime(){
     if(!state.client||!state.session)return;
+    try{
+      await state.client.realtime.setAuth(state.session.access_token);
+      console.log('[Soikat Realtime] Auth token set');
+    }catch(e){
+      console.error('[Soikat Realtime] setAuth failed',e);
+    }
     if(state.channel)state.client.removeChannel(state.channel);
     const userId=state.session.user.id;
     state.channel=state.client.channel('soikat-cloud-'+userId)
