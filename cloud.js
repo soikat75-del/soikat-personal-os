@@ -459,7 +459,9 @@
       // The channel is already private and scoped to the authenticated user's
       // topic, so do not reject a valid database row because of a formatting/
       // type mismatch in user_id. Only accept app IDs registered by this client.
-      if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app)){
+      // APPS is storageKey -> cloudAppId, while incoming row.app is the cloudAppId.
+      // Therefore validate against the mapped values, not the object keys.
+      if(!row.app||!Object.values(APPS).includes(row.app)){
         console.warn('[Soikat Realtime] Unknown app in event:',row.app);
         return;
       }
