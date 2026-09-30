@@ -444,8 +444,13 @@
       console.log('[Soikat Realtime] BROADCAST EVENT',message);
 
       const p=message?.payload||{};
-      // realtime.broadcast_changes() puts the changed row in payload.record.
-      const row=p.record || p.new || p;
+      let row=p.record || p.new_record || p.new || p.data?.record || p.payload?.record;
+      if(typeof row==='string'){
+        try{row=JSON.parse(row)}catch(e){}
+      }
+      if(!row && p.app && p.user_id) row=p;
+
+      console.log('[Soikat Realtime] EVENT ROW',row);
       if(!row||row.user_id!==userId)return;
       if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app))return;
       if(!meaningful(row.data))return;
@@ -453,20 +458,24 @@
       const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
       if(!key)return;
 
-      const incoming=stable(row.data);
-      if(state.lastCloudWrite[row.app]===incoming)return;
-
-      state.lastCloudWrite[row.app]=incoming;
+      // Always accept a database broadcast. The cloud row is authoritative.
+      state.lastCloudWrite[row.app]=stable(row.data);
       writeLocal(key,row.data);
       window.dispatchEvent(new CustomEvent('soikat-cloud-updated',{
         detail:{app:row.app,key}
       }));
-      refreshPageFromCloud(row.app);
+
+      // Force the existing page to re-read the freshly written localStorage.
+      // This avoids depending on the original page's render implementation.
+      if(row.app==='soikat_100k_goal' || row.app==='soikat_200d_plan'){
+        setTimeout(()=>location.reload(),50);
+      }else{
+        refreshPageFromCloud(row.app);
+      }
     };
 
     channel
-      .on('broadcast',{event:'INSERT'},handleBroadcast)
-      .on('broadcast',{event:'UPDATE'},handleBroadcast)
+      .on('broadcast',{event:'*'},handleBroadcast)
       .subscribe((status,err)=>{
         console.log('[Soikat Realtime]',status,err||'');
         if(status==='SUBSCRIBED')setStatus('Realtime on','online');
@@ -515,7 +524,7 @@
   }
 
   window.SoikatCloud={
-    version:'1.0.0',
+    version:'1.1.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
