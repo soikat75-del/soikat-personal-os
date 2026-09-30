@@ -15,7 +15,7 @@
   // Add future apps here. Their existing localStorage keys do not need to change.
   const APPS = {
     'soikat_1l_goal_entries_v4': 'soikat_100k_goal',
-    'soikat_200d_plan_v2': '200d_plan'
+    'soikat_200d_plan_v2': 'soikat_200d_plan'
   };
 
   // One-time cleanup for the earlier 100K cloud app id. The old row is
