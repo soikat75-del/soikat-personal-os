@@ -509,9 +509,12 @@
         detail:{app:row.app,key}
       }));
 
-      if(row.app==='soikat_100k_goal' || row.app==='soikat_200d_plan'){
-        console.log('[Soikat Realtime] NEW CLOUD DATA APPLIED — RELOADING');
-        setTimeout(()=>location.reload(),150);
+      if(row.app==='soikat_100k_goal'){
+        console.log('[Soikat Realtime] NEW 100K CLOUD DATA APPLIED — RENDERING');
+        if(typeof window.render==='function') window.render();
+      }else if(row.app==='soikat_200d_plan'){
+        console.log('[Soikat Realtime] NEW 200D CLOUD DATA APPLIED — REFRESH EVENT');
+        window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
       }else{
         refreshPageFromCloud(row.app);
       }
