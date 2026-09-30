@@ -377,7 +377,7 @@
       }
       // 200D PLAN keeps its working data object in memory; reload only when
       // a cloud change needs to enter that existing in-memory state.
-      if(app==='200d_plan' && document.readyState==='complete'){
+      if(app==='soikat_200d_plan' && document.readyState==='complete'){
         window.location.reload();
         return;
       }
@@ -423,12 +423,13 @@
     const userId=state.session.user.id;
     state.channel=state.client.channel('soikat-cloud-'+userId)
       .on('postgres_changes',{
-        event:'*',schema:'public',table:TABLE,
-        filter:'user_id=eq.'+userId
+        event:'*',schema:'public',table:TABLE
       },payload=>{
+        console.log('[Soikat Realtime] EVENT', payload.eventType, payload.new || payload.old || payload);
         if(payload.eventType==='DELETE')return; // Never delete local data from a remote delete.
         const row=payload.new;
-        if(!row||!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app))return;
+        if(!row||row.user_id!==userId)return;
+        if(!row.app||!Object.prototype.hasOwnProperty.call(APPS,row.app))return;
         const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
         if(!key||!meaningful(row.data))return;
         const incoming=stable(row.data);
