@@ -13,30 +13,34 @@
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at 20% 0%,#101a30 0,#070b14 38%,#050810 100%);
 font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
-.wrap{max-width:1200px;margin:auto;padding:28px 22px 45px}
-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px}
+.wrap{max-width:1200px;margin:auto;padding:14px 16px 24px}
+header{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:40px;border-bottom:1px solid var(--line);padding:0 0 7px;margin-bottom:10px}
+.header-back{justify-self:start;color:var(--muted);text-decoration:none;font-size:10px;white-space:nowrap;transition:.15s}
+.header-back:hover{color:var(--text)}
+.header-brand{justify-self:center;font-weight:800;letter-spacing:.13em;font-size:12px;white-space:nowrap}
+.header-range{justify-self:end;color:var(--muted);font-size:9px;white-space:nowrap}
 .brand{font-weight:800;letter-spacing:.16em;font-size:15px}.brand span{color:var(--blue)}
 .sub{font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:5px}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap}
 button,.btn{border:1px solid var(--line);background:#0c1422;color:var(--text);border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:700}
 button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
-.hero{display:grid;grid-template-columns:1fr;gap:16px}
-.card{background:linear-gradient(180deg,#0e1727,#0a111e);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 12px 35px #0004}
+.hero{display:grid;grid-template-columns:1fr;gap:10px}
+.card{background:linear-gradient(180deg,#0e1727,#0a111e);border:1px solid var(--line);border-radius:11px;padding:12px;box-shadow:0 8px 24px #0003}
 .kicker{font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:800}
-.big{font-size:34px;font-weight:900;margin:8px 0}
+.big{font-size:27px;font-weight:900;margin:5px 0}
 .big span{color:var(--blue)}
-.progress{height:9px;background:#182237;border-radius:20px;overflow:hidden;margin:15px 0 10px}
+.progress{height:7px;background:#182237;border-radius:20px;overflow:hidden;margin:9px 0 7px}
 .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:20px}
 .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
-.stat{background:#0b1321;border:1px solid var(--line);border-radius:10px;padding:12px}
-.stat b{display:block;font-size:20px;margin-top:5px}.stat small{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:9px}
+.stat{background:#0b1321;border:1px solid var(--line);border-radius:8px;padding:8px}
+.stat b{display:block;font-size:16px;margin-top:3px}.stat small{color:var(--muted);font-size:9px}
 
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
-.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
-.section-title h2{margin:0;font-size:16px}.tag{font-size:10px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);padding:5px 7px;border-radius:7px}
-.daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:12px;border-radius:10px;margin-bottom:10px}
-.daybar strong{font-size:13px}.daybar span{font-size:11px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-top:10px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.section-title h2{margin:0;font-size:14px}.tag{font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:4px 6px;border-radius:6px}
+.daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:9px 10px;border-radius:8px;margin-bottom:6px}
+.daybar strong{font-size:12px}.daybar span{font-size:10px;color:var(--muted)}
 .study-row{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #162238}
 .study-row:last-child{border-bottom:0}
 .check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
@@ -55,58 +59,112 @@ input,select,textarea{width:100%;background:#080f1c;border:1px solid var(--line)
 input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .full{grid-column:1/-1}
 .add{width:100%;margin-top:9px;background:#14253d;border-color:#31547e}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
-.cal-head{font-size:9px;text-align:center;color:var(--muted);padding:5px}
-.cal-day{min-height:66px;border:1px solid var(--line);border-radius:7px;padding:7px;background:#0a1220;cursor:pointer;transition:.15s}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:7px}
+.cal-head{font-size:8px;text-align:center;color:var(--muted);padding:3px}
+.cal-day{min-height:50px;border:1px solid var(--line);border-radius:6px;padding:5px;background:#0a1220;cursor:pointer;transition:.15s}
 .cal-day:hover{border-color:#3d5a80}
 .cal-day.today{box-shadow:0 0 0 2px var(--blue) inset}
+.cal-day.selected-date{box-shadow:0 0 0 2px var(--purple) inset,0 0 0 1px #a77bff55}
+.cal-day.selected-date .selected-marker{display:block}
+.selected-marker{display:none;position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 3px #a77bff22}
+.cal-day{position:relative}
 .cal-day.done{background:#0d2a21;border-color:#1d7358}
 .cal-day.partial{background:#282310;border-color:#75651c}
 .cal-day.missed{background:#2a1118;border-color:#71313d}
 .cal-day.pending{background:#0a1220;border-color:#33425a}
 .cal-day.empty{background:#0a1220;border-color:#1b2638;opacity:.75}
-.cal-day .n{font-size:11px;font-weight:800}.cal-day .mini{font-size:9px;color:var(--muted);margin-top:6px}
+.cal-day .n{font-size:10px;font-weight:800}.cal-day .mini{font-size:8px;color:var(--muted);margin-top:3px}
 .cal-day.done .mini{color:var(--green)}
 .cal-day.partial .mini{color:var(--orange)}
 .cal-day.missed .mini{color:var(--red)}
 .cal-day.pending .mini{color:var(--muted)}
-.cal-status{font-size:7px;letter-spacing:.08em;margin-top:4px;font-weight:800;color:var(--muted)}
+.cal-status-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:4px}.cal-status{font-size:7px;letter-spacing:.08em;font-weight:800;color:var(--muted)}.cal-today{font-size:7px;letter-spacing:.08em;font-weight:800;color:var(--blue)}
 .cal-day.done .cal-status{color:var(--green)}
 .cal-day.partial .cal-status{color:var(--orange)}
 .cal-day.missed .cal-status{color:var(--red)}
 .cal-day.pending .cal-status{color:var(--muted)}
 
 .cal-day.outside{opacity:.28;cursor:default;background:#070b14}
-.cal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--muted);font-size:9px;letter-spacing:.05em}
-.cal-legend span{display:flex;align-items:center;gap:5px}
-.lg{width:8px;height:8px;border-radius:2px;border:1px solid var(--line);display:inline-block}
-.lg.done{background:#0d2a21;border-color:#1d7358}
-.lg.partial{background:#282310;border-color:#75651c}
-.lg.missed{background:#2a1118;border-color:#71313d}
-.lg.today{box-shadow:0 0 0 1px var(--blue) inset}
-.lg.pending{background:#0a1220;border-color:#33425a}
-.selected-day{margin-top:10px;border:1px solid var(--line);border-radius:9px;padding:11px;background:#0a1220;min-height:20px}
-.selected-day .sd-head{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:800}
-.selected-day .sd-meta{color:var(--muted);font-size:10px;margin-top:5px}
-.selected-day .sd-list{margin-top:8px;display:grid;gap:5px}
-.selected-day .sd-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #162238;font-size:11px}
-.sd-toggle{padding:6px 8px;font-size:9px;white-space:nowrap;border-radius:7px}
 .delete-routine{border:1px solid #71313d;color:var(--red);background:#160c10;padding:5px 8px;font-size:8px;border-radius:6px;cursor:pointer}
 .delete-routine:hover{border-color:var(--red)}
-.routine-item{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.routine-check{display:flex;align-items:center;gap:9px;flex:1;cursor:pointer}
-.routine-check .topic{white-space:pre-line}
+.routine-item{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) 30px;
+  gap:6px;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid #162238;
+}
+.routine-item:last-child{border-bottom:0}
+.routine-content{
+  min-width:0;
+  width:100%;
+  justify-self:stretch;
+  text-align:left;
+}
+.routine-content .subject{
+  display:block;
+  text-align:left;
+}
+.routine-content .topic{
+  display:block;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  text-align:left;
+  line-height:1.4;
+  margin-top:2px;
+}
+.routine-action{
+  width:30px;
+  height:30px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  flex:none;
+}
+.routine-action svg{
+  width:14px;
+  height:14px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.routine-action.check-action{
+  color:var(--muted);
+}
+.routine-action.check-action:hover{
+  color:var(--green);
+  border-color:#1d7358;
+}
+.routine-action.check-action.done{
+  color:var(--green);
+  background:#0d2a21;
+  border-color:#1d7358;
+}
+.routine-action.delete-action{
+  color:var(--red);
+  border-color:#71313d;
+  background:#160c10;
+}
+.routine-action.delete-action:hover{
+  border-color:var(--red);
+  background:#211017;
+}
 
-
-.sd-toggle.checked{border-color:#1d7358;color:var(--green);background:#0d2a21}
-
-.selected-day .sd-item em{font-style:normal;color:var(--muted)}
 
 .rev{margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#0a1220}
 .rev-head{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.rev small{display:block;color:var(--muted);margin-top:5px}
-.revision-list{margin-top:8px;display:grid;gap:7px;max-height:360px;overflow:auto}
+.rev-head-single{justify-content:flex-start}.rev-head-single span{font-weight:800}
+.rev-title-stack{display:flex;flex-direction:row;align-items:center;gap:10px;width:100%;margin-bottom:8px}.rev-title-stack h2{margin:0;white-space:nowrap}.rev-date-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.03em;white-space:nowrap}.rev-count-label{font-size:11px;font-weight:800;color:var(--text);margin-left:auto;white-space:nowrap}
+
+.revision-list{margin-top:5px;display:grid;gap:5px;max-height:360px;overflow:auto}
 .revision-item{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;
-  padding:9px 0;border-top:1px solid #162238;cursor:pointer}
+  padding:7px 0;border-top:1px solid #162238;cursor:pointer}
 .revision-item input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
 .revision-item .topic{font-size:12px}
 .revision-date{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
@@ -120,22 +178,125 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .bulk{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;min-height:240px;resize:vertical}
 .note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:8px}
 footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
-@media(max-width:850px){.hero,.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.wrap{padding:18px 12px}.stats{grid-template-columns:1fr 1fr}.cal-day{min-height:48px;padding:5px}.status{display:none}.big{font-size:28px}}
+/* ===== FIXED DESKTOP LAYOUT =====
+   The four main work areas keep their positions.
+   Their internal content scrolls instead of pushing the
+   other sections up/down when routine or revision lists grow.
+*/
+@media(min-width:851px){
+  .grid{
+    align-items:start;
+  }
+
+  .grid>div{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .routine-card,
+  .calendar-card,
+  .weekly-card,
+  .monthly-card{
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
+    flex:none;
+  }
+
+  /* Keep the four sections in fixed positions,
+     but let their CONTENT scroll internally. */
+  .routine-card,
+  .weekly-card{
+    height:430px;
+  }
+
+  .calendar-card,
+  .monthly-card{
+    height:430px;
+  }
+
+  .routine-card #routineList{
+    min-height:0;
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+  }
+
+  .routine-complete{
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--green);
+    font-size:14px;
+    font-weight:800;
+    padding:20px;
+  }
+
+  .calendar-card .calendar{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    align-content:start;
+  }
+
+  .weekly-card #weeklyList,
+  .monthly-card #monthlyList{
+    min-height:0;
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+  }
+
+  .weekly-card .revision-list,
+  .monthly-card .revision-list{
+    max-height:none;
+    overflow:visible;
+  }
+}
+
+@media(max-width:850px){
+  .hero,.grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .routine-card,.calendar-card,.weekly-card,.monthly-card{height:auto}
+  .routine-card #routineList,
+  .weekly-card #weeklyList,
+  .monthly-card #monthlyList{overflow:visible}
+  .calendar-card .calendar{overflow:visible}
+  header{grid-template-columns:auto 1fr auto;gap:10px}
+  .header-brand{font-size:12px;letter-spacing:.12em}
+}
+@media(max-width:560px){
+  .wrap{padding:18px 12px}
+  .stats{grid-template-columns:1fr 1fr}
+  .cal-day{min-height:48px;padding:5px}
+  .status{display:none}
+  .big{font-size:28px}
+  .header-back{font-size:10px}
+  .header-brand{font-size:10px}
+  .header-range{font-size:8px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
-  <div>
-    <div class="brand">SOIKAT <span>· 200D PLAN</span></div>
-    <div class="sub">ROUTINE / WEEKLY / MONTHLY / PROGRESS</div>
-  </div>
-  <div class="top-actions">
-    <button onclick="openBulk()">SET ROUTINE</button>
-    <button onclick="syncTrustedDate(true)">SYNC DATE</button>
-  </div>
+  <a class="header-back" href="javascript:history.back()">← Back</a>
+  <div class="header-brand">SOIKAT · 200D PLAN</div>
+  <div class="header-range">01 Oct 2026 → 18 Apr 2027</div>
 </header>
+
+<div class="top-actions" style="justify-content:flex-end;margin-bottom:0">
+  <button onclick="openBulk()">SET ROUTINE</button>
+  <button onclick="syncTrustedDate(true)">SYNC DATE</button>
+</div>
 
 <section class="hero">
   <div class="card">
@@ -150,12 +311,11 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
       <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b><small class="metric-sub">pending studies</small></div>
     </div>
   </div>
-  <div class="sync-status" id="dateSyncStatus">Date source: checking…</div>
 </section>
 
 <section class="grid">
   <div>
-    <div class="card">
+    <div class="card routine-card">
       <div class="section-title"><h2>ROUTINE</h2><span class="tag" id="selectedDateLabel">TODAY</span></div>
       <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
       <div id="routineList"></div>
@@ -163,30 +323,23 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 
     
 
-    <div class="card" style="margin-top:12px">
+    <div class="card calendar-card" style="margin-top:12px">
       <div class="section-title">
         <h2>200D CALENDAR</h2>
         <div class="month-nav"><button onclick="changeMonth(-1)">‹</button><div class="month-name" id="calMonth"></div><button onclick="changeMonth(1)">›</button></div>
       </div>
       <div class="calendar" id="calendar"></div>
-      <div class="cal-legend">
-        <span><i class="lg done"></i> ALL DONE</span>
-        <span><i class="lg partial"></i> PARTIAL</span>
-        <span><i class="lg missed"></i> MISSED</span>
-        <span><i class="lg today"></i> TODAY</span>
-      <span><i class="lg pending"></i> PENDING</span>
-      </div>
-      <div class="selected-day" id="selectedDayInfo"></div>
-    </div>
+
+        </div>
   </div>
 
   <div>
-    <div class="card">
-      <div class="section-title"><h2>WEEKLY REVISION</h2><span class="tag" id="weekLabel">THIS WEEK</span></div>
+    <div class="card weekly-card">
+      <div class="section-title rev-title-stack"><h2>WEEKLY REVISION</h2><div class="rev-date-label" id="weekLabel">THIS WEEK</div><div class="rev-count-label" id="weekCount">0/0 ✅</div></div>
       <div id="weeklyList"></div>
     </div>
-    <div class="card" style="margin-top:16px">
-      <div class="section-title"><h2>MONTHLY REVISION</h2><span class="tag" id="monthLabel">THIS MONTH</span></div>
+    <div class="card monthly-card" style="margin-top:16px">
+      <div class="section-title rev-title-stack"><h2>MONTHLY REVISION</h2><div class="rev-date-label" id="monthLabel">THIS MONTH</div><div class="rev-count-label" id="monthCount">0/0 ✅</div></div>
       <div id="monthlyList"></div>
     </div>
   </div>
@@ -194,98 +347,157 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 
 
 
-<footer>Built with love by Soikat</footer>
+<footer>Built with ❤️ by Soikat</footer>
 </div>
 
 <div class="modal" id="bulkModal">
   <div class="modal-box">
     <div class="modal-head"><h2 style="margin:0;font-size:17px">SET ROUTINE IN BULK</h2><button onclick="closeBulk()">×</button></div>
-    <div class="note">একই Date + Subject-এর নিচে আলাদা লাইনে আরও Topic লিখতে পারবে; প্রতিটি line আলাদা Study হবে।</div><textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
+    <div class="note">একই Date + Subject-এর নিচে যতক্ষণ নতুন Date | Subject | Topic line না আসে, সব line একই Topic-এর অংশ হবে।</div><textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
 02 Oct 2026 | বাংলা | সমাস
 03 Oct 2026 | English | Tense
 04 Oct 2026 | গণিত | শতকরা"></textarea>
-    <div class="note">Format: <b>DD Mon YYYY | Subject | Topic</b><br>প্রতি লাইনে একটি Study। Existing routine মুছে যাবে না; নতুনগুলো যোগ হবে।</div>
+    <div class="note">Format: <b>DD Mon YYYY | Subject | Topic</b><br>একটি Date | Subject | Topic line = একটি Study। পরের Date line আসা পর্যন্ত নিচের line-গুলো একই Topic-এর অংশ। Existing routine মুছে যাবে না; নতুনগুলো যোগ হবে।</div>
     <button class="add" onclick="importBulk()">IMPORT ROUTINE</button>
   </div>
 </div>
 
 <script>
-/*
-  SOIKAT 200D PLAN
-  IMPORTANT: Keep this KEY unchanged when replacing/updating this file.
-  It preserves the existing localStorage data on the same origin.
-*/
 const START = new Date(2026,9,1);
 const END = new Date(2027,3,18);
 const DAYS = 200;
+
+// IMPORTANT: keep the existing storage key unchanged.
 const KEY = 'soikat_200d_plan_v2';
-let data = JSON.parse(localStorage.getItem(KEY) || '{"routine":{},"done":{},"weekly":{},"monthly":{},"weeklyRevision":{},"monthlyRevision":{}}');
-data.routine ||= {};
-data.done ||= {};
-data.weekly ||= {};
-data.monthly ||= {};
-data.weeklyRevision ||= {};
-data.monthlyRevision ||= {};
+
+const DEFAULT_DATA = {
+  routine:{},
+  done:{},
+  weekly:{},
+  monthly:{},
+  weeklyRevision:{},
+  monthlyRevision:{}
+};
+
+function loadDataSafely(){
+  let raw = null;
+  try{ raw = localStorage.getItem(KEY); }catch(e){}
+  let parsed = null;
+  if(raw){
+    try{ parsed = JSON.parse(raw); }catch(e){}
+  }
+  const base = parsed && typeof parsed === 'object' ? parsed : {};
+  Object.keys(DEFAULT_DATA).forEach(k=>{
+    if(!base[k] || typeof base[k] !== 'object' || Array.isArray(base[k])) base[k] = {};
+  });
+  return base;
+}
+
+let data = loadDataSafely();
+
 let trustedOffsetMs = Number(localStorage.getItem(KEY+'_trusted_offset_ms') || 0);
 let trustedAtMs = Number(localStorage.getItem(KEY+'_trusted_at_ms') || 0);
 let trustedSource = localStorage.getItem(KEY+'_trusted_source') || 'none';
+
 let selected = new Date();
 let calCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
 
 function pad(n){return String(n).padStart(2,'0')}
+
 function iso(d){
   return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 }
-function cloneDate(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
-function save(){localStorage.setItem(KEY,JSON.stringify(data))}
-function inPlan(d){return d>=START && d<=END}
-function fmt(d){return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+
+function cloneDate(d){
+  return new Date(d.getFullYear(),d.getMonth(),d.getDate());
+}
+
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(data));
+}
+
+function inPlan(d){
+  return d>=START && d<=END;
+}
+
+function fmt(d){
+  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+}
+
 function displayDate(isoDate){
   const d=new Date(isoDate+'T00:00:00');
-  return `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`;
+  return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()}`;
 }
-function dayIndex(d){return Math.floor((cloneDate(d)-START)/86400000)+1}
-function allDates(){let a=[];for(let d=cloneDate(START);d<=END;d.setDate(d.getDate()+1))a.push(cloneDate(d));return a}
-function entries(date){return data.routine[iso(date)]||[]}
+
+function dayIndex(d){
+  return Math.floor((cloneDate(d)-START)/86400000)+1;
+}
+
+function allDates(){
+  const a=[];
+  for(let d=cloneDate(START);d<=END;d.setDate(d.getDate()+1)) a.push(cloneDate(d));
+  return a;
+}
+
+function entries(date){
+  return Array.isArray(data.routine[iso(date)]) ? data.routine[iso(date)] : [];
+}
+
 function dhakaDateFromInstant(ms){
   const parts=new Intl.DateTimeFormat('en-CA',{
-    timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'
+    timeZone:'Asia/Dhaka',
+    year:'numeric',
+    month:'2-digit',
+    day:'2-digit'
   }).formatToParts(new Date(ms));
   const get=t=>parts.find(p=>p.type===t)?.value;
   return new Date(Number(get('year')),Number(get('month'))-1,Number(get('day')));
 }
+
 function trustedNowMs(){
-  // Best available clock:
-  // 1) freshly synced trusted internet time, corrected for local clock offset
-  // 2) previously synced offset, still usable offline
-  // 3) device clock as a last resort
+  // Fresh trusted offset -> previously trusted offset -> device clock.
   return Date.now() + (Number.isFinite(trustedOffsetMs) ? trustedOffsetMs : 0);
 }
+
 function todayDhaka(){
   return dhakaDateFromInstant(trustedNowMs());
 }
+
 function saveTrustedClock(serverMs, source){
-  trustedOffsetMs=serverMs-Date.now();
-  trustedAtMs=Date.now();
+  const now=Date.now();
+  trustedOffsetMs=serverMs-now;
+  trustedAtMs=now;
   trustedSource=source;
-  localStorage.setItem(KEY+'_trusted_offset_ms', String(trustedOffsetMs));
-  localStorage.setItem(KEY+'_trusted_at_ms', String(trustedAtMs));
-  localStorage.setItem(KEY+'_trusted_source', source);
+  localStorage.setItem(KEY+'_trusted_offset_ms',String(trustedOffsetMs));
+  localStorage.setItem(KEY+'_trusted_at_ms',String(trustedAtMs));
+  localStorage.setItem(KEY+'_trusted_source',source);
 }
+
 async function syncTrustedDate(manual=false){
   const endpoints=[
-    ['timeapi.io','https://timeapi.io/api/Time/current/zone?timeZone=Asia%2FDhaka',
-      async r=>new Date((await r.json()).dateTime).getTime()],
     ['WorldTimeAPI','https://worldtimeapi.org/api/timezone/Asia/Dhaka',
-      async r=>(await r.json()).unixtime*1000]
+      async r=>(await r.json()).unixtime*1000],
+    ['timeapi.io','https://timeapi.io/api/Time/current/zone?timeZone=Asia%2FDhaka',
+      async r=>{
+        const j=await r.json();
+        const raw=String(j.dateTime||j.currentDateTime||'');
+        if(!raw) return NaN;
+        // Asia/Dhaka is UTC+06:00. If the API omits an offset, interpret
+        // the returned Dhaka wall-clock value explicitly as UTC+06:00.
+        if(/[zZ]|[+-]\d{2}:?\d{2}$/.test(raw)) return Date.parse(raw);
+        const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?$/);
+        if(!m) return NaN;
+        return Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]-6,+m[5],+(m[6]||0),0);
+      }]
   ];
+
   for(const [name,url,parse] of endpoints){
     try{
       const controller=new AbortController();
       const timer=setTimeout(()=>controller.abort(),5000);
       const r=await fetch(url,{cache:'no-store',signal:controller.signal});
       clearTimeout(timer);
-      if(!r.ok)continue;
+      if(!r.ok) continue;
       const ms=await parse(r);
       if(Number.isFinite(ms)){
         saveTrustedClock(ms,name);
@@ -295,60 +507,134 @@ async function syncTrustedDate(manual=false){
       }
     }catch(e){}
   }
-  updateDateSyncStatus();
+
   if(manual) render();
   return false;
 }
-function updateDateSyncStatus(){
-  const el=document.getElementById('dateSyncStatus');
-  if(!el)return;
-  const age=trustedAtMs?Math.max(0,Date.now()-trustedAtMs):0;
-  if(trustedAtMs){
-    const days=Math.floor(age/86400000);
-    el.innerHTML='Date source: <strong>trusted sync cached</strong> · '+(days?days+'d ago':'recent')+' · works offline with saved offset';
-  }else{
-    el.textContent='Date source: device clock until first trusted sync';
-  }
+
+
+/*
+  DATA MIGRATION / ID SAFETY
+  --------------------------
+  Old versions used date#index IDs such as 2026-10-01#0.
+  We preserve those records and map them to a permanent uid on each study.
+  After migration, completion/revision state follows the study itself,
+  not its array position. No localStorage key is changed and no data is cleared.
+*/
+function makeUid(){
+  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return 'study_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2);
 }
 
-function actualItems(date){
-  const planned=entries(date).map((x,i)=>({...x,plannedDate:iso(date),sourceIndex:i,carry:false}));
-  let carry=[];
-  for(let d=cloneDate(START);d<date;d.setDate(d.getDate()+1)){
-    const k=iso(d), next=cloneDate(d); next.setDate(next.getDate()+1);
-    if(next.toDateString()===date.toDateString()){
-      (data.routine[k]||[]).forEach((x,i)=>{
-        const id=itemId(k,i);
-        if(!data.done[id]) carry.push({...x,plannedDate:k,sourceIndex:i,carry:true});
+function legacyId(dateKey,index){
+  return dateKey+'#'+index;
+}
+
+function ensureStudyUids(){
+  let changed=false;
+
+  Object.keys(data.routine).forEach(dateKey=>{
+    const list=Array.isArray(data.routine[dateKey]) ? data.routine[dateKey] : [];
+    data.routine[dateKey]=list;
+
+    list.forEach((item,index)=>{
+      if(!item || typeof item!=='object'){
+        list[index]={subject:'Study',topic:String(item??'')};
+        item=list[index];
+        changed=true;
+      }
+
+      const oldId=legacyId(dateKey,index);
+      if(!item.uid){
+        item.uid=makeUid();
+        changed=true;
+      }
+
+      const uid=item.uid;
+
+      // Preserve old completion state by copying it to the permanent uid.
+      if(data.done[oldId]===true && data.done[uid]!==true){
+        data.done[uid]=true;
+        changed=true;
+      }
+
+      // Preserve old revision state in both revision stores.
+      if(data.weeklyRevision[oldId]===true && data.weeklyRevision[uid]!==true){
+        data.weeklyRevision[uid]=true;
+        changed=true;
+      }
+
+      if(data.monthlyRevision[oldId]===true && data.monthlyRevision[uid]!==true){
+        data.monthlyRevision[uid]=true;
+        changed=true;
+      }
+    });
+  });
+
+  if(changed) save();
+}
+
+ensureStudyUids();
+
+function studyId(item,dateKey,index){
+  return item && item.uid ? item.uid : legacyId(dateKey,index);
+}
+
+function isDone(item,dateKey,index){
+  return data.done[studyId(item,dateKey,index)]===true;
+}
+
+function getStudiesInRange(start,end){
+  const items=[];
+
+  for(let d=cloneDate(start);d<=end;d.setDate(d.getDate()+1)){
+    const k=iso(d);
+    const list=entries(d);
+
+    list.forEach((item,index)=>{
+      items.push({
+        ...item,
+        plannedDate:k,
+        sourceIndex:index,
+        studyId:studyId(item,k,index),
+        completed:isDone(item,k,index)
       });
-    }
+    });
   }
-  // recursively bring unresolved items from previous days through the selected date
-  let unresolved=[];
-  for(let d=cloneDate(START);d<date;d.setDate(d.getDate()+1)){
-    (data.routine[iso(d)]||[]).forEach((x,i)=>{
-      const id=itemId(iso(d),i);
-      if(!data.done[id]){
-        let age=Math.floor((date-d)/86400000);
-        if(age>0 && age<200) unresolved.push({...x,plannedDate:iso(d),sourceIndex:i,carry:true});
+
+  return items;
+}
+
+function getPreviousPendingStudies(current){
+  const pending=[];
+
+  for(let d=cloneDate(START);d<current;d.setDate(d.getDate()+1)){
+    const k=iso(d);
+    const list=entries(d);
+
+    list.forEach((item,index)=>{
+      if(!isDone(item,k,index)){
+        pending.push({
+          ...item,
+          plannedDate:k,
+          sourceIndex:index,
+          studyId:studyId(item,k,index),
+          carry:true
+        });
       }
     });
   }
-  // remove duplicates by original item id
-  const seen=new Set(), out=[];
-  [...unresolved,...planned].forEach(x=>{
-    const id=itemId(x.plannedDate,x.sourceIndex);
-    if(!seen.has(id)){seen.add(id);out.push(x)}
-  });
-  return out;
+
+  return pending;
 }
-function itemId(k,i){return k+'#'+i}
 
 function render(){
   const now=todayDhaka();
-  let current=inPlan(now)?cloneDate(now):selected;
+
+  let current=inPlan(now)?cloneDate(now):cloneDate(selected);
   if(current<START) current=cloneDate(START);
   if(current>END) current=cloneDate(END);
+
   selected=current;
 
   const idx=dayIndex(current);
@@ -361,57 +647,44 @@ function render(){
   document.getElementById('startText').textContent='01 Oct 2026';
   document.getElementById('endText').textContent='18 Apr 2027';
 
-  // Study progress is FIXED against 200 plan days, as requested.
-  // A day counts as completed when every planned study for that day is checked.
-  const all=allDates();
-  const completedDays=all.filter(d=>{
-    const list=entries(d);
-    return list.length>0 && list.every((x,i)=>!!data.done[itemId(iso(d),i)]);
-  }).length;
-  const completedPct=Math.round(completedDays/DAYS*100);
-  const studyLeft=Math.max(0,DAYS-completedDays);
-  const studyLeftPct=Math.round(studyLeft/DAYS*100);
+  // 200 is the fixed plan denominator.
+  // Each routine study counts once when completed.
+  const allStudies=[];
+  Object.keys(data.routine).forEach(k=>{
+    const list=Array.isArray(data.routine[k])?data.routine[k]:[];
+    list.forEach((item,index)=>{
+      allStudies.push({item,dateKey:k,index});
+    });
+  });
+
+  const completedRaw=allStudies.reduce(
+    (n,x)=>n+(isDone(x.item,x.dateKey,x.index)?1:0),0
+  );
+
+  // Keep the fixed 200-study plan mathematically bounded.
+  const completed=Math.min(DAYS,completedRaw);
+  const studyLeft=DAYS-completed;
+  const completedPct=Math.round(completed/DAYS*100);
+  const studyLeftPct=100-completedPct;
 
   document.getElementById('studyDone').innerHTML=
-    completedDays+' <span class="metric-sub">('+completedPct+'%)</span>';
+    completed+' <span class="metric-sub">('+completedPct+'%)</span>';
+
   document.getElementById('studyLeft').innerHTML=
     studyLeft+' <span class="metric-sub">('+studyLeftPct+'%)</span>';
 
-  // Carry Forward = ONLY unfinished studies from dates before the selected/current day.
-  // The current day's pending studies are intentionally NOT counted here.
-  const carryItems = getPreviousPendingStudies(current);
-  const carryCount = carryItems.length;
+  const carryCount=getPreviousPendingStudies(current).length;
   document.getElementById('carryCount').textContent=carryCount;
-
 
   document.getElementById('routineDate').textContent=fmt(current);
   document.getElementById('routineDay').textContent='DAY '+idx+' / 200';
-  document.getElementById('selectedDateLabel').textContent=iso(current)===iso(now)?'TODAY':'SELECTED';
+  document.getElementById('selectedDateLabel').textContent=
+    iso(current)===iso(now)?'TODAY':'SELECTED';
 
   renderRoutine(current);
   renderWeekly(current);
   renderMonthly(current);
   renderCalendar();
-  updateDateSyncStatus();
-}
-
-function getPreviousPendingStudies(current){
-  const pending=[];
-  for(let d=cloneDate(START); d<current; d.setDate(d.getDate()+1)){
-    const k=iso(d);
-    const list=entries(d);
-    list.forEach((item,i)=>{
-      if(!data.done[itemId(k,i)]){
-        pending.push({
-          ...item,
-          plannedDate:k,
-          sourceIndex:i,
-          carry:true
-        });
-      }
-    });
-  }
-  return pending;
 }
 
 function renderRoutine(d){
@@ -424,60 +697,141 @@ function renderRoutine(d){
     return;
   }
 
-  box.innerHTML=list.map((x,i)=>{
-    const id=itemId(k,i);
-    const checked=!!data.done[id];
+  // Completed studies disappear from the Routine view.
+  // They remain safely stored in data.done and continue to
+  // participate in Calendar / Weekly / Monthly calculations.
+  const pending=list
+    .map((x,i)=>({x,i}))
+    .filter(({x,i})=>data.done[studyId(x,k,i)]!==true);
 
-    return `<div class="routine-item">
-      <label class="routine-check">
-        <input type="checkbox" ${checked?'checked':''}
-          onchange="toggleDone('${id}',this.checked)">
-        <span>
-          <span class="subject">${escapeHtml(x.subject||'Study')}</span>
-          <span class="topic">${escapeHtml(x.topic||'Untitled')}</span>
-        </span>
-      </label>
-      <button class="delete-routine" onclick="deleteRoutineItem('${k}',${i})">DELETE</button>
+  if(!pending.length){
+    const todayKey=iso(todayDhaka());
+    const message=
+      k===todayKey
+        ? 'আজকের Study সম্পন্ন হয়েছে ✓'
+        : 'এই দিনের Study সম্পন্ন হয়েছে ✓';
+
+    box.innerHTML=`<div class="routine-complete">${message}</div>`;
+    return;
+  }
+
+  box.innerHTML=pending.map(({x,i})=>{
+    const id=studyId(x,k,i);
+
+    return `<div class="routine-item" data-study-id="${escapeAttr(id)}" data-date="${escapeAttr(k)}">
+
+      <button
+        type="button"
+        class="routine-action check-action"
+        title="Complete"
+        aria-label="Complete"
+        onclick="toggleRoutineById(this)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
+      </button>
+
+      <div class="routine-content">
+        <span class="subject">${escapeHtml(x.subject||'Study')}</span>
+        <span class="topic">${renderTopic(x.topic)}</span>
+      </div>
+
+      <button
+        type="button"
+        class="routine-action delete-action"
+        title="Delete"
+        aria-label="Delete"
+        data-date="${escapeAttr(k)}" data-id="${escapeAttr(id)}" onclick="deleteRoutineDirect(this.dataset.date, this.dataset.id)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4h8v2"></path>
+          <path d="M19 6l-1 14H6L5 6"></path>
+          <path d="M10 11v5"></path>
+          <path d="M14 11v5"></path>
+        </svg>
+      </button>
+
     </div>`;
   }).join('');
 }
 
-function deleteRoutineItem(dateKey,index){
-  const list=data.routine[dateKey]||[];
-  if(index<0 || index>=list.length) return;
+/*
+  DIRECT button handlers.
 
-  const item=list[index];
-  if(!confirm(`Delete this study?\n\n${item.subject||'Study'} — ${item.topic||'Untitled'}`)) return;
+  These intentionally do not depend on event delegation.
+  Every button finds its own .routine-item and then uses
+  the permanent study UID stored on that row.
+*/
+function deleteRoutineDirect(dateKey,id){
+  if(!dateKey || !id) return false;
 
-  const rebuild=(source)=>{
-    const out={};
-    const prefix=dateKey+'__';
-    Object.keys(source||{}).forEach(id=>{
-      if(!id.startsWith(prefix)){
-        out[id]=source[id];
-        return;
-      }
-      const oldIndex=Number(id.slice(prefix.length));
-      if(Number.isNaN(oldIndex) || oldIndex<index) out[id]=source[id];
-      else if(oldIndex>index) out[itemId(dateKey,oldIndex-1)]=source[id];
-    });
-    return out;
-  };
+  const list=data.routine[dateKey];
+  if(!Array.isArray(list)) return false;
 
-  data.done=rebuild(data.done);
-  data.weeklyRevision=rebuild(data.weeklyRevision);
-  data.monthlyRevision=rebuild(data.monthlyRevision);
+  const index=list.findIndex((item,index)=>{
+    if(!item) return false;
+    return String(studyId(item,dateKey,index))===String(id);
+  });
 
+  if(index<0) return false;
+
+  // Delete immediately. No confirm dialog, so the button cannot appear to do nothing.
   list.splice(index,1);
-  if(list.length) data.routine[dateKey]=list;
-  else delete data.routine[dateKey];
+
+  if(list.length===0){
+    delete data.routine[dateKey];
+  }else{
+    data.routine[dateKey]=list;
+  }
+
+  // IMPORTANT: do NOT rebuild, shift, or clear done/revision maps.
+  // Permanent study IDs keep all remaining states attached to the correct study.
+  save();
+  render();
+  return false;
+}
+
+function deleteRoutineById(button){
+  if(!button) return false;
+  return deleteRoutineDirect(
+    button.getAttribute('data-date'),
+    button.getAttribute('data-id')
+  );
+}
+
+function toggleRoutineById(button){
+  const row=button.closest('.routine-item');
+  if(!row) return;
+
+  const id=row.getAttribute('data-study-id');
+  if(!id) return;
+
+  const current=data.done[id]===true;
+  toggleDone(id,!current);
+}
+
+function toggleDone(id,value){
+  if(!id) return;
+
+  if(value===true) data.done[id]=true;
+  else delete data.done[id];
+
+  save();
+  render();
+}
+
+function toggleDoneFromCalendar(id){
+  if(data.done[id]===true) delete data.done[id];
+  else data.done[id]=true;
 
   save();
   render();
 }
 
 function renderWeekly(d){
-  // Weekly cycle: Saturday -> Friday. Friday is the revision day.
+  // Saturday -> Friday.
   const start=cloneDate(d);
   const day=start.getDay();
   const daysFromSaturday=(day+1)%7;
@@ -497,24 +851,16 @@ function renderWeekly(d){
     return;
   }
 
-  // HEADER COUNT = ONLY the revision checkboxes in THIS LIST.
-  // Checked = DONE, unchecked = PENDING.
-  const completedCount=items.reduce((n,x)=>n+(data.weeklyRevision[x.studyId]===true?1:0),0);
-  const pendingCount=items.length-completedCount;
+  const revisedCount=items.reduce(
+    (n,x)=>n+(data.weeklyRevision[x.studyId]===true?1:0),0
+  );
+  document.getElementById('weekCount').textContent=
+    revisedCount+'/'+items.length+' ✅';
 
-  // Revision checkbox is ONLY for marking the topic as revised.
   const pendingRoutine=items.filter(x=>!x.completed);
   const completedRoutine=items.filter(x=>x.completed);
 
   box.innerHTML=`
-    <div class="rev">
-      <div class="rev-head">
-        <span>${pendingCount} PENDING</span>
-        <span>${completedCount}/${items.length} DONE</span>
-      </div>
-      <small>Saturday → Friday · Friday = revision day · checkbox = revision done</small>
-    </div>
-
     ${pendingRoutine.length ? `
       <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
       <div class="revision-list">
@@ -522,7 +868,7 @@ function renderWeekly(d){
           const revised=!!data.weeklyRevision[x.studyId];
           return `<label class="revision-item">
             <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('weeklyRevision','${x.studyId}',this.checked)">
+              onchange="toggleRevision('weeklyRevision','${escapeAttr(x.studyId)}',this.checked)">
             <div>
               <div class="subject">${escapeHtml(x.subject||'Study')}</div>
               <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
@@ -540,7 +886,69 @@ function renderWeekly(d){
           const revised=!!data.weeklyRevision[x.studyId];
           return `<label class="revision-item">
             <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('weeklyRevision','${x.studyId}',this.checked)">
+              onchange="toggleRevision('weeklyRevision','${escapeAttr(x.studyId)}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+  `;
+}
+
+function renderMonthly(d){
+  const start=new Date(d.getFullYear(),d.getMonth(),1);
+  const end=new Date(d.getFullYear(),d.getMonth()+1,0);
+  const items=getStudiesInRange(start,end);
+  const box=document.getElementById('monthlyList');
+
+  document.getElementById('monthLabel').textContent=
+    d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+
+  if(!items.length){
+    box.innerHTML='<div class="empty">এই মাসে কোনো Study নেই।</div>';
+    return;
+  }
+
+  const revisedCount=items.reduce(
+    (n,x)=>n+(data.monthlyRevision[x.studyId]===true?1:0),0
+  );
+  document.getElementById('monthCount').textContent=
+    revisedCount+'/'+items.length+' ✅';
+
+  const pendingRoutine=items.filter(x=>!x.completed);
+  const completedRoutine=items.filter(x=>x.completed);
+
+  box.innerHTML=`
+    ${pendingRoutine.length ? `
+      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
+      <div class="revision-list">
+        ${pendingRoutine.map(x=>{
+          const revised=!!data.monthlyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('monthlyRevision','${escapeAttr(x.studyId)}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+
+    ${completedRoutine.length ? `
+      <div class="revision-group-title">COMPLETED — REVISION</div>
+      <div class="revision-list">
+        ${completedRoutine.map(x=>{
+          const revised=!!data.monthlyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('monthlyRevision','${escapeAttr(x.studyId)}',this.checked)">
             <div>
               <div class="subject">${escapeHtml(x.subject||'Study')}</div>
               <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
@@ -558,115 +966,39 @@ function toggleRevision(type,id,value){
 
   data[type] ||= {};
 
-  if(value===true){
-    data[type][id]=true;
-  }else{
-    delete data[type][id];
-  }
+  if(value===true) data[type][id]=true;
+  else delete data[type][id];
 
   save();
   render();
-}
-
-function renderMonthly(d){
-  const start=new Date(d.getFullYear(),d.getMonth(),1);
-  const end=new Date(d.getFullYear(),d.getMonth()+1,0);
-  const items=getStudiesInRange(start,end);
-
-  document.getElementById('monthLabel').textContent=
-    d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
-
-  const box=document.getElementById('monthlyList');
-
-  if(!items.length){
-    box.innerHTML='<div class="empty">এই মাসে কোনো Study নেই।</div>';
-    return;
-  }
-
-  // HEADER COUNT = ONLY the revision checkboxes in THIS LIST.
-  // Checked = DONE, unchecked = PENDING.
-  const completedCount=items.reduce((n,x)=>n+(data.monthlyRevision[x.studyId]===true?1:0),0);
-  const pendingCount=items.length-completedCount;
-
-  const pendingRoutine=items.filter(x=>!x.completed);
-  const completedRoutine=items.filter(x=>x.completed);
-
-  box.innerHTML=`
-    <div class="rev">
-      <div class="rev-head">
-        <span>${pendingCount} PENDING</span>
-        <span>${completedCount}/${items.length} DONE</span>
-      </div>
-      <small>Checkbox = revision done</small>
-    </div>
-
-    ${pendingRoutine.length ? `
-      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
-      <div class="revision-list">
-        ${pendingRoutine.map(x=>{
-          const revised=!!data.monthlyRevision[x.studyId];
-          return `<label class="revision-item">
-            <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('monthlyRevision','${x.studyId}',this.checked)">
-            <div>
-              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
-              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
-              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
-            </div>
-            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
-          </label>`;
-        }).join('')}
-      </div>` : ''}
-
-    ${completedRoutine.length ? `
-      <div class="revision-group-title">COMPLETED — REVISION</div>
-      <div class="revision-list">
-        ${completedRoutine.map(x=>{
-          const revised=!!data.monthlyRevision[x.studyId];
-          return `<label class="revision-item">
-            <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('monthlyRevision','${x.studyId}',this.checked)">
-            <div>
-              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
-              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
-              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
-            </div>
-            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
-          </label>`;
-        }).join('')}
-      </div>` : ''}
-  `;
 }
 
 function calendarStatus(d){
   const k=iso(d);
   const list=entries(d);
   const total=list.length;
-  const done=list.filter((x,i)=>data.done[itemId(k,i)]===true).length;
+  const done=list.filter((x,i)=>isDone(x,k,i)).length;
   const todayKey=iso(todayDhaka());
   const isToday=k===todayKey;
 
   if(!inPlan(d)) return {type:'outside',done,total,isToday};
-  if(isToday){
-    if(total===0) return {type:'empty',done,total,isToday:true};
-    if(done===total) return {type:'done',done,total,isToday:true};
-    if(done>0) return {type:'partial',done,total,isToday:true};
-    return {type:'pending',done,total,isToday:true};
+
+  if(total===0) return {type:'empty',done,total,isToday};
+
+  if(k<todayKey && done<total){
+    return {type:'missed',done,total,isToday};
   }
 
-  if(k<todayKey && total>0 && done<total){
-    return {type:'missed',done,total,isToday:false};
-  }
+  if(done===total) return {type:'done',done,total,isToday};
+  if(done>0) return {type:'partial',done,total,isToday};
 
-  if(total===0) return {type:'empty',done,total,isToday:false};
-  if(done===total) return {type:'done',done,total,isToday:false};
-  if(done>0) return {type:'partial',done,total,isToday:false};
-  return {type:'pending',done,total,isToday:false};
+  return {type:'pending',done,total,isToday};
 }
 
 function renderCalendar(){
   const box=document.getElementById('calendar');
   const y=calCursor.getFullYear(),m=calCursor.getMonth();
+
   document.getElementById('calMonth').textContent=
     calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
 
@@ -677,7 +1009,7 @@ function renderCalendar(){
   const offset=(first.getDay()+6)%7;
   const days=new Date(y,m+1,0).getDate();
 
-  for(let i=0;i<offset;i++)h+='<div></div>';
+  for(let i=0;i<offset;i++) h+='<div></div>';
 
   for(let n=1;n<=days;n++){
     const d=new Date(y,m,n), k=iso(d);
@@ -685,6 +1017,7 @@ function renderCalendar(){
 
     let cls='cal-day '+st.type;
     if(st.isToday) cls+=' today';
+    if(iso(selected)===k) cls+=' selected-date';
 
     const label={
       done:'ALL DONE',
@@ -696,66 +1029,49 @@ function renderCalendar(){
     }[st.type];
 
     const mini=st.total ? `${st.done}/${st.total}` : '—';
-    const statusText=st.total ? label : '';
 
-    h+=`<div class="${cls}" ${st.type!=='outside'?`onclick="selectDate('${k}')"`:''} title="${statusText}">
+    const todayText=st.isToday?'<span class="cal-today">TODAY</span>':'';
+
+    h+=`<div class="${cls}" ${st.type!=='outside'?`onclick="selectDate('${k}')"`:''} title="${st.isToday?'TODAY':label}">
       <div class="n">${n}</div>
+      <span class="selected-marker" aria-label="Selected routine date"></span>
       <div class="mini">${mini}</div>
-      ${st.total?`<div class="cal-status">${label}</div>`:''}
+      <div class="cal-status-wrap">
+        ${st.total?`<span class="cal-status">${label}</span>`:''}
+        ${todayText}
+      </div>
     </div>`;
   }
 
   box.innerHTML=h;
-  renderSelectedDay();
-}
-
-function renderSelectedDay(){
-  const box=document.getElementById('selectedDayInfo');
-  if(!box)return;
-  const d=selected;
-  const list=actualItems(d);
-  const planned=entries(d);
-  const done=planned.filter((x,i)=>data.done[itemId(iso(d),i)]).length;
-  const status=planned.length ? (done===planned.length ? 'ALL DONE' : done ? 'PARTIAL' : 'PENDING') : 'NO ROUTINE';
-
-  let html=`<div class="sd-head"><span>${fmt(d)}</span><span>${status}</span></div>
-    <div class="sd-meta">DAY ${dayIndex(d)} / 200 · ${done}/${planned.length} completed · ${displayDate(iso(d))}</div>`;
-
-  if(!list.length){
-    html+='<div class="sd-meta">এই দিনে কোনো Study set করা নেই।</div>';
-  }else{
-    html+='<div class="sd-list">'+list.map(x=>{
-      const id=itemId(x.plannedDate,x.sourceIndex);
-      const checked=!!data.done[id];
-      return `<div class="sd-item">
-        <div>
-          <div>${escapeHtml(x.subject||'Study')} — ${escapeHtml(x.topic||'Untitled')}${x.carry?' <em>↳ CARRY</em>':''}</div>
-          <div class="revision-date">${checked?'COMPLETED':'PENDING'}</div>
-        </div>
-        <button class="sd-toggle ${checked?'checked':''}" onclick="toggleDoneFromCalendar('${id}')">
-          ${checked?'✓ COMPLETED':'MARK DONE'}
-        </button>
-      </div>`;
-    }).join('')+'</div>';
-  }
-
-  box.innerHTML=html;
-}
-
-function toggleDoneFromCalendar(id){
-  if(data.done[id]) delete data.done[id];
-  else data.done[id]=true;
-  save();
-  render();
 }
 
 function selectDate(k){
   const d=new Date(k+'T00:00:00');
-  if(!inPlan(d))return;
+  if(!inPlan(d)) return;
+
   selected=d;
   calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
-  document.getElementById('dateInput').value=k;
   render();
+
+  // Calendar click -> automatically take the user to the Routine section.
+  // The Routine card itself stays in its fixed layout position; only the page
+  // scrolls to it, and its internal list starts at the selected date.
+  requestAnimationFrame(()=>{
+    const routineCard=document.querySelector('.routine-card');
+    const routineList=document.getElementById('routineList');
+
+    if(routineList){
+      routineList.scrollTop=0;
+    }
+
+    if(routineCard){
+      routineCard.scrollIntoView({
+        behavior:'smooth',
+        block:'start'
+      });
+    }
+  });
 }
 
 function changeMonth(n){
@@ -763,37 +1079,51 @@ function changeMonth(n){
   renderCalendar();
 }
 
-function addOne(){
-  const date=document.getElementById('dateInput').value, subject=document.getElementById('subjectInput').value.trim(), topic=document.getElementById('topicInput').value.trim();
-  if(!date||!subject||!topic)return alert('Date, Subject and Topic — তিনটাই দিতে হবে।');
-  const d=new Date(date+'T00:00:00'); if(!inPlan(d))return alert('200D plan: 01 Oct 2026 থেকে 18 Apr 2027 পর্যন্ত।');
-  data.routine[date]??=[];data.routine[date].push({subject,topic});save();
-  document.getElementById('subjectInput').value='';document.getElementById('topicInput').value='';selected=d;render();
+function openBulk(){
+  document.getElementById('bulkModal').classList.add('open');
 }
-function openBulk(){document.getElementById('bulkModal').classList.add('open')}
-function closeBulk(){document.getElementById('bulkModal').classList.remove('open')}
+
+function closeBulk(){
+  document.getElementById('bulkModal').classList.remove('open');
+}
+
+/*
+  BULK FORMAT
+  -----------
+  A new study starts ONLY when a line matches:
+  Date | Subject | Topic
+
+  Every following non-date line becomes part of that same Topic,
+  preserving line breaks. Therefore a multiline topic is ONE study.
+*/
 function parsePlanDate(s){
   const raw=String(s).trim();
-  const m=raw.match(/^(\\d{1,2})\\s+([A-Za-z]{3,9})\\s+(\\d{4})$/);
-  if(!m)return new Date(raw);
+  const m=raw.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})$/);
+  if(!m) return new Date(raw);
+
   const months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
   const mi=months.indexOf(m[2].slice(0,3).toLowerCase());
-  if(mi<0)return null;
-  return new Date(Number(m[3]),mi,Number(m[1]));
+  if(mi<0) return null;
+
+  const d=new Date(Number(m[3]),mi,Number(m[1]));
+  if(d.getFullYear()!==Number(m[3]) || d.getMonth()!==mi || d.getDate()!==Number(m[1])) return null;
+  return d;
 }
+
 function parseRoutineBulk(raw){
   const lines=String(raw||'').split(/\r?\n/);
   const result=[];
   let current=null;
 
   for(const rawLine of lines){
+    // Keep the original line content, but use a trimmed copy for detecting headers.
     const line=rawLine.trim();
     if(!line) continue;
 
     const parts=line.split('|').map(x=>x.trim());
     const parsedDate=parts.length>=3 ? parsePlanDate(parts[0]) : null;
 
-    // A line containing Date | Subject | starts a NEW study.
+    // Date | Subject | starts a NEW study.
     if(parts.length>=3 && parsedDate && inPlan(parsedDate)){
       if(current) result.push(current);
 
@@ -805,10 +1135,10 @@ function parseRoutineBulk(raw){
       continue;
     }
 
-    // Following lines belong to the SAME topic.
-    // Preserve line breaks inside the topic.
+    // No new Date | Subject | Topic line:
+    // this line belongs to the current study's multiline Topic.
     if(current){
-      current.topic += (current.topic ? '\\n' : '') + line;
+      current.topic += (current.topic ? '\n' : '') + rawLine.trimEnd();
     }
   }
 
@@ -817,7 +1147,9 @@ function parseRoutineBulk(raw){
 }
 
 function importBulk(){
-  const rows=parseRoutineBulk(document.getElementById('bulkInput').value);
+  const input=document.getElementById('bulkInput');
+  const rows=parseRoutineBulk(input.value);
+
   if(!rows.length){
     alert('কোনো valid routine পাওয়া যায়নি। Format: 01 Oct 2026 | Bangla | Topic');
     return;
@@ -825,7 +1157,9 @@ function importBulk(){
 
   rows.forEach(row=>{
     data.routine[row.date] ||= [];
+
     data.routine[row.date].push({
+      uid:makeUid(),
       subject:row.subject,
       topic:row.topic
     });
@@ -833,19 +1167,61 @@ function importBulk(){
 
   save();
   closeBulk();
+  input.value='';
   render();
+
   alert(rows.length+'টি Study routine-এ যোগ হয়েছে।');
 }
 
-function resetAll(){if(confirm('200D Plan-এর সব routine এবং progress মুছে ফেলবে?')){data={routine:{},done:{},weekly:{},monthly:{},weeklyRevision:{},monthlyRevision:{}};save();render()}}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
+
+function renderTopic(s){
+  let text=String(s??'Untitled');
+
+  // Some older imports may contain the literal characters \\n instead of a real line break.
+  text=text.replace(/\\r?\\n/g,'\n');
+
+  // Real multiline topics stay line-by-line.
+  let lines=text.split(/\r?\n/);
+
+  // If an older record flattened the topic into comma-separated text,
+  // display each comma-separated part on its own line without changing storage.
+  if(lines.length===1 && /,\s*/.test(text)){
+    lines=text.split(/,\s*/);
+  }
+
+  return lines
+    .map(line=>escapeHtml(line))
+    .join('<br>');
+}
+
+function escapeAttr(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+// Initial state.
 const bootDate=todayDhaka();
 selected=cloneDate(inPlan(bootDate)?bootDate:START);
 calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
-document.getElementById('dateInput').value=iso(selected);
+
 render();
+
+// Trusted internet time sync. If offline, saved offset remains usable.
 syncTrustedDate(false);
-setInterval(()=>{ syncTrustedDate(false); render(); }, 15*60*1000);
+
+// Periodic refresh; this never clears or replaces existing study data.
+setInterval(()=>{
+  syncTrustedDate(false);
+  render();
+},15*60*1000);
 </script>
 </body>
 </html>
