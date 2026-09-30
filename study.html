@@ -1207,6 +1207,23 @@ function escapeAttr(s){
   return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
+// Cloud realtime bridge for 200D PLAN.
+// cloud.js writes the incoming cloud state to the existing localStorage key,
+// then emits this event. Re-read that same key into the page's in-memory
+// `data` object so the original UI can render the new state without a reload.
+window.addEventListener('soikat-200d-cloud-updated',()=>{
+  try{
+    const fresh=loadDataSafely();
+    if(fresh && typeof fresh==='object'){
+      data=fresh;
+      render();
+      console.log('[Soikat 200D] CLOUD DATA APPLIED TO PAGE');
+    }
+  }catch(e){
+    console.error('[Soikat 200D] cloud refresh failed',e);
+  }
+});
+
 // Initial state.
 const bootDate=todayDhaka();
 selected=cloneDate(inPlan(bootDate)?bootDate:START);
