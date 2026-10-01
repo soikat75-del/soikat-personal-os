@@ -427,6 +427,29 @@
     state.lastCloudWrite[app]=stable(initial);
   }
 
+  const RESTORE_RELOAD_KEY = 'soikat_cloud_restore_reload_v22';
+
+  function reloadAfterInitialRestore(){
+    // The app scripts create their in-memory state before cloud.js finishes its
+    // asynchronous Supabase read. A single reload makes the restored localStorage
+    // become the app's initial state on the next page load.
+    const b=basename();
+    if(b!=='goal.html' && b!=='study.html') return;
+    try{
+      if(sessionStorage.getItem(RESTORE_RELOAD_KEY)==='1'){
+        sessionStorage.removeItem(RESTORE_RELOAD_KEY);
+        console.log('[Soikat Cloud] RESTORE VERIFIED — using restored localStorage');
+        return;
+      }
+      sessionStorage.setItem(RESTORE_RELOAD_KEY,'1');
+      console.log('[Soikat Cloud] INITIAL RESTORE COMPLETE — reloading app once');
+      window.location.reload();
+    }catch(e){
+      // sessionStorage may be unavailable; fall back to the existing refresh.
+      console.warn('[Soikat Cloud] restore reload marker unavailable',e);
+    }
+  }
+
   function refreshPageFromCloud(app){
     try{
       // 100K GOAL reads localStorage inside render(), so direct render is enough.
@@ -434,9 +457,10 @@
         window.render();
         return;
       }
-      // 200D PLAN keeps its working data object in memory; reload only when
-      // a cloud change needs to enter that existing in-memory state.
-      if(app==='soikat_200d_plan' && document.readyState==='complete'){
+      // Both apps have already created their own state before cloud.js finishes.
+      // Reloading once is the safest way to make cloud-restored localStorage become
+      // the app's initial in-memory state. Realtime changes use the same path.
+      if((app==='soikat_200d_plan' || app===null) && document.readyState==='complete'){
         window.location.reload();
         return;
       }
@@ -457,8 +481,9 @@
     refreshAuthUI();
     // Let the existing page redraw from its now-synced localStorage without changing its code.
     window.dispatchEvent(new CustomEvent('soikat-cloud-synced'));
-    // The original apps do not listen for this event, so refresh their visible state.
-    if(basename()==='goal.html' || basename()==='study.html') refreshPageFromCloud(null);
+    // Initial restore must enter the app's own in-memory state as well as localStorage.
+    // Do this only once per page load; the next load starts directly from restored data.
+    reloadAfterInitialRestore();
   }
 
   function queueLocalCloudSave(key,app,payload){
@@ -610,11 +635,7 @@
 
       if(existing===incoming){
         console.log('[Soikat Realtime] EVENT already in localStorage — refreshing page state');
-        if(row.app==='soikat_200d_plan'){
-          window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
-        }else if(row.app==='soikat_100k_goal'){
-          if(typeof window.render==='function') window.render();
-        }
+        refreshPageFromCloud(row.app);
         return;
       }
 
@@ -634,15 +655,8 @@
         detail:{app:row.app,key}
       }));
 
-      if(row.app==='soikat_100k_goal'){
-        console.log('[Soikat Realtime] NEW 100K CLOUD DATA APPLIED — RENDERING');
-        if(typeof window.render==='function') window.render();
-      }else if(row.app==='soikat_200d_plan'){
-        console.log('[Soikat Realtime] NEW 200D CLOUD DATA APPLIED — REFRESH EVENT');
-        window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
-      }else{
-        refreshPageFromCloud(row.app);
-      }
+      console.log('[Soikat Realtime] CLOUD DATA APPLIED — RELOADING APP STATE');
+      refreshPageFromCloud(row.app);
     };
 
     channel
@@ -695,7 +709,7 @@
   }
 
   window.SoikatCloud={
-    version:'2.1.0',
+    version:'2.2.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
