@@ -1234,6 +1234,27 @@ setInterval(()=>{
   render();
 },15*60*1000);
 </script>
-  <script src="cloud.js?v=22"></script>
+<script>
+// Cloud restore/update hook: refresh 200D's in-memory state without reloading the page.
+window.addEventListener('soikat-200d-cloud-updated',()=>{
+  try{
+    data=loadDataSafely();
+    render();
+    console.log('[Soikat 200D] CLOUD STATE APPLIED TO UI — NO PAGE RELOAD');
+  }catch(e){
+    console.error('[Soikat 200D] cloud state apply failed',e);
+  }
+});
+window.addEventListener('soikat-cloud-synced',()=>{
+  try{
+    data=loadDataSafely();
+    render();
+    console.log('[Soikat 200D] INITIAL CLOUD RESTORE APPLIED — NO PAGE RELOAD');
+  }catch(e){
+    console.error('[Soikat 200D] initial cloud restore failed',e);
+  }
+});
+</script>
+  <script src="cloud.js?v=23"></script>
 </body>
 </html>
