@@ -31,7 +31,10 @@
     booting: false,
     channel: null,
     pending: Object.create(null),
-    lastCloudWrite: Object.create(null)
+    lastCloudWrite: Object.create(null),
+    lastObservedLocal: Object.create(null),
+    saveTimers: Object.create(null),
+    localWatcher: null
   };
 
   function basename(){
@@ -266,21 +269,62 @@
   async function pushCloud(key,app,payload){
     const user=state.session?.user;
     if(!user||!state.client)return false;
-    // Empty objects are valid cloud states: they represent an intentional full deletion.
     if(payload===null || payload===undefined) payload={};
+
+    const snapshot=clone(payload);
     const stamp=new Date().toISOString();
-    const {error}=await state.client.from(TABLE).upsert({
-      user_id:user.id,
-      app:app,
-      data:payload,
-      updated_at:stamp
-    },{onConflict:'user_id,app'});
-    if(error){
-      console.error('[Soikat Cloud] write failed',app,error);
-      return false;
+
+    for(let attempt=1;attempt<=3;attempt++){
+      try{
+        const result=await state.client.from(TABLE).upsert({
+          user_id:user.id,
+          app:app,
+          data:snapshot,
+          updated_at:stamp
+        },{onConflict:'user_id,app'});
+
+        if(result.error){
+          console.error(`[Soikat Cloud] WRITE FAILED ${app} attempt ${attempt}/3`,result.error);
+          if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+          continue;
+        }
+
+        // Verify the row actually contains the exact state we just sent.
+        const verify=await state.client.from(TABLE)
+          .select('data,updated_at')
+          .eq('user_id',user.id)
+          .eq('app',app)
+          .maybeSingle();
+
+        if(verify.error){
+          console.error(`[Soikat Cloud] VERIFY FAILED ${app} attempt ${attempt}/3`,verify.error);
+          if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+          continue;
+        }
+
+        const remote=verify.data?.data ?? {};
+        if(stable(remote)!==stable(snapshot)){
+          console.error('[Soikat Cloud] VERIFY MISMATCH',{
+            app,
+            sent:snapshot,
+            remote
+          });
+          if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+          continue;
+        }
+
+        state.lastCloudWrite[app]=stable(snapshot);
+        state.lastObservedLocal[key]=stable(snapshot);
+        console.log('[Soikat Cloud] WRITE VERIFIED',app,snapshot);
+        return true;
+      }catch(err){
+        console.error(`[Soikat Cloud] WRITE EXCEPTION ${app} attempt ${attempt}/3`,err);
+        if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+      }
     }
-    state.lastCloudWrite[app]=stable(payload);
-    return true;
+
+    setStatus(`Cloud write failed · ${app}`,'error');
+    return false;
   }
 
   async function migrateLegacyRows(app,canonicalData){
@@ -406,6 +450,9 @@
     setStatus('Syncing…','syncing');
     for(const [key,app] of Object.entries(APPS)) await syncApp(key,app);
     state.ready=true;
+    // Start the safety watcher after the initial cloud-authoritative sync.
+    installLocalWatcher();
+    for(const [key,app] of Object.entries(APPS)) state.lastObservedLocal[key]=stable(readLocal(key)===null?{}:readLocal(key));
     setStatus('Cloud synced','online');
     refreshAuthUI();
     // Let the existing page redraw from its now-synced localStorage without changing its code.
@@ -414,22 +461,82 @@
     if(basename()==='goal.html' || basename()==='study.html') refreshPageFromCloud(null);
   }
 
+  function queueLocalCloudSave(key,app,payload){
+    if(!state.session || !state.client || !state.ready) return;
+
+    const snapshot=clone(payload);
+    state.pending[key]=true;
+    state.lastObservedLocal[key]=stable(snapshot);
+
+    clearTimeout(state.saveTimers[key]);
+    state.saveTimers[key]=setTimeout(async()=>{
+      state.pending[key]=false;
+      const ok=await pushCloud(key,app,snapshot);
+      if(!ok){
+        // One final delayed retry. This is intentionally quiet to the UI;
+        // the console contains the exact Supabase error.
+        clearTimeout(state.saveTimers[key]);
+        state.saveTimers[key]=setTimeout(()=>{
+          const latest=readLocal(key);
+          pushCloud(key,app,latest===null?{}:latest).catch(err=>
+            console.error('[Soikat Cloud] retry exception',app,err)
+          );
+        },2000);
+      }
+    },250);
+  }
+
   function installStorageBridge(){
-    const original=Storage.prototype.setItem;
-    if(original.__soikatCloudWrapped)return;
-    function wrapped(key,value){
-      original.call(this,key,value);
+    if(Storage.prototype.__soikatCloudWrappedV21)return;
+
+    const originalSet=Storage.prototype.setItem;
+    const originalRemove=Storage.prototype.removeItem;
+
+    function wrappedSet(key,value){
+      originalSet.call(this,key,value);
       if(this!==window.localStorage)return;
       const app=APPS[key];
-      if(!app||!state.session)return;
-      state.pending[key]=true;
-      if(!state.ready)return;
-      let payload=null;
-      try{payload=JSON.parse(value);}catch(e){return;}
-      pushCloud(key,app,payload).catch(()=>{});
+      if(!app)return;
+      let payload;
+      try{payload=JSON.parse(value);}catch(e){
+        console.error('[Soikat Cloud] Invalid JSON for',key,e);
+        return;
+      }
+      queueLocalCloudSave(key,app,payload);
     }
-    wrapped.__soikatCloudWrapped=true;
-    Storage.prototype.setItem=wrapped;
+
+    function wrappedRemove(key){
+      originalRemove.call(this,key);
+      if(this!==window.localStorage)return;
+      const app=APPS[key];
+      if(!app)return;
+      queueLocalCloudSave(key,app,{});
+    }
+
+    wrappedSet.__soikatCloudWrappedV21=true;
+    wrappedRemove.__soikatCloudWrappedV21=true;
+    Storage.prototype.setItem=wrappedSet;
+    Storage.prototype.removeItem=wrappedRemove;
+    Storage.prototype.__soikatCloudWrappedV21=true;
+  }
+
+  function installLocalWatcher(){
+    if(state.localWatcher)return;
+    state.localWatcher=setInterval(()=>{
+      if(!state.session || !state.client || !state.ready)return;
+      for(const [key,app] of Object.entries(APPS)){
+        const local=readLocal(key);
+        const hash=stable(local===null?{}:local);
+        if(state.lastObservedLocal[key]===undefined){
+          state.lastObservedLocal[key]=hash;
+          continue;
+        }
+        if(hash!==state.lastObservedLocal[key]){
+          console.log('[Soikat Cloud] LOCAL CHANGE DETECTED',app);
+          queueLocalCloudSave(key,app,local===null?{}:local);
+        }
+      }
+    },1000);
   }
 
   async function installRealtime(){
@@ -588,7 +695,7 @@
   }
 
   window.SoikatCloud={
-    version:'1.1.0',
+    version:'2.1.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
