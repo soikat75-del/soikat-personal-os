@@ -1218,6 +1218,20 @@ function escapeAttr(s){
   return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
+// Cloud realtime update: cloud.js writes the latest 200D state into localStorage.
+// The page also keeps a separate in-memory `data` object, so reload that object
+// before rendering whenever a realtime update arrives.
+window.addEventListener('soikat-200d-cloud-updated',()=>{
+  try{
+    data=loadDataSafely();
+    ensureStudyUids();
+    render();
+    console.log('[Soikat 200D] CLOUD STATE APPLIED TO UI');
+  }catch(e){
+    console.error('[Soikat 200D] CLOUD UI REFRESH FAILED',e);
+  }
+});
+
 // Initial state.
 const bootDate=todayDhaka();
 selected=cloneDate(inPlan(bootDate)?bootDate:START);
