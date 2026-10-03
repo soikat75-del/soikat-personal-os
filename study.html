@@ -1368,7 +1368,9 @@ setInterval(()=>{
 
   function normalize(v){
     const x=(v&&typeof v==='object'&&!Array.isArray(v))?v:{};
-    for(const k of ['routine','done','weekly','monthly','weeklyRevision','monthlyRevision']){
+    // Cloud data can come from an older schema, so restore every required
+    // top-level map before assigning it to the live in-memory `data` object.
+    for(const k of Object.keys(DEFAULT_DATA)){
       if(!x[k]||typeof x[k]!=='object'||Array.isArray(x[k])) x[k]={};
     }
     return x;
