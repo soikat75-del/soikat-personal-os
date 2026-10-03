@@ -30,11 +30,16 @@
     ready: false,
     booting: false,
     channel: null,
+    realtimeGeneration: 0,
+    reconnectTimer: null,
+    realtimeHealthTimer: null,
     pending: Object.create(null),
     lastCloudWrite: Object.create(null),
     lastObservedLocal: Object.create(null),
     saveTimers: Object.create(null),
-    localWatcher: null
+    localWatcher: null,
+    suppressQueue: Object.create(null),
+    syncHealthy: true
   };
 
   function basename(){
@@ -103,10 +108,14 @@
 
   function writeLocal(key,value){
     try{
+      state.suppressQueue[key]=true;
       state.pending[key]=false;
       localStorage.setItem(key,JSON.stringify(value));
       return true;
-    }catch(e){return false;}
+    }catch(e){
+      state.suppressQueue[key]=false;
+      return false;
+    }
   }
 
   function setStatus(text,kind){
@@ -203,8 +212,11 @@
     if(inside)inside.style.display=signedIn?'block':'none';
     if(email)email.textContent=state.session?.user?.email||'';
     if(btn)btn.textContent=signedIn?'CLOUD · ON':'CLOUD';
-    if(signedIn)setStatus('Cloud synced','online');
-    else setStatus('Local only','offline');
+    if(!signedIn)setStatus('Local only','offline');
+    else if(state.ready && state.syncHealthy && !state.reconnectTimer){
+      const hasError=Object.keys(state.pending).some(k=>state.pending[k]);
+      if(!hasError) setStatus('Cloud synced','online');
+    }
   }
 
   function redirectUrl(){
@@ -266,16 +278,82 @@
       .eq('user_id',user.id).eq('app',app).maybeSingle();
   }
 
-  async function pushCloud(key,app,payload){
+  const META_PREFIX='soikat_cloud_meta_v3:';
+  const OUTBOX_PREFIX='soikat_cloud_outbox_v3:';
+
+  function metaKey(key){return META_PREFIX+key;}
+  function outboxKey(key){return OUTBOX_PREFIX+key;}
+
+  function readJsonKey(key,fallback=null){
+    try{
+      const raw=localStorage.getItem(key);
+      return raw===null?fallback:JSON.parse(raw);
+    }catch(e){return fallback;}
+  }
+
+  function writeJsonKey(key,value){
+    try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(e){return false;}
+  }
+
+  function readMeta(key){return readJsonKey(metaKey(key),{});}
+  function saveMeta(key,meta){writeJsonKey(metaKey(key),meta||{});}
+  function readOutbox(key){return readJsonKey(outboxKey(key),null);}
+  function clearOutbox(key){try{localStorage.removeItem(outboxKey(key));}catch(e){}}
+
+  function saveSafetyCopy(key,payload,reason){
+    const stamp=new Date().toISOString().replace(/[:.]/g,'-');
+    const safeKey=`soikat_cloud_safety:${key}:${stamp}`;
+    writeJsonKey(safeKey,{savedAt:new Date().toISOString(),reason,payload:clone(payload)});
+    console.warn('[Soikat Cloud] SAFETY COPY SAVED',safeKey,reason);
+    return safeKey;
+  }
+
+  function markSynced(key,app,payload,remoteUpdatedAt){
+    const hash=stable(payload===null||payload===undefined?{}:payload);
+    const now=new Date().toISOString();
+    saveMeta(key,{
+      app,
+      lastSyncedHash:hash,
+      lastSyncedAt:remoteUpdatedAt||now,
+      lastConfirmedAt:now
+    });
+    clearOutbox(key);
+    state.lastCloudWrite[app]=hash;
+    state.lastObservedLocal[key]=hash;
+  }
+
+  async function pushCloud(key,app,payload,opts={}){
     const user=state.session?.user;
     if(!user||!state.client)return false;
     if(payload===null || payload===undefined) payload={};
 
     const snapshot=clone(payload);
-    const stamp=new Date().toISOString();
+    const stamp=opts.updatedAt || new Date().toISOString();
 
-    for(let attempt=1;attempt<=3;attempt++){
+    for(let attempt=1;attempt<=4;attempt++){
       try{
+        // Do not blindly overwrite a newer cloud revision. This protects against
+        // two devices saving at nearly the same time.
+        const current=await state.client.from(TABLE)
+          .select('data,updated_at')
+          .eq('user_id',user.id)
+          .eq('app',app)
+          .maybeSingle();
+        if(current.error){
+          console.error('[Soikat Cloud] PREFLIGHT READ FAILED',app,current.error);
+          if(attempt<4) await new Promise(r=>setTimeout(r,700*attempt));
+          continue;
+        }
+        if(current.data?.updated_at && opts.baseUpdatedAt){
+          const remoteAt=Date.parse(current.data.updated_at)||0;
+          const baseAt=Date.parse(opts.baseUpdatedAt)||0;
+          if(remoteAt>baseAt && stable(current.data.data??{})!==stable(snapshot)){
+            saveSafetyCopy(key,snapshot,'newer cloud revision detected before write');
+            console.warn('[Soikat Cloud] WRITE BLOCKED — newer cloud revision exists',app);
+            return false;
+          }
+        }
+
         const result=await state.client.from(TABLE).upsert({
           user_id:user.id,
           app:app,
@@ -284,12 +362,11 @@
         },{onConflict:'user_id,app'});
 
         if(result.error){
-          console.error(`[Soikat Cloud] WRITE FAILED ${app} attempt ${attempt}/3`,result.error);
-          if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+          console.error(`[Soikat Cloud] WRITE FAILED ${app} attempt ${attempt}/4`,result.error);
+          if(attempt<4) await new Promise(r=>setTimeout(r,700*attempt));
           continue;
         }
 
-        // Verify the row actually contains the exact state we just sent.
         const verify=await state.client.from(TABLE)
           .select('data,updated_at')
           .eq('user_id',user.id)
@@ -297,34 +374,49 @@
           .maybeSingle();
 
         if(verify.error){
-          console.error(`[Soikat Cloud] VERIFY FAILED ${app} attempt ${attempt}/3`,verify.error);
-          if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+          console.error(`[Soikat Cloud] VERIFY FAILED ${app} attempt ${attempt}/4`,verify.error);
+          if(attempt<4) await new Promise(r=>setTimeout(r,700*attempt));
           continue;
         }
 
         const remote=verify.data?.data ?? {};
         if(stable(remote)!==stable(snapshot)){
-          console.error('[Soikat Cloud] VERIFY MISMATCH',{
-            app,
-            sent:snapshot,
-            remote
-          });
-          if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+          console.error('[Soikat Cloud] VERIFY MISMATCH',{app,sent:snapshot,remote});
+          if(attempt<4) await new Promise(r=>setTimeout(r,700*attempt));
           continue;
         }
 
-        state.lastCloudWrite[app]=stable(snapshot);
-        state.lastObservedLocal[key]=stable(snapshot);
-        console.log('[Soikat Cloud] WRITE VERIFIED',app,snapshot);
+        markSynced(key,app,snapshot,verify.data?.updated_at||stamp);
+        console.log('[Soikat Cloud] WRITE VERIFIED',app);
         return true;
       }catch(err){
-        console.error(`[Soikat Cloud] WRITE EXCEPTION ${app} attempt ${attempt}/3`,err);
-        if(attempt<3) await new Promise(r=>setTimeout(r,500*attempt));
+        console.error(`[Soikat Cloud] WRITE EXCEPTION ${app} attempt ${attempt}/4`,err);
+        if(attempt<4) await new Promise(r=>setTimeout(r,700*attempt));
       }
     }
 
-    setStatus(`Cloud write failed · ${app}`,'error');
+    setStatus(`CLOUD SYNC ERROR · ${app}`,'error');
     return false;
+  }
+
+  async function flushOutbox(key,app){
+    if(!state.session||!state.client)return false;
+    const box=readOutbox(key);
+    if(!box || !Object.prototype.hasOwnProperty.call(box,'payload'))return false;
+
+    const local=readLocal(key);
+    const localHash=stable(local===null?{}:local);
+    // Never upload an obsolete queued snapshot after the user has changed data again.
+    if(box.hash!==localHash){
+      const fresh={payload:local===null?{}:clone(local),hash:localHash,updatedAt:new Date().toISOString()};
+      writeJsonKey(outboxKey(key),fresh);
+      return await flushOutbox(key,app);
+    }
+
+    const meta=readMeta(key);
+    const ok=await pushCloud(key,app,box.payload,{updatedAt:box.updatedAt,baseUpdatedAt:meta.lastSyncedAt||null});
+    if(!ok) setStatus('CLOUD SYNC ERROR · RETRYING','error');
+    return ok;
   }
 
   async function migrateLegacyRows(app,canonicalData){
@@ -373,58 +465,113 @@
     if(!state.session||!state.client)return;
 
     const local=readLocal(key);
+    const localState=local===null?{}:local;
+    const localHash=stable(localState);
+    const meta=readMeta(key);
+    const outbox=readOutbox(key);
     const result=await fetchCloud(key,app);
+
     if(result.error){
-      console.error('[Soikat Cloud] read failed',app,result.error);
-      setStatus('Cloud error','error');
-      return;
+      console.error('[Soikat Cloud] READ FAILED',app,result.error);
+      // Keep local data and preserve a pending outbox. Never overwrite local on a read error.
+      if(local!==null && !outbox){
+        writeJsonKey(outboxKey(key),{payload:clone(localState),hash:localHash,updatedAt:new Date().toISOString()});
+      }
+      setStatus('CLOUD READ ERROR · LOCAL SAFE','error');
+      return false;
     }
 
     let cloud=result.row ? clone(result.row.data || {}) : null;
 
-    // Migrate the earlier duplicate 100K app id into the canonical row.
-    if(app==='soikat_100k_goal'){
-      cloud=await migrateLegacyRows(app,cloud);
-    }
+    if(app==='soikat_100k_goal') cloud=await migrateLegacyRows(app,cloud);
 
-    /*
-      IMPORTANT SYNC RULE
-      -------------------
-      Once a canonical cloud row exists, CLOUD IS AUTHORITATIVE.
-      Never merge local data back into an existing cloud row.
-      A missing item on the local device is often an intentional deletion;
-      merging would resurrect that item from the cloud.
-
-      If no canonical row exists yet, this is first-time migration, so the
-      existing local data is allowed to create the cloud row.
-    */
-    if(result.row || meaningful(cloud)){
-      const cloudState=cloud || {};
-      writeLocal(key,cloudState);
-      state.lastCloudWrite[app]=stable(cloudState);
-
-      // If legacy 100K data was found, write the migrated canonical state.
-      if(app==='soikat_100k_goal' && stable(cloudState)!==stable(result.row?.data || {})){
-        const ok=await pushCloud(key,app,cloudState);
-        if(!ok){
-          console.error('[Soikat Cloud] canonical migration write failed',app);
-          setStatus('Cloud write failed','error');
-          return;
-        }
-        await deleteLegacyRows(app);
+    // A queued local change is authoritative for this device until it is either
+    // confirmed in the cloud or superseded by a newer remote change. Never erase it silently.
+    if(outbox || (meta.lastSyncedHash && localHash!==meta.lastSyncedHash)){
+      if(!result.row){
+        const ok=await pushCloud(key,app,localState,{updatedAt:outbox?.updatedAt||new Date().toISOString()});
+        if(ok && app==='soikat_100k_goal') await deleteLegacyRows(app);
+        return ok;
       }
-      return;
+
+      const cloudHash=stable(cloud||{});
+      if(cloudHash===localHash){
+        writeLocal(key,cloud||{});
+        markSynced(key,app,cloud||{},result.row.updated_at);
+        return true;
+      }
+
+      const lastSyncedAt=meta.lastSyncedAt?Date.parse(meta.lastSyncedAt):0;
+      const remoteAt=result.row.updated_at?Date.parse(result.row.updated_at):0;
+      const localAt=outbox?.updatedAt?Date.parse(outbox.updatedAt):Date.now();
+
+      if(remoteAt && lastSyncedAt && remoteAt>lastSyncedAt && remoteAt>=localAt){
+        // Another device changed the cloud after this device's last confirmed sync.
+        // Preserve the local unsynced version before accepting the newer remote state.
+        saveSafetyCopy(key,localState,'remote changed while this device had unsynced local changes');
+        writeLocal(key,cloud||{});
+        markSynced(key,app,cloud||{},result.row.updated_at);
+        console.warn('[Soikat Cloud] REMOTE NEWER — LOCAL SAFETY COPY KEPT',app);
+        return true;
+      }
+
+      // Local change is newer (or timestamps are unavailable): upload it and verify.
+      const ok=await pushCloud(key,app,localState,{updatedAt:outbox?.updatedAt||new Date().toISOString()});
+      if(ok && app==='soikat_100k_goal') await deleteLegacyRows(app);
+      return ok;
     }
 
-    // No cloud row exists: create it from the current device's local state.
-    const initial=meaningful(local) ? local : {};
-    const ok=await pushCloud(key,app,initial);
-    if(!ok){
-      console.error('[Soikat Cloud] initial write failed',app);
-      setStatus('Cloud write failed','error');
-      return;
+    // Normal remote-change case: this device has no unsynced local edit and
+    // its local state is exactly the last cloud version it acknowledged.
+    // Therefore a newer cloud row is authoritative and must flow into local
+    // storage + the page without requiring Realtime. This is what makes the
+    // cross-device sync resilient when a Realtime broadcast is missed.
+    if(result.row && !outbox && meta.lastSyncedHash && localHash===meta.lastSyncedHash){
+      const cloudHash=stable(cloud||{});
+      if(cloudHash!==localHash){
+        writeLocal(key,cloud||{});
+        markSynced(key,app,cloud||{},result.row.updated_at);
+        console.log('[Soikat Cloud] REMOTE POLL APPLIED',app);
+        refreshPageFromCloud(app);
+      }else{
+        markSynced(key,app,cloud||{},result.row.updated_at);
+      }
+      return true;
     }
-    state.lastCloudWrite[app]=stable(initial);
+
+    // First run with no sync history.
+    if(result.row){
+      // If local already exactly matches cloud, simply establish the baseline.
+      if(localHash===stable(cloud||{})){
+        writeLocal(key,cloud||{});
+        markSynced(key,app,cloud||{},result.row.updated_at);
+        return true;
+      }
+
+      // No baseline exists and both sides contain different data. Do NOT
+      // silently choose one: preserve the local copy and surface a conflict.
+      // A fresh/empty device can safely restore from cloud.
+      if(local!==null && meaningful(localState)){
+        saveSafetyCopy(key,localState,'first sync conflict: local and cloud both contain data');
+        saveSafetyCopy(key,cloud||{},'first sync conflict: cloud version preserved');
+        setStatus(`SYNC CONFLICT · ${app} · LOCAL SAFE`,'error');
+        console.warn('[Soikat Cloud] FIRST SYNC CONFLICT — NO OVERWRITE',app);
+        return false;
+      }
+      writeLocal(key,cloud||{});
+      markSynced(key,app,cloud||{},result.row.updated_at);
+      return true;
+    }
+
+    // No cloud row: current local state becomes the initial cloud state.
+    const initial=local===null?{}:localState;
+    const ok=await pushCloud(key,app,initial,{updatedAt:new Date().toISOString()});
+    if(!ok){
+      writeJsonKey(outboxKey(key),{payload:clone(initial),hash:stable(initial),updatedAt:new Date().toISOString()});
+      setStatus('CLOUD WRITE ERROR · LOCAL SAFE','error');
+      return false;
+    }
+    return true;
   }
 
   function refreshPageFromCloud(app){
@@ -434,10 +581,9 @@
         window.render();
         return;
       }
-      // 200D PLAN keeps its working data object in memory; reload only when
-      // a cloud change needs to enter that existing in-memory state.
-      if(app==='soikat_200d_plan' && document.readyState==='complete'){
-        window.location.reload();
+      // 200D keeps working state in memory; notify the page instead of reloading it.
+      if(app==='soikat_200d_plan'){
+        window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
         return;
       }
       if(typeof window.render==='function') window.render();
@@ -447,47 +593,56 @@
   async function syncAll(){
     if(!state.session||!state.client)return;
     state.ready=false;
+    state.syncHealthy=true;
     setStatus('Syncing…','syncing');
-    for(const [key,app] of Object.entries(APPS)) await syncApp(key,app);
+
+    let allOk=true;
+    for(const [key,app] of Object.entries(APPS)){
+      const ok=await syncApp(key,app);
+      if(ok===false)allOk=false;
+      if(ok===false)state.syncHealthy=false;
+    }
+
     state.ready=true;
-    // Start the safety watcher after the initial cloud-authoritative sync.
     installLocalWatcher();
-    for(const [key,app] of Object.entries(APPS)) state.lastObservedLocal[key]=stable(readLocal(key)===null?{}:readLocal(key));
-    setStatus('Cloud synced','online');
+
+    for(const [key,app] of Object.entries(APPS)){
+      state.lastObservedLocal[key]=stable(readLocal(key)===null?{}:readLocal(key));
+      if(readOutbox(key)){
+        // A failed write survives reload and is retried as soon as the session is ready.
+        setTimeout(()=>flushOutbox(key,app),200);
+      }
+    }
+
+    state.syncHealthy=allOk;
+    setStatus(allOk?'Cloud synced':'CLOUD SYNC ERROR · LOCAL SAFE',allOk?'online':'error');
     refreshAuthUI();
-    // Let the existing page redraw from its now-synced localStorage without changing its code.
     window.dispatchEvent(new CustomEvent('soikat-cloud-synced'));
-    // The original apps do not listen for this event, so refresh their visible state.
-    if(basename()==='goal.html' || basename()==='study.html') refreshPageFromCloud(null);
   }
 
   function queueLocalCloudSave(key,app,payload){
-    if(!state.session || !state.client || !state.ready) return;
+    const snapshot=clone(payload===null||payload===undefined?{}:payload);
+    const hash=stable(snapshot);
+    const existing=readOutbox(key);
 
-    const snapshot=clone(payload);
-    state.pending[key]=true;
-    state.lastObservedLocal[key]=stable(snapshot);
+    // Store the outbox BEFORE waiting for auth/realtime. This is the key safety layer.
+    const updatedAt=new Date().toISOString();
+    writeJsonKey(outboxKey(key),{payload:snapshot,hash,updatedAt});
+    state.lastObservedLocal[key]=hash;
 
     clearTimeout(state.saveTimers[key]);
     state.saveTimers[key]=setTimeout(async()=>{
-      state.pending[key]=false;
-      const ok=await pushCloud(key,app,snapshot);
-      if(!ok){
-        // One final delayed retry. This is intentionally quiet to the UI;
-        // the console contains the exact Supabase error.
-        clearTimeout(state.saveTimers[key]);
-        state.saveTimers[key]=setTimeout(()=>{
-          const latest=readLocal(key);
-          pushCloud(key,app,latest===null?{}:latest).catch(err=>
-            console.error('[Soikat Cloud] retry exception',app,err)
-          );
-        },2000);
+      state.saveTimers[key]=null;
+      if(!state.session||!state.client||!state.ready){
+        setStatus('CLOUD WAITING · LOCAL SAFE','syncing');
+        return;
       }
-    },250);
+      await flushOutbox(key,app);
+    },350);
   }
 
   function installStorageBridge(){
-    if(Storage.prototype.__soikatCloudWrappedV21)return;
+    if(Storage.prototype.__soikatCloudWrappedV30)return;
 
     const originalSet=Storage.prototype.setItem;
     const originalRemove=Storage.prototype.removeItem;
@@ -497,6 +652,7 @@
       if(this!==window.localStorage)return;
       const app=APPS[key];
       if(!app)return;
+      if(state.suppressQueue[key]){state.suppressQueue[key]=false;return;}
       let payload;
       try{payload=JSON.parse(value);}catch(e){
         console.error('[Soikat Cloud] Invalid JSON for',key,e);
@@ -510,20 +666,18 @@
       if(this!==window.localStorage)return;
       const app=APPS[key];
       if(!app)return;
+      if(state.suppressQueue[key]){state.suppressQueue[key]=false;return;}
       queueLocalCloudSave(key,app,{});
     }
 
-    wrappedSet.__soikatCloudWrappedV21=true;
-    wrappedRemove.__soikatCloudWrappedV21=true;
     Storage.prototype.setItem=wrappedSet;
     Storage.prototype.removeItem=wrappedRemove;
-    Storage.prototype.__soikatCloudWrappedV21=true;
+    Storage.prototype.__soikatCloudWrappedV30=true;
   }
 
   function installLocalWatcher(){
     if(state.localWatcher)return;
     state.localWatcher=setInterval(()=>{
-      if(!state.session || !state.client || !state.ready)return;
       for(const [key,app] of Object.entries(APPS)){
         const local=readLocal(key);
         const hash=stable(local===null?{}:local);
@@ -539,14 +693,40 @@
     },1000);
   }
 
-  async function installRealtime(){
+  function scheduleRealtimeReconnect(reason,delay=1500){
     if(!state.client||!state.session)return;
+    if(state.reconnectTimer)return;
+
+    console.warn('[Soikat Realtime] Reconnect scheduled:',reason);
+    setStatus('Realtime reconnecting…','syncing');
+
+    state.reconnectTimer=setTimeout(async()=>{
+      state.reconnectTimer=null;
+      if(!state.client||!state.session)return;
+      try{
+        await installRealtime(true);
+        if(state.session && state.ready){
+          // Reconcile cloud changes after reconnect. syncApp protects pending local changes.
+          await syncAll();
+        }
+      }catch(e){
+        console.error('[Soikat Realtime] reconnect failed',e);
+        scheduleRealtimeReconnect('retry after failure',3000);
+      }
+    },delay);
+  }
+
+  async function installRealtime(isReconnect=false){
+    if(!state.client||!state.session)return;
+
+    const myGeneration=++state.realtimeGeneration;
 
     try{
       await state.client.realtime.setAuth(state.session.access_token);
       console.log('[Soikat Realtime] Auth token set');
     }catch(e){
       console.error('[Soikat Realtime] setAuth failed',e);
+      scheduleRealtimeReconnect('setAuth failed',2000);
       return;
     }
 
@@ -558,7 +738,7 @@
     const userId=state.session.user.id;
     const topic='soikat-cloud:'+userId;
     console.log('[Soikat Realtime] USER ID:',userId);
-    console.log('[Soikat Realtime] TOPIC:',topic);
+    console.log('[Soikat Realtime] TOPIC:',topic,isReconnect?'(reconnect)':'');
 
     const channel=state.client.channel(topic,{config:{private:true}});
 
@@ -578,16 +758,10 @@
         return;
       }
 
-      // The channel is already private and scoped to the authenticated user's
-      // topic, so do not reject a valid database row because of a formatting/
-      // type mismatch in user_id. Only accept app IDs registered by this client.
-      // APPS is storageKey -> cloudAppId, while incoming row.app is the cloudAppId.
-      // Therefore validate against the mapped values, not the object keys.
       if(!row.app||!Object.values(APPS).includes(row.app)){
         console.warn('[Soikat Realtime] Unknown app in event:',row.app);
         return;
       }
-      // Empty object is a valid event: it means the user intentionally cleared the app.
       if(row.data===null || row.data===undefined) row.data={};
 
       const key=Object.keys(APPS).find(k=>APPS[k]===row.app);
@@ -620,10 +794,8 @@
 
       state.lastCloudWrite[row.app]=incoming;
 
-      // Write the incoming cloud state immediately. The private topic already
-      // scopes delivery to the current user's channel.
       try{
-        localStorage.setItem(key,JSON.stringify(row.data));
+        writeLocal(key,row.data);
         console.log('[Soikat Realtime] LOCAL STORAGE UPDATED',key);
       }catch(e){
         console.error('[Soikat Realtime] Failed to write incoming cloud data',e);
@@ -648,13 +820,36 @@
     channel
       .on('broadcast',{event:'*'},handleBroadcast)
       .subscribe((status,err)=>{
+        // Ignore callbacks from a channel that has already been replaced.
+        if(myGeneration!==state.realtimeGeneration)return;
+
         console.log('[Soikat Realtime]',status,err||'');
-        if(status==='SUBSCRIBED')setStatus('Realtime on','online');
-        else if(status==='CHANNEL_ERROR')setStatus('Realtime error','error');
-        else if(status==='TIMED_OUT')setStatus('Realtime timeout','error');
+        if(status==='SUBSCRIBED'){
+          setStatus('Realtime on','online');
+          console.log('[Soikat Realtime] CONNECTED');
+        }else if(status==='CHANNEL_ERROR' || status==='TIMED_OUT' || status==='CLOSED'){
+          setStatus('Realtime error','error');
+          console.error('[Soikat Realtime] CONNECTION LOST',status,err||'');
+          scheduleRealtimeReconnect(status,1500);
+        }
       });
 
     state.channel=channel;
+
+    // One lightweight health check prevents a silently dead channel from
+    // staying in the UI as if realtime were still connected.
+    if(!state.realtimeHealthTimer){
+      state.realtimeHealthTimer=setInterval(()=>{
+        if(!state.client||!state.session||!state.ready)return;
+        const ch=state.channel;
+        if(!ch)return;
+        const st=ch.state;
+        if(st && st!=='joined' && !state.reconnectTimer){
+          console.warn('[Soikat Realtime] HEALTH CHECK: channel state =',st);
+          scheduleRealtimeReconnect('health check: '+st,1000);
+        }
+      },30000);
+    }
   }
 
   async function boot(){
@@ -677,13 +872,30 @@
       }
 
       state.client.auth.onAuthStateChange((_event,session)=>{
+        console.log('[Soikat Auth] EVENT:',_event);
         state.session=session;
         refreshAuthUI();
         if(session){
-          setTimeout(async()=>{await syncAll();installRealtime();},0);
+          // A refreshed access token must also be applied to the Realtime
+          // connection. Rebuild the channel so an expired JWT cannot leave
+          // the page stuck at "Realtime error".
+          if(_event==='TOKEN_REFRESHED' || _event==='SIGNED_IN' || _event==='INITIAL_SESSION'){
+            setTimeout(async()=>{
+              try{
+                await syncAll();
+                await installRealtime(_event==='TOKEN_REFRESHED');
+              }catch(e){
+                console.error('[Soikat Auth] resync/realtime failed',e);
+                scheduleRealtimeReconnect('auth event failure',2000);
+              }
+            },0);
+          }
         }else{
+          state.realtimeGeneration++;
+          if(state.reconnectTimer){clearTimeout(state.reconnectTimer);state.reconnectTimer=null;}
           if(state.channel){state.client.removeChannel(state.channel);state.channel=null;}
           state.ready=false;
+          setStatus('Cloud signed out','offline');
         }
       });
     }catch(err){
@@ -695,20 +907,23 @@
   }
 
   function publicQueueSave(storageKey,appId,payload){
-    if(storageKey&&appId&&!APPS[storageKey]) APPS[storageKey]=appId;
-    const value = payload===undefined ? readLocal(storageKey) : payload;
-    return queueLocalCloudSave(storageKey,appId,value===null?{}:value);
+    if(storageKey&&appId&&!APPS[storageKey])APPS[storageKey]=appId;
+    if(storageKey&&appId)queueLocalCloudSave(storageKey,appId,payload===undefined?readLocal(storageKey):payload);
   }
 
   window.SoikatCloud={
-    version:'2.2.0',
+    version:'3.0.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
     },
+    queueSave:publicQueueSave,
     getSession:function(){return state.session},
     getApps:function(){return {...APPS}},
-    queueSave:publicQueueSave,
+    syncApp:function(storageKey,appId){
+      if(!storageKey||!appId||!state.session||!state.client)return Promise.resolve(false);
+      return syncApp(storageKey,appId);
+    },
     sync:function(){return syncAll()}
   };
 
