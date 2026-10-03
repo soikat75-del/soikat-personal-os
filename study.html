@@ -1235,69 +1235,83 @@ setInterval(()=>{
 },15*60*1000);
 </script>
 
-<!-- SOIKAT 200D CLOUD BRIDGE: keep the in-memory plan state in sync with cloud/localStorage. -->
-<script src="cloud.js?v=21"></script>
+<!-- SOIKAT 200D CLOUD BRIDGE: explicit save + cloud-to-memory synchronization. -->
 <script>
 (function(){
   'use strict';
-  const STORAGE_KEY = 'soikat_200d_plan_v2';
-  let applying = false;
+  const STORAGE_KEY='soikat_200d_plan_v2';
+  const APP_ID='soikat_200d_plan';
 
   function normalize(v){
-    const base = (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
-    if(!base.routine || typeof base.routine !== 'object' || Array.isArray(base.routine)) base.routine={};
-    if(!base.done || typeof base.done !== 'object' || Array.isArray(base.done)) base.done={};
-    if(!base.weekly || typeof base.weekly !== 'object' || Array.isArray(base.weekly)) base.weekly={};
-    if(!base.monthly || typeof base.monthly !== 'object' || Array.isArray(base.monthly)) base.monthly={};
-    if(!base.weeklyRevision || typeof base.weeklyRevision !== 'object' || Array.isArray(base.weeklyRevision)) base.weeklyRevision={};
-    if(!base.monthlyRevision || typeof base.monthlyRevision !== 'object' || Array.isArray(base.monthlyRevision)) base.monthlyRevision={};
+    const base=(v&&typeof v==='object'&&!Array.isArray(v))?v:{};
+    for(const k of ['routine','done','weekly','monthly','weeklyRevision','monthlyRevision']){
+      if(!base[k]||typeof base[k]!=='object'||Array.isArray(base[k])) base[k]={};
+    }
     return base;
   }
 
   function readPlan(){
     try{
       const raw=localStorage.getItem(STORAGE_KEY);
-      return normalize(raw ? JSON.parse(raw) : {});
+      return normalize(raw?JSON.parse(raw):{});
     }catch(e){
-      console.error('[Soikat 200D] Could not read synced state',e);
+      console.error('[Soikat 200D] local read failed',e);
       return null;
     }
   }
 
-  function applyPlan(source){
+  function applyFromLocal(reason){
     const next=readPlan();
     if(!next) return;
     data=next;
-    console.log('[Soikat 200D] STATE APPLIED',source);
-    try{ render(); }catch(e){ console.error('[Soikat 200D] render after sync failed',e); }
+    console.log('[Soikat 200D] STATE APPLIED:',reason);
+    try{render();}catch(e){console.error('[Soikat 200D] render failed',e);}
   }
 
-  // cloud.js writes the incoming cloud snapshot into localStorage and then
-  // emits this event. Replace the in-memory `data` object before rendering.
-  window.addEventListener('soikat-200d-cloud-updated',function(){
-    applyPlan('cloud realtime');
-  });
+  // Cloud -> localStorage -> in-memory data -> UI
+  window.addEventListener('soikat-200d-cloud-updated',()=>applyFromLocal('realtime cloud'));
+  window.addEventListener('soikat-cloud-synced',()=>applyFromLocal('initial cloud sync'));
 
-  window.addEventListener('soikat-cloud-synced',function(){
-    applyPlan('initial cloud sync');
-  });
+  function sendCurrentToCloud(reason){
+    try{
+      const snapshot=normalize(JSON.parse(JSON.stringify(data)));
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(snapshot));
+      if(window.SoikatCloud && typeof window.SoikatCloud.queueSave==='function'){
+        window.SoikatCloud.queueSave(STORAGE_KEY,APP_ID,snapshot);
+        console.log('[Soikat 200D] CLOUD SAVE QUEUED:',reason);
+      }else{
+        console.warn('[Soikat 200D] queueSave API not available:',reason);
+      }
+    }catch(e){console.error('[Soikat 200D] cloud save queue failed',e);}
+  }
 
-  // If another local script changes the plan, keep the current in-memory
-  // object authoritative and let the normal localStorage/cloud bridge save it.
-  const originalSave = window.save;
-  if(typeof originalSave==='function' && !originalSave.__soikat200DWrapped){
-    const wrappedSave=function(){
-      const result=originalSave.apply(this,arguments);
-      try{ window.dispatchEvent(new CustomEvent('soikat-200d-local-saved')); }catch(e){}
+  // Wrap the app's real save() so every add/check/delete/import/revision
+  // operation explicitly enters the cloud queue. Existing app logic remains intact.
+  const install=()=>{
+    if(typeof window.save!=='function') return false;
+    if(window.save.__soikat200DFinal) return true;
+    const original=window.save;
+    const wrapped=function(){
+      const result=original.apply(this,arguments);
+      sendCurrentToCloud('save()');
       return result;
     };
-    wrappedSave.__soikat200DWrapped=true;
-    window.save=wrappedSave;
+    wrapped.__soikat200DFinal=true;
+    window.save=wrapped;
+    console.log('[Soikat 200D] FINAL SAVE HOOK INSTALLED');
+    return true;
+  };
+
+  // Main script is above this bridge, but retry briefly in case the browser
+  // has not exposed the top-level function yet.
+  if(!install()){
+    let n=0;
+    const timer=setInterval(()=>{
+      if(install() || ++n>40) clearInterval(timer);
+    },100);
   }
 
-  // The cloud sync can finish shortly after this script loads. Apply the
-  // current local snapshot once now, without changing any stored data.
-  applyPlan('startup');
+  applyFromLocal('startup');
 })();
 </script>
 </body>
