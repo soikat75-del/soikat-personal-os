@@ -1234,77 +1234,70 @@ setInterval(()=>{
   render();
 },15*60*1000);
 </script>
-<script>
-/* SOIKAT 200D — cloud/local state bridge
-   Keep the app's existing data model and localStorage key unchanged.
-   cloud.js writes incoming cloud data to localStorage and emits this event.
-*/
-(function(){
-  const KEY='soikat_200d_plan_v2';
-  let applying=false;
-  let saveHooked=false;
 
-  function read(){
-    try{
-      const raw=localStorage.getItem(KEY);
-      if(!raw) return null;
-      const v=JSON.parse(raw);
-      return v && typeof v==='object' ? v : null;
-    }catch(e){ return null; }
+<!-- SOIKAT 200D CLOUD BRIDGE: keep the in-memory plan state in sync with cloud/localStorage. -->
+<script src="cloud.js?v=21"></script>
+<script>
+(function(){
+  'use strict';
+  const STORAGE_KEY = 'soikat_200d_plan_v2';
+  let applying = false;
+
+  function normalize(v){
+    const base = (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+    if(!base.routine || typeof base.routine !== 'object' || Array.isArray(base.routine)) base.routine={};
+    if(!base.done || typeof base.done !== 'object' || Array.isArray(base.done)) base.done={};
+    if(!base.weekly || typeof base.weekly !== 'object' || Array.isArray(base.weekly)) base.weekly={};
+    if(!base.monthly || typeof base.monthly !== 'object' || Array.isArray(base.monthly)) base.monthly={};
+    if(!base.weeklyRevision || typeof base.weeklyRevision !== 'object' || Array.isArray(base.weeklyRevision)) base.weeklyRevision={};
+    if(!base.monthlyRevision || typeof base.monthlyRevision !== 'object' || Array.isArray(base.monthlyRevision)) base.monthlyRevision={};
+    return base;
   }
 
-  function replaceStateFromLocal(reason){
-    const incoming=read();
-    if(!incoming) return;
+  function readPlan(){
     try{
-      applying=true;
-      // Replace the existing in-memory object without changing the app's
-      // variable or any of its rendering logic.
-      Object.keys(data).forEach(k=>delete data[k]);
-      Object.assign(data,incoming);
-      ensureStudyUids();
-      render();
-      console.log('[Soikat 200D Sync] STATE APPLIED:',reason);
+      const raw=localStorage.getItem(STORAGE_KEY);
+      return normalize(raw ? JSON.parse(raw) : {});
     }catch(e){
-      console.error('[Soikat 200D Sync] STATE APPLY FAILED',e);
-    }finally{
-      applying=false;
+      console.error('[Soikat 200D] Could not read synced state',e);
+      return null;
     }
   }
 
-  function hookSave(){
-    if(saveHooked || typeof window.save!=='function') return false;
-    const original=window.save;
-    window.save=function(){
-      const result=original.apply(this,arguments);
-      if(!applying){
-        // cloud.js already observes this localStorage write. This event only
-        // makes the current page's state explicit and debuggable.
-        window.dispatchEvent(new CustomEvent('soikat-200d-local-saved'));
-      }
-      return result;
-    };
-    saveHooked=true;
-    console.log('[Soikat 200D Sync] SAVE HOOK INSTALLED');
-    return true;
+  function applyPlan(source){
+    const next=readPlan();
+    if(!next) return;
+    data=next;
+    console.log('[Soikat 200D] STATE APPLIED',source);
+    try{ render(); }catch(e){ console.error('[Soikat 200D] render after sync failed',e); }
   }
 
-  window.addEventListener('soikat-200d-cloud-updated',()=>{
-    replaceStateFromLocal('cloud event');
+  // cloud.js writes the incoming cloud snapshot into localStorage and then
+  // emits this event. Replace the in-memory `data` object before rendering.
+  window.addEventListener('soikat-200d-cloud-updated',function(){
+    applyPlan('cloud realtime');
   });
 
-  window.addEventListener('soikat-cloud-synced',()=>{
-    replaceStateFromLocal('initial cloud sync');
+  window.addEventListener('soikat-cloud-synced',function(){
+    applyPlan('initial cloud sync');
   });
 
-  // cloud.js loads asynchronously, so hook when the app is ready.
-  const timer=setInterval(()=>{
-    if(hookSave()) clearInterval(timer);
-  },100);
-  setTimeout(()=>clearInterval(timer),15000);
+  // If another local script changes the plan, keep the current in-memory
+  // object authoritative and let the normal localStorage/cloud bridge save it.
+  const originalSave = window.save;
+  if(typeof originalSave==='function' && !originalSave.__soikat200DWrapped){
+    const wrappedSave=function(){
+      const result=originalSave.apply(this,arguments);
+      try{ window.dispatchEvent(new CustomEvent('soikat-200d-local-saved')); }catch(e){}
+      return result;
+    };
+    wrappedSave.__soikat200DWrapped=true;
+    window.save=wrappedSave;
+  }
 
-  // If cloud.js finished before this bridge attached, reconcile once.
-  setTimeout(()=>replaceStateFromLocal('startup reconcile'),500);
+  // The cloud sync can finish shortly after this script loads. Apply the
+  // current local snapshot once now, without changing any stored data.
+  applyPlan('startup');
 })();
 </script>
 </body>
