@@ -6,120 +6,401 @@
 <title>SOIKAT · 200D PLAN</title>
 <style>
 :root{
-  --bg:#070b12;--panel:#0d1420;--panel2:#111a28;--line:#1e2a3b;--text:#edf2f7;--muted:#8290a3;
-  --blue:#4da3ff;--green:#35d07f;--red:#ff5d6c;--amber:#f4b942;--violet:#a78bfa;--cyan:#32d6d0;
+  --bg:#070b14;--panel:#0d1422;--panel2:#111a2b;--line:#1d2940;
+  --text:#edf3ff;--muted:#8190a8;--green:#35e39a;--blue:#5aa7ff;
+  --purple:#a77bff;--orange:#ffb454;--red:#ff6b78;--yellow:#f4d35e;
 }
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,input,textarea{font:inherit}button{cursor:pointer}
-body{min-height:100vh}.wrap{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:18px 0 36px}
-header{height:54px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;border-bottom:1px solid var(--line);margin-bottom:18px}
-.back{color:var(--muted);text-decoration:none;font-size:12px;white-space:nowrap}.back:hover{color:var(--text)}
-.brand{font-size:14px;font-weight:800;letter-spacing:.16em}.range{font-size:10px;color:var(--muted);letter-spacing:.1em;white-space:nowrap}
-.card{background:linear-gradient(180deg,var(--panel),#0a111c);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.16)}
-.progress-card{padding:20px 22px;margin-bottom:16px}.kicker{font-size:10px;letter-spacing:.16em;color:var(--muted);font-weight:800}.day-big{font-size:36px;font-weight:800;line-height:1.1;margin:7px 0 14px}.day-big span{color:var(--blue)}
-.bar{height:7px;background:#172232;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--blue);border-radius:inherit;transition:width .2s}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-top:18px;border:1px solid var(--line);border-radius:10px;overflow:hidden}.stat{background:var(--panel2);padding:13px 14px}.stat small{display:block;color:var(--muted);font-size:9px;letter-spacing:.1em;font-weight:700}.stat b{display:block;font-size:20px;margin-top:4px}.submetric{font-size:10px;color:var(--muted);font-weight:500}
-.main{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}.card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px;border-bottom:1px solid var(--line)}.title{font-size:11px;letter-spacing:.14em;font-weight:800}.date-label{font-size:11px;color:var(--muted);font-weight:700}.actions{display:flex;align-items:center;gap:5px}.btn{border:1px solid var(--line);background:#111b29;color:var(--text);border-radius:8px;padding:7px 10px;font-size:10px;font-weight:700}.btn:hover{border-color:#38506e;background:#162235}.btn.primary{border-color:#285f91;color:#cfe7ff}.btn.icon{width:30px;padding:7px 0;text-align:center}
-.day-nav{display:flex;gap:6px;padding:12px 18px;border-bottom:1px solid var(--line)}.day-nav .btn{flex:1}.day-title{padding:13px 18px 8px;display:flex;align-items:end;justify-content:space-between}.day-title strong{font-size:18px}.day-title span{font-size:10px;color:var(--muted)}
-.routine-list{padding:0 18px 18px;max-height:420px;overflow:auto}.routine-item{display:grid;grid-template-columns:30px 1fr 30px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}.routine-item:last-child{border-bottom:0}.check{width:25px;height:25px;border:1px solid #33445b;background:transparent;border-radius:7px;display:grid;place-items:center;padding:0}.check svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;opacity:0}.check.done{background:rgba(53,208,127,.13);border-color:rgba(53,208,127,.5);color:var(--green)}.check.done svg{opacity:1}.subject{font-size:12px;font-weight:800}.topic{font-size:12px;line-height:1.55;color:#b5c0ce;margin-top:3px;white-space:normal}.delete{width:25px;height:25px;border:1px solid transparent;background:transparent;color:#637083;border-radius:7px;padding:0}.delete:hover{color:var(--red);border-color:rgba(255,93,108,.25);background:rgba(255,93,108,.06)}.delete svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7}
-.empty{padding:35px 8px;text-align:center;color:var(--muted);font-size:11px}
-.recent{min-height:520px}.recent-list{padding:0 18px 18px;max-height:470px;overflow:auto}.recent-item{display:grid;grid-template-columns:72px 1fr 30px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}.recent-date{font-size:10px;color:var(--muted);font-weight:700}.recent-subject{font-size:11px;font-weight:800}.recent-topic{font-size:11px;color:#aeb9c8;line-height:1.45;margin-top:2px}.done-mark{font-size:9px;color:var(--green);margin-top:3px}
-.revision-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}.revision-card{min-height:390px}.revision-list{padding:0 18px 18px;max-height:350px;overflow:auto}.rev-summary{display:flex;gap:8px;align-items:center}.count{font-size:10px;color:var(--muted);font-weight:700}.revision-item{display:grid;grid-template-columns:20px 1fr auto;gap:9px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}.revision-item input{margin-top:3px;accent-color:var(--green)}.revision-item .rsubject{font-size:11px;font-weight:800}.revision-item .rtopic{font-size:10px;color:#aeb9c8;margin-top:2px;line-height:1.45}.revision-date{font-size:9px;color:var(--muted);margin-top:4px}.status{font-size:8px;letter-spacing:.06em;align-self:start;padding:4px 6px;border-radius:5px;border:1px solid var(--line);color:var(--muted)}.status.done{color:var(--green);border-color:rgba(53,208,127,.35);background:rgba(53,208,127,.06)}.group-title{font-size:9px;letter-spacing:.12em;color:var(--muted);font-weight:800;padding:12px 0 4px}.group-title:first-child{padding-top:0}
-.calendar-card{margin-top:16px;padding-bottom:14px}.calendar-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px}.month{font-size:13px;font-weight:800;letter-spacing:.08em}.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:0 14px}.cal-head{text-align:center;color:var(--muted);font-size:9px;font-weight:800;letter-spacing:.08em;padding:5px 0}.cal-day{position:relative;min-height:74px;border:1px solid var(--line);border-radius:9px;background:#0b121d;padding:8px;cursor:pointer;transition:.15s}.cal-day:hover{border-color:#38506e;transform:translateY(-1px)}.cal-day .n{font-size:11px;font-weight:800}.cal-day .mini{font-size:9px;color:var(--muted);margin-top:5px}.cal-day .state{font-size:7px;letter-spacing:.06em;margin-top:8px;font-weight:800}.cal-day.done{border-color:rgba(53,208,127,.45);background:rgba(53,208,127,.07)}.cal-day.done .state{color:var(--green)}.cal-day.missed{border-color:rgba(255,93,108,.45);background:rgba(255,93,108,.07)}.cal-day.missed .state{color:var(--red)}.cal-day.carry{border-color:rgba(244,185,66,.48);background:rgba(244,185,66,.07)}.cal-day.carry .state{color:var(--amber)}.cal-day.partial{border-color:rgba(167,139,250,.5);background:rgba(167,139,250,.07)}.cal-day.partial .state{color:var(--violet)}.cal-day.carry-done{border-color:rgba(50,214,208,.55);background:rgba(50,214,208,.08)}.cal-day.carry-done .state{color:var(--cyan)}.cal-day.today{box-shadow:inset 0 0 0 2px var(--blue);border-color:var(--blue)}.cal-legend{display:flex;flex-wrap:wrap;gap:14px;padding:13px 18px 0;color:var(--muted);font-size:9px}.legend{display:flex;align-items:center;gap:5px}.dot{width:8px;height:8px;border-radius:50%;border:1px solid currentColor}.lg-green{color:var(--green)}.lg-red{color:var(--red)}.lg-amber{color:var(--amber)}.lg-violet{color:var(--violet)}.lg-blue{color:var(--blue)}
-footer{text-align:center;color:var(--muted);font-size:11px;margin-top:28px}.heart{font-size:12px;color:#ff6b7a}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}.modal.open{display:flex}.modal-box{width:min(620px,100%);max-height:90vh;overflow:auto;background:#0d1522;border:1px solid var(--line);border-radius:14px;padding:18px}.modal-head{display:flex;align-items:center;justify-content:space-between}.modal-head h2{font-size:13px;letter-spacing:.1em}.close{background:transparent;border:0;color:var(--muted);font-size:24px}.bulk{width:100%;min-height:270px;resize:vertical;background:#080e17;border:1px solid var(--line);border-radius:9px;color:var(--text);padding:12px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;line-height:1.5;margin:12px 0}.note{font-size:10px;color:var(--muted);line-height:1.5}.modal-foot{display:flex;justify-content:flex-end;gap:7px}
-@media(max-width:850px){.main,.revision-grid{grid-template-columns:1fr}.recent{min-height:0}.recent-list{max-height:380px}.routine-list,.revision-list{max-height:none}.calendar{gap:3px}.cal-day{min-height:62px}}
-@media(max-width:560px){.wrap{width:min(100% - 20px,1180px)}header{grid-template-columns:auto 1fr;gap:10px}.range{grid-column:2;grid-row:2;margin-top:-12px;margin-bottom:10px}.brand{font-size:12px}.stats{grid-template-columns:1fr}.calendar{padding:0 7px}.cal-day{min-height:55px;padding:6px}.cal-day .state{display:none}.calendar-card{overflow:hidden}.day-nav .btn{font-size:9px;padding:7px 5px}.recent-item{grid-template-columns:62px 1fr 28px}}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 20% 0%,#101a30 0,#070b14 38%,#050810 100%);
+font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
+.wrap{max-width:1200px;margin:auto;padding:28px 22px 45px}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:22px}
+.brand{font-weight:800;letter-spacing:.16em;font-size:15px}.brand span{color:var(--blue)}
+.sub{font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:5px}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:1px solid var(--line);background:#0c1422;color:var(--text);border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:700}
+button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
+.hero{display:grid;grid-template-columns:1fr;gap:16px}
+.card{background:linear-gradient(180deg,#0e1727,#0a111e);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 12px 35px #0004}
+.kicker{font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:800}
+.big{font-size:34px;font-weight:900;margin:8px 0}
+.big span{color:var(--blue)}
+.progress{height:9px;background:#182237;border-radius:20px;overflow:hidden;margin:15px 0 10px}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:20px}
+.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:14px}
+.stat{background:#0b1321;border:1px solid var(--line);border-radius:10px;padding:12px}
+.stat b{display:block;font-size:20px;margin-top:5px}.stat small{color:var(--muted)}
+
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.section-title h2{margin:0;font-size:16px}.tag{font-size:10px;letter-spacing:.12em;color:var(--muted);border:1px solid var(--line);padding:5px 7px;border-radius:7px}
+.daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:12px;border-radius:10px;margin-bottom:10px}
+.daybar strong{font-size:13px}.daybar span{font-size:11px;color:var(--muted)}
+.study-row{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #162238}
+.study-row:last-child{border-bottom:0}
+.check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+.subject{font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.topic{font-size:14px;margin-top:3px}.carry{font-size:10px;color:var(--orange);margin-top:4px}
+.status{font-size:10px;color:var(--muted);white-space:nowrap}
+.status.done{color:var(--green)}
+.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+.month-nav{display:flex;gap:8px;align-items:center}.month-nav button{padding:7px 10px}
+.month-name{min-width:135px;text-align:center;font-weight:800}
+.month-item{border:1px solid var(--line);border-radius:9px;padding:11px;background:#0a1220;cursor:pointer}
+.month-item.active{border-color:var(--blue);box-shadow:0 0 0 1px #5aa7ff33 inset}
+.month-item b{display:block;font-size:12px}.month-item span{font-size:10px;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+input,select,textarea{width:100%;background:#080f1c;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+.full{grid-column:1/-1}
+.add{width:100%;margin-top:9px;background:#14253d;border-color:#31547e}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
+.cal-head{font-size:9px;text-align:center;color:var(--muted);padding:5px}
+.cal-day{min-height:66px;border:1px solid var(--line);border-radius:7px;padding:7px;background:#0a1220;cursor:pointer;transition:.15s}
+.cal-day:hover{border-color:#3d5a80}
+.cal-day.today{box-shadow:0 0 0 2px var(--blue) inset}
+.cal-day.done{background:#0d2a21;border-color:#1d7358}
+.cal-day.partial{background:#282310;border-color:#75651c}
+.cal-day.missed{background:#2a1118;border-color:#71313d}
+.cal-day.pending{background:#0a1220;border-color:#33425a}
+.cal-day.empty{background:#0a1220;border-color:#1b2638;opacity:.75}
+.cal-day .n{font-size:11px;font-weight:800}.cal-day .mini{font-size:9px;color:var(--muted);margin-top:6px}
+.cal-day.done .mini{color:var(--green)}
+.cal-day.partial .mini{color:var(--orange)}
+.cal-day.missed .mini{color:var(--red)}
+.cal-day.pending .mini{color:var(--muted)}
+.cal-status{font-size:7px;letter-spacing:.08em;margin-top:4px;font-weight:800;color:var(--muted)}
+.cal-day.done .cal-status{color:var(--green)}
+.cal-day.partial .cal-status{color:var(--orange)}
+.cal-day.missed .cal-status{color:var(--red)}
+.cal-day.pending .cal-status{color:var(--muted)}
+
+.cal-day.outside{opacity:.28;cursor:default;background:#070b14}
+.cal-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--muted);font-size:9px;letter-spacing:.05em}
+.cal-legend span{display:flex;align-items:center;gap:5px}
+.lg{width:8px;height:8px;border-radius:2px;border:1px solid var(--line);display:inline-block}
+.lg.done{background:#0d2a21;border-color:#1d7358}
+.lg.partial{background:#282310;border-color:#75651c}
+.lg.missed{background:#2a1118;border-color:#71313d}
+.lg.today{box-shadow:0 0 0 1px var(--blue) inset}
+.lg.pending{background:#0a1220;border-color:#33425a}
+.delete-routine{border:1px solid #71313d;color:var(--red);background:#160c10;padding:5px 8px;font-size:8px;border-radius:6px;cursor:pointer}
+.delete-routine:hover{border-color:var(--red)}
+.routine-item{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr) 30px;
+  gap:8px;
+  align-items:center;
+  padding:13px 0;
+  border-bottom:1px solid #162238;
+}
+.routine-item:last-child{border-bottom:0}
+.routine-content{
+  min-width:0;
+  width:100%;
+  justify-self:stretch;
+  text-align:left;
+}
+.routine-content .subject{
+  display:block;
+  text-align:left;
+}
+.routine-content .topic{
+  display:block;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  text-align:left;
+  line-height:1.55;
+  margin-top:4px;
+}
+.routine-action{
+  width:34px;
+  height:34px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  flex:none;
+}
+.routine-action svg{
+  width:16px;
+  height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.routine-action.check-action{
+  color:var(--muted);
+}
+.routine-action.check-action:hover{
+  color:var(--green);
+  border-color:#1d7358;
+}
+.routine-action.check-action.done{
+  color:var(--green);
+  background:#0d2a21;
+  border-color:#1d7358;
+}
+.routine-action.delete-action{
+  color:var(--red);
+  border-color:#71313d;
+  background:#160c10;
+}
+.routine-action.delete-action:hover{
+  border-color:var(--red);
+  background:#211017;
+}
+.routine-action.archive-action{
+  width:auto;
+  min-width:34px;
+  padding:0 9px;
+  color:#d9b66f;
+  border-color:#6f5924;
+  background:#17130a;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.04em;
+}
+.routine-action.archive-action:hover{
+  border-color:#d9b66f;
+  background:#211b0d;
+}
+.routine-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.archive-count{
+  margin-left:6px;
+  padding:4px 7px;
+  border:1px solid #6f5924;
+  border-radius:6px;
+  color:#d9b66f;
+  background:#17130a;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+.archive-list{
+  max-height:65vh;
+  overflow:auto;
+  margin-top:10px;
+}
+.archive-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid #162238;
+}
+.archive-item:last-child{border-bottom:0}
+.archive-meta{font-size:9px;color:var(--muted);margin-top:4px}
+.archive-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.archive-btn{border:1px solid var(--line);background:#101823;color:var(--text);border-radius:7px;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}
+.archive-btn:hover{border-color:#52657c}
+.archive-btn.undo{color:var(--green);border-color:#1d7358;background:#0d2a21}
+.archive-btn.delete{color:var(--red);border-color:#71313d;background:#160c10}
+@media(max-width:560px){.archive-item{grid-template-columns:1fr}.archive-actions{justify-content:flex-start}}
+
+
+.rev{margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#0a1220}
+.rev-head{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.rev small{display:block;color:var(--muted);margin-top:5px}
+.revision-list{margin-top:8px;display:grid;gap:7px;max-height:360px;overflow:auto}
+.revision-item{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;
+  padding:9px 0;border-top:1px solid #162238;cursor:pointer}
+.revision-item input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
+.revision-item .topic{font-size:12px}
+.revision-date{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
+.revision-group-title{font-size:9px;letter-spacing:.12em;color:var(--orange);font-weight:800;margin-top:12px;padding-bottom:6px;border-bottom:1px solid #162238}
+.pending-item{cursor:default}
+
+
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal.open{display:flex}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#0d1524;border:1px solid var(--line);border-radius:14px;padding:18px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.bulk{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;min-height:240px;resize:vertical}
+.note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:8px}
+footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
+/* ===== FIXED DESKTOP LAYOUT =====
+   The four main work areas keep their positions.
+   Their internal content scrolls instead of pushing the
+   other sections up/down when routine or revision lists grow.
+*/
+@media(min-width:851px){
+  .grid{
+    align-items:start;
+  }
+
+  .grid>div{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .routine-card,
+  .calendar-card,
+  .weekly-card,
+  .monthly-card{
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
+    flex:none;
+  }
+
+  /* Keep the four sections in fixed positions,
+     but let their CONTENT scroll internally. */
+  .routine-card,
+  .weekly-card{
+    height:520px;
+  }
+
+  .calendar-card,
+  .monthly-card{
+    height:520px;
+  }
+
+  .routine-card #routineList{
+    min-height:0;
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+  }
+
+  .calendar-card .calendar{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    align-content:start;
+  }
+
+  .weekly-card #weeklyList,
+  .monthly-card #monthlyList{
+    min-height:0;
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+  }
+
+  .weekly-card .revision-list,
+  .monthly-card .revision-list{
+    max-height:none;
+    overflow:visible;
+  }
+}
+
+@media(max-width:850px){
+  .hero,.grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .routine-card,.calendar-card,.weekly-card,.monthly-card{height:auto}
+  .routine-card #routineList,
+  .weekly-card #weeklyList,
+  .monthly-card #monthlyList{overflow:visible}
+  .calendar-card .calendar{overflow:visible}
+}
+@media(max-width:560px){.wrap{padding:18px 12px}.stats{grid-template-columns:1fr 1fr}.cal-day{min-height:48px;padding:5px}.status{display:none}.big{font-size:28px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
-  <a class="back" href="javascript:history.back()">← Back</a>
-  <div class="brand">SOIKAT · 200D PLAN</div>
-  <div class="range">01 Oct 2026 → 18 Apr 2027</div>
+  <div>
+    <div class="brand">SOIKAT <span>· 200D PLAN</span></div>
+    <div class="sub">ROUTINE / WEEKLY / MONTHLY</div>
+  </div>
+  <div class="top-actions">
+    <button onclick="openBulk()">SET ROUTINE</button>
+    <button onclick="syncTrustedDate(true)">SYNC DATE</button>
+  </div>
 </header>
 
-<section class="card progress-card">
-  <div class="kicker">200 DAY PROGRESS</div>
-  <div class="day-big">DAY <span id="dayNo">1</span> / 200</div>
-  <div class="bar"><i id="bar"></i></div>
-  <div class="stats">
-    <div class="stat"><small>STUDY DONE</small><b id="studyDone">0 <span class="submetric">(0%)</span></b></div>
-    <div class="stat"><small>STUDY LEFT</small><b id="studyLeft">200 <span class="submetric">(100%)</span></b></div>
-    <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b></div>
+<section class="hero">
+  <div class="card">
+    <div class="kicker">200 DAY PROGRESS</div>
+    <div class="big">DAY <span id="dayNo">1</span> <small style="font-size:15px;color:var(--muted)">/ 200</small></div>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="meta"><span id="startText"></span><span id="endText"></span></div>
+    <div class="stats">
+      <div class="stat"><small>DAYS LEFT</small><b id="daysLeft">200</b></div>
+      <div class="stat"><small>STUDY DONE</small><b id="studyDone">0 <span class="metric-sub">(0%)</span></b></div>
+      <div class="stat"><small>STUDY LEFT</small><b id="studyLeft">200 <span class="metric-sub">(100%)</span></b></div>
+      <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b><small class="metric-sub">pending studies</small></div>
+    </div>
   </div>
+  <div class="sync-status" id="dateSyncStatus">Date source: checking…</div>
 </section>
 
-<section class="main">
-  <div class="card routine-card">
-    <div class="card-head">
-      <div class="title">ROUTINE</div>
-      <div class="actions">
-        <button class="btn primary" onclick="openBulk()">SET ROUTINE</button>
+<section class="grid">
+  <div>
+    <div class="card routine-card">
+      <div class="section-title"><h2>ROUTINE</h2><div style="display:flex;align-items:center;gap:6px"><button class="archive-count" type="button" onclick="openArchive()">ARCHIVE <span id="archiveCount">0</span></button><span class="tag" id="selectedDateLabel">TODAY</span></div></div>
+      <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
+      <div id="routineList"></div>
+    </div>
+
+    
+
+    <div class="card calendar-card" style="margin-top:12px">
+      <div class="section-title">
+        <h2>200D CALENDAR</h2>
+        <div class="month-nav"><button onclick="changeMonth(-1)">‹</button><div class="month-name" id="calMonth"></div><button onclick="changeMonth(1)">›</button></div>
       </div>
-    </div>
-    <div class="day-nav">
-      <button class="btn" onclick="moveDay(-1)">PREV DAY</button>
-      <button class="btn" onclick="goToday()">TODAY</button>
-      <button class="btn" onclick="moveDay(1)">NEXT DAY</button>
-    </div>
-    <div class="day-title"><strong id="routineDate">04 Oct 2026</strong><span id="routineCount">0/0 DONE</span></div>
-    <div class="routine-list" id="routineList"></div>
+      <div class="calendar" id="calendar"></div>
+      <div class="cal-legend">
+        <span><i class="lg done"></i> ALL DONE</span>
+        <span><i class="lg partial"></i> PARTIAL</span>
+        <span><i class="lg missed"></i> MISSED</span>
+        <span><i class="lg today"></i> TODAY</span>
+      <span><i class="lg pending"></i> PENDING</span>
+      </div>
+        </div>
   </div>
 
-  <div class="card recent">
-    <div class="card-head">
-      <div class="title">RECENT ENTRIES</div>
-      <div class="date-label" id="recentCount">0</div>
+  <div>
+    <div class="card weekly-card">
+      <div class="section-title"><h2>WEEKLY REVISION</h2><span class="tag" id="weekLabel">THIS WEEK</span></div>
+      <div id="weeklyList"></div>
     </div>
-    <div class="recent-list" id="recentList"></div>
+    <div class="card monthly-card" style="margin-top:16px">
+      <div class="section-title"><h2>MONTHLY REVISION</h2><span class="tag" id="monthLabel">THIS MONTH</span></div>
+      <div id="monthlyList"></div>
+    </div>
   </div>
 </section>
 
-<section class="revision-grid">
-  <div class="card revision-card">
-    <div class="card-head">
-      <div><div class="title">WEEKLY REVISION</div><div class="date-label" id="weekLabel">THIS WEEK</div></div>
-      <div class="rev-summary"><span class="count" id="weekCount">0/0 DONE</span></div>
-    </div>
-    <div class="revision-list" id="weeklyList"></div>
-  </div>
-  <div class="card revision-card">
-    <div class="card-head">
-      <div><div class="title">MONTHLY REVISION</div><div class="date-label" id="monthLabel">THIS MONTH</div></div>
-      <div class="rev-summary"><span class="count" id="monthCount">0/0 DONE</span></div>
-    </div>
-    <div class="revision-list" id="monthlyList"></div>
-  </div>
-</section>
 
-<section class="card calendar-card">
-  <div class="calendar-head">
-    <div class="month" id="calMonth">OCTOBER 2026</div>
-    <div class="actions"><button class="btn icon" onclick="changeMonth(-1)">‹</button><button class="btn icon" onclick="changeMonth(1)">›</button></div>
-  </div>
-  <div class="calendar" id="calendar"></div>
-  <div class="cal-legend">
-    <span class="legend lg-green"><i class="dot"></i> STUDY DONE</span>
-    <span class="legend lg-red"><i class="dot"></i> MISSED</span>
-    <span class="legend lg-amber"><i class="dot"></i> CARRY FORWARD</span>
-    <span class="legend lg-violet"><i class="dot"></i> PARTIAL</span>
-    <span class="legend lg-blue"><i class="dot"></i> TODAY</span>
-  </div>
-</section>
 
-<footer>Built with love <span class="heart">♥</span> by Soikat</footer>
+<footer>Built with love by Soikat</footer>
+</div>
+
+<div class="modal" id="archiveModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2 style="margin:0;font-size:17px">ARCHIVED STUDIES</h2><button onclick="closeArchive()">×</button></div>
+    <div class="note">এখান থেকে কোনো Study আবার ROUTINE-এ ফেরানো যাবে, অথবা permanently delete করা যাবে। UNDO করলে Study আবার PENDING হবে।</div>
+    <div id="archiveList" class="archive-list"></div>
+  </div>
 </div>
 
 <div class="modal" id="bulkModal">
   <div class="modal-box">
-    <div class="modal-head"><h2>SET ROUTINE</h2><button class="close" onclick="closeBulk()">×</button></div>
-    <div class="note">Format: <b>01 Oct 2026 | Subject | Topic</b>. পরের Date line না আসা পর্যন্ত নিচের line-গুলো একই Topic-এর অংশ হবে। Existing routine মুছে যাবে না; নতুনগুলো যোগ হবে।</div>
-    <textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | English | Adjective, Adverb, Preposition
-02 Oct 2026 | Bangla | সন্ধি
-03 Oct 2026 | Math | শতকরা"></textarea>
-    <div class="modal-foot"><button class="btn" onclick="closeBulk()">CANCEL</button><button class="btn primary" onclick="importBulk()">ADD ROUTINE</button></div>
+    <div class="modal-head"><h2 style="margin:0;font-size:17px">SET ROUTINE IN BULK</h2><button onclick="closeBulk()">×</button></div>
+    <div class="note">একই Date + Subject-এর নিচে যতক্ষণ নতুন Date | Subject | Topic line না আসে, সব line একই Topic-এর অংশ হবে।</div><textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
+02 Oct 2026 | বাংলা | সমাস
+03 Oct 2026 | English | Tense
+04 Oct 2026 | গণিত | শতকরা"></textarea>
+    <div class="note">Format: <b>DD Mon YYYY | Subject | Topic</b><br>একটি Date | Subject | Topic line = একটি Study। পরের Date line আসা পর্যন্ত নিচের line-গুলো একই Topic-এর অংশ। Existing routine মুছে যাবে না; নতুনগুলো যোগ হবে।</div>
+    <button class="add" onclick="importBulk()">IMPORT ROUTINE</button>
   </div>
 </div>
 
@@ -127,8 +408,20 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:28px}.hear
 const START = new Date(2026,9,1);
 const END = new Date(2027,3,18);
 const DAYS = 200;
+
+// IMPORTANT: keep the existing storage key unchanged.
 const KEY = 'soikat_200d_plan_v2';
-const DEFAULT_DATA = {routine:{},done:{},weekly:{},monthly:{},weeklyRevision:{},monthlyRevision:{}};
+
+const DEFAULT_DATA = {
+  routine:{},
+  done:{},
+  weekly:{},
+  monthly:{},
+  weeklyRevision:{},
+  monthlyRevision:{},
+  archived:{}
+};
+
 function loadDataSafely(){
   let raw = null;
   try{ raw = localStorage.getItem(KEY); }catch(e){}
@@ -258,10 +551,23 @@ async function syncTrustedDate(manual=false){
     }catch(e){}
   }
 
+  updateDateSyncStatus();
   if(manual) render();
   return false;
 }
 
+function updateDateSyncStatus(){
+  const el=document.getElementById('dateSyncStatus');
+  if(!el) return;
+
+  if(trustedAtMs){
+    const age=Math.max(0,Date.now()-trustedAtMs);
+    const days=Math.floor(age/86400000);
+    el.innerHTML='Date source: <strong>trusted sync cached</strong> · '+(days?days+'d ago':'recent')+' · works offline with saved offset';
+  }else{
+    el.textContent='Date source: device clock until first trusted sync';
+  }
+}
 
 /*
   DATA MIGRATION / ID SAFETY
@@ -378,211 +684,678 @@ function getPreviousPendingStudies(current){
   return pending;
 }
 
+function render(){
+  const now=todayDhaka();
 
+  let current=inPlan(now)?cloneDate(now):cloneDate(selected);
+  if(current<START) current=cloneDate(START);
+  if(current>END) current=cloneDate(END);
 
-function normalizeDataShape(){
-  const base=data && typeof data==='object'?data:{};
-  Object.keys(DEFAULT_DATA).forEach(k=>{
-    if(!base[k] || typeof base[k]!=='object' || Array.isArray(base[k])) base[k]={};
-  });
-  data=base;
-}
+  selected=current;
 
-function recentEntries(){
-  const out=[];
+  const idx=dayIndex(current);
+  const dayNo=Math.max(1,Math.min(DAYS,idx));
+  const daysLeft=Math.max(0,DAYS-dayNo);
+
+  document.getElementById('dayNo').textContent=dayNo;
+  document.getElementById('daysLeft').textContent=daysLeft;
+  document.getElementById('bar').style.width=Math.min(100,Math.max(0,dayNo/DAYS*100))+'%';
+  document.getElementById('startText').textContent='01 Oct 2026';
+  document.getElementById('endText').textContent='18 Apr 2027';
+
+  // 200 is the fixed plan denominator.
+  // Each routine study counts once when completed.
+  const allStudies=[];
   Object.keys(data.routine).forEach(k=>{
     const list=Array.isArray(data.routine[k])?data.routine[k]:[];
-    list.forEach((item,index)=>out.push({item,dateKey:k,index,id:studyId(item,k,index),done:isDone(item,k,index)}));
+    list.forEach((item,index)=>{
+      allStudies.push({item,dateKey:k,index});
+    });
   });
-  out.sort((a,b)=>b.dateKey.localeCompare(a.dateKey)||b.index-a.index);
-  return out;
-}
 
-function render(){
-  // IMPORTANT: localStorage is the single source of truth for the visible UI.
-  // Cloud/realtime writes land in localStorage first; every render reads the
-  // latest state so cross-device updates cannot get stuck in an old in-memory object.
-  data=loadDataSafely();
-  normalizeDataShape();
-  const now=todayDhaka();
-  if(!selected || !inPlan(selected)) selected=cloneDate(inPlan(now)?now:START);
-  if(selected<START) selected=cloneDate(START);
-  if(selected>END) selected=cloneDate(END);
+  const completedRaw=allStudies.reduce(
+    (n,x)=>n+(isDone(x.item,x.dateKey,x.index)?1:0),0
+  );
 
-  const idx=dayIndex(selected);
-  document.getElementById('dayNo').textContent=Math.max(1,Math.min(DAYS,idx));
-  document.getElementById('bar').style.width=Math.min(100,Math.max(0,idx/DAYS*100))+'%';
+  // Keep the fixed 200-study plan mathematically bounded.
+  const completed=Math.min(DAYS,completedRaw);
+  const studyLeft=DAYS-completed;
+  const completedPct=Math.round(completed/DAYS*100);
+  const studyLeftPct=100-completedPct;
 
-  // 200D progress is DAY-based: a planned day counts as DONE only when
-  // every study scheduled for that day is completed. Empty days are not
-  // silently counted as completed.
-  const plannedDays=allDates().filter(d=>entries(d).length>0);
-  const completed=Math.min(DAYS,plannedDays.filter(d=>{
-    const k=iso(d), list=entries(d);
-    return list.length>0 && list.every((item,index)=>isDone(item,k,index));
-  }).length);
-  const pct=Math.round(completed/DAYS*100);
-  document.getElementById('studyDone').innerHTML=completed+' <span class="submetric">('+pct+'%)</span>';
-  document.getElementById('studyLeft').innerHTML=(DAYS-completed)+' <span class="submetric">('+(100-pct)+'%)</span>';
-  document.getElementById('carryCount').textContent=getPreviousPendingStudies(selected).length;
+  document.getElementById('studyDone').innerHTML=
+    completed+' <span class="metric-sub">('+completedPct+'%)</span>';
 
-  renderRoutine(selected);
-  renderRecent();
-  renderWeekly(selected);
-  renderMonthly(selected);
+  document.getElementById('studyLeft').innerHTML=
+    studyLeft+' <span class="metric-sub">('+studyLeftPct+'%)</span>';
+
+  const carryCount=getPreviousPendingStudies(current).length;
+  document.getElementById('carryCount').textContent=carryCount;
+
+  document.getElementById('routineDate').textContent=fmt(current);
+  document.getElementById('routineDay').textContent='DAY '+idx+' / 200';
+  document.getElementById('selectedDateLabel').textContent=
+    iso(current)===iso(now)?'TODAY':'SELECTED';
+
+  renderRoutine(current);
+  renderWeekly(current);
+  renderMonthly(current);
   renderCalendar();
+  updateDateSyncStatus();
 }
 
 function renderRoutine(d){
-  const k=iso(d), list=entries(d), box=document.getElementById('routineList');
-  const doneCount=list.filter((x,i)=>isDone(x,k,i)).length;
-  document.getElementById('routineDate').textContent=fmt(d).toUpperCase();
-  document.getElementById('routineCount').textContent=doneCount+'/'+list.length+' DONE';
-  if(!list.length){box.innerHTML='<div class="empty">No study planned for this day.</div>';return;}
-  box.innerHTML=list.map((x,i)=>{
-    const id=studyId(x,k,i), checked=isDone(x,k,i);
-    return `<div class="routine-item">
-      <button class="check ${checked?'done':''}" onclick="toggleDone('${escapeAttr(id)}',${!checked})" title="${checked?'Undo':'Mark Done'}">
-        <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+  const box=document.getElementById('routineList');
+  const k=iso(d);
+  const list=entries(d);
+  const visible=list.filter((x,i)=>!data.archived[studyId(x,k,i)]);
+
+  if(!visible.length){
+    box.innerHTML='<div class="empty">এই দিনে কোনো active Study নেই।</div>';
+    renderArchive();
+    return;
+  }
+
+  box.innerHTML=visible.map((x)=>{
+    const i=list.indexOf(x);
+    const id=studyId(x,k,i);
+    const checked=data.done[id]===true;
+
+    return `<div class="routine-item" data-study-id="${escapeAttr(id)}" data-date="${escapeAttr(k)}">
+
+      <button
+        type="button"
+        class="routine-action check-action ${checked?'done':''}"
+        title="${checked?'Undo':'Complete'}"
+        aria-label="${checked?'Undo':'Complete'}"
+        onclick="toggleRoutineById(this)"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 6 9 17l-5-5"></path>
+        </svg>
       </button>
-      <div><div class="subject">${escapeHtml(x.subject||'Study')}</div><div class="topic">${renderTopic(x.topic)}</div></div>
-      <button class="delete" onclick="deleteRoutineDirect('${escapeAttr(k)}','${escapeAttr(id)}')" title="Delete">
-        <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg>
-      </button>
+
+      <div class="routine-content">
+        <span class="subject">${escapeHtml(x.subject||'Study')}</span>
+        <span class="topic">${renderTopic(x.topic)}</span>
+      </div>
+
+      <div class="routine-actions">
+        ${checked ? `<button type="button" class="routine-action archive-action" title="Archive" aria-label="Archive" data-date="${escapeAttr(k)}" data-id="${escapeAttr(id)}" onclick="archiveRoutineById(this)">ARCHIVE</button>` : ''}
+        ${!checked ? `<button type="button" class="routine-action delete-action" title="Delete" aria-label="Delete" data-date="${escapeAttr(k)}" data-id="${escapeAttr(id)}" onclick="deleteRoutineDirect(this.dataset.date, this.dataset.id)">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v5"></path><path d="M14 11v5"></path>
+          </svg>
+        </button>` : ''}
+      </div>
+
     </div>`;
   }).join('');
+
+  renderArchive();
 }
 
-function renderRecent(){
-  const box=document.getElementById('recentList'), rows=recentEntries();
-  document.getElementById('recentCount').textContent=rows.length+' STUDIES';
-  if(!rows.length){box.innerHTML='<div class="empty">No routine entries yet.</div>';return;}
-  box.innerHTML=rows.slice(0,60).map(x=>`<div class="recent-item">
-    <div class="recent-date">${displayDate(x.dateKey)}</div>
-    <div><div class="recent-subject">${escapeHtml(x.item.subject||'Study')}</div><div class="recent-topic">${renderTopic(x.item.topic)}</div>${x.done?'<div class="done-mark">DONE</div>':''}</div>
-    <button class="delete" onclick="deleteRoutineDirect('${escapeAttr(x.dateKey)}','${escapeAttr(x.id)}')" title="Delete"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg></button>
+function getArchivedStudies(){
+  const out=[];
+  Object.keys(data.routine||{}).forEach(dateKey=>{
+    const list=Array.isArray(data.routine[dateKey])?data.routine[dateKey]:[];
+    list.forEach((item,index)=>{
+      const id=studyId(item,dateKey,index);
+      if(data.archived[id]===true){
+        out.push({item,dateKey,index,studyId:id});
+      }
+    });
+  });
+  out.sort((a,b)=>b.dateKey.localeCompare(a.dateKey));
+  return out;
+}
+
+function renderArchive(){
+  const list=getArchivedStudies();
+  const countEl=document.getElementById('archiveCount');
+  if(countEl) countEl.textContent=String(list.length);
+
+  const box=document.getElementById('archiveList');
+  if(!box) return;
+  if(!list.length){
+    box.innerHTML='<div class="empty">কোনো archived Study নেই।</div>';
+    return;
+  }
+
+  box.innerHTML=list.map(x=>`<div class="archive-item">
+    <div>
+      <div class="subject">${escapeHtml(x.item.subject||'Study')}</div>
+      <div class="topic">${renderTopic(x.item.topic)}</div>
+      <div class="archive-meta">Planned: ${displayDate(x.dateKey)} · COMPLETED</div>
+    </div>
+    <div class="archive-actions">
+      <button class="archive-btn undo" type="button" onclick="restoreArchivedStudy('${escapeAttr(x.dateKey)}','${escapeAttr(x.studyId)}')">UNDO</button>
+      <button class="archive-btn delete" type="button" onclick="deleteArchivedStudy('${escapeAttr(x.dateKey)}','${escapeAttr(x.studyId)}')">DELETE</button>
+    </div>
   </div>`).join('');
 }
 
-function deleteRoutineDirect(dateKey,id){
-  const list=data.routine[dateKey]; if(!Array.isArray(list)) return;
-  const index=list.findIndex((item,i)=>String(studyId(item,dateKey,i))===String(id));
-  if(index<0)return;
-  const item=list[index]; const sid=studyId(item,dateKey,index);
+function openArchive(){
+  renderArchive();
+  document.getElementById('archiveModal').classList.add('open');
+}
+
+function closeArchive(){
+  document.getElementById('archiveModal').classList.remove('open');
+}
+
+function archiveRoutineById(button){
+  if(!button) return false;
+  const dateKey=button.getAttribute('data-date');
+  const id=button.getAttribute('data-id');
+  if(!dateKey||!id) return false;
+  if(data.done[id]!==true) return false;
+
+  data.archived[id]=true;
+  save();
+  render();
+  return false;
+}
+
+function findStudyIndex(dateKey,id){
+  const list=data.routine[dateKey];
+  if(!Array.isArray(list)) return -1;
+  return list.findIndex((item,index)=>String(studyId(item,dateKey,index))===String(id));
+}
+
+function restoreArchivedStudy(dateKey,id){
+  const index=findStudyIndex(dateKey,id);
+  if(index<0) return false;
+
+  // UNDO = remove from archive + mark as pending again.
+  delete data.archived[id];
+  delete data.done[id];
+  save();
+  closeArchive();
+  render();
+  return false;
+}
+
+function deleteArchivedStudy(dateKey,id){
+  const index=findStudyIndex(dateKey,id);
+  if(index<0) return false;
+
+  const list=data.routine[dateKey];
   list.splice(index,1);
-  if(list.length) data.routine[dateKey]=list; else delete data.routine[dateKey];
-  // Remove state for the deleted permanent study only.
-  delete data.done[sid]; delete data.weeklyRevision[sid]; delete data.monthlyRevision[sid];
-  save(); render();
+  if(list.length) data.routine[dateKey]=list;
+  else delete data.routine[dateKey];
+
+  delete data.done[id];
+  delete data.archived[id];
+  delete data.weeklyRevision[id];
+  delete data.monthlyRevision[id];
+
+  save();
+  renderArchive();
+  render();
+  return false;
+}
+
+/*
+  DIRECT button handlers.
+
+  These intentionally do not depend on event delegation.
+  Every button finds its own .routine-item and then uses
+  the permanent study UID stored on that row.
+*/
+function deleteRoutineDirect(dateKey,id){
+  if(!dateKey || !id) return false;
+
+  const list=data.routine[dateKey];
+  if(!Array.isArray(list)) return false;
+
+  const index=list.findIndex((item,index)=>{
+    if(!item) return false;
+    return String(studyId(item,dateKey,index))===String(id);
+  });
+
+  if(index<0) return false;
+
+  // Delete immediately. No confirm dialog, so the button cannot appear to do nothing.
+  list.splice(index,1);
+
+  if(list.length===0){
+    delete data.routine[dateKey];
+  }else{
+    data.routine[dateKey]=list;
+  }
+
+  // IMPORTANT: do NOT rebuild, shift, or clear done/revision maps.
+  // Permanent study IDs keep all remaining states attached to the correct study.
+  save();
+  render();
+  return false;
+}
+
+function deleteRoutineById(button){
+  if(!button) return false;
+  return deleteRoutineDirect(
+    button.getAttribute('data-date'),
+    button.getAttribute('data-id')
+  );
+}
+
+function toggleRoutineById(button){
+  const row=button.closest('.routine-item');
+  if(!row) return;
+
+  const id=row.getAttribute('data-study-id');
+  if(!id) return;
+
+  const current=data.done[id]===true;
+  toggleDone(id,!current);
 }
 
 function toggleDone(id,value){
-  if(value===true)data.done[id]=true; else delete data.done[id];
-  save(); render();
+  if(!id) return;
+
+  if(value===true) data.done[id]=true;
+  else delete data.done[id];
+
+  save();
+  render();
+}
+
+function toggleDoneFromCalendar(id){
+  if(data.done[id]===true) delete data.done[id];
+  else data.done[id]=true;
+
+  save();
+  render();
 }
 
 function renderWeekly(d){
-  // Saturday -> Friday, keeping the existing 200D revision convention.
-  const start=cloneDate(d); const daysFromSaturday=(start.getDay()+1)%7; start.setDate(start.getDate()-daysFromSaturday);
-  const end=cloneDate(start); end.setDate(end.getDate()+6);
-  const items=getStudiesInRange(start,end), box=document.getElementById('weeklyList');
-  document.getElementById('weekLabel').textContent=displayDate(iso(start))+' → '+displayDate(iso(end));
-  const revised=items.filter(x=>data.weeklyRevision[x.studyId]===true).length;
-  document.getElementById('weekCount').textContent=revised+'/'+items.length+' DONE';
-  if(!items.length){box.innerHTML='<div class="empty">No studies in this week.</div>';return;}
-  const pending=items.filter(x=>!x.completed), done=items.filter(x=>x.completed);
-  box.innerHTML=(pending.length?'<div class="group-title">PENDING — REVISION / CATCH UP</div>'+pending.map(x=>revisionRow(x,'weeklyRevision')).join(''):'')+
-    (done.length?'<div class="group-title">COMPLETED — REVISION</div>'+done.map(x=>revisionRow(x,'weeklyRevision')).join(''):'');
+  // Saturday -> Friday.
+  const start=cloneDate(d);
+  const day=start.getDay();
+  const daysFromSaturday=(day+1)%7;
+  start.setDate(start.getDate()-daysFromSaturday);
+
+  const end=cloneDate(start);
+  end.setDate(end.getDate()+6);
+
+  const items=getStudiesInRange(start,end);
+  const box=document.getElementById('weeklyList');
+
+  document.getElementById('weekLabel').textContent=
+    fmt(start).slice(0,6)+' → '+fmt(end).slice(0,6);
+
+  if(!items.length){
+    box.innerHTML='<div class="empty">এই সপ্তাহে কোনো Study নেই।</div>';
+    return;
+  }
+
+  // HEADER COUNT = ONLY the checkboxes in this Weekly Revision list.
+  const revisedCount=items.reduce(
+    (n,x)=>n+(data.weeklyRevision[x.studyId]===true?1:0),0
+  );
+  const pendingCount=items.length-revisedCount;
+
+  const pendingRoutine=items.filter(x=>!x.completed);
+  const completedRoutine=items.filter(x=>x.completed);
+
+  box.innerHTML=`
+    <div class="rev">
+      <div class="rev-head">
+        <span>${pendingCount} PENDING</span>
+        <span>${revisedCount}/${items.length} DONE</span>
+      </div>
+      <small>Saturday → Friday · Friday = revision day · checkbox = revision done</small>
+    </div>
+
+    ${pendingRoutine.length ? `
+      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
+      <div class="revision-list">
+        ${pendingRoutine.map(x=>{
+          const revised=!!data.weeklyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('weeklyRevision','${escapeAttr(x.studyId)}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+
+    ${completedRoutine.length ? `
+      <div class="revision-group-title">COMPLETED — REVISION</div>
+      <div class="revision-list">
+        ${completedRoutine.map(x=>{
+          const revised=!!data.weeklyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('weeklyRevision','${escapeAttr(x.studyId)}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+  `;
 }
 
 function renderMonthly(d){
-  const start=new Date(d.getFullYear(),d.getMonth(),1), end=new Date(d.getFullYear(),d.getMonth()+1,0);
-  const items=getStudiesInRange(start,end), box=document.getElementById('monthlyList');
-  document.getElementById('monthLabel').textContent=d.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
-  const revised=items.filter(x=>data.monthlyRevision[x.studyId]===true).length;
-  document.getElementById('monthCount').textContent=revised+'/'+items.length+' DONE';
-  if(!items.length){box.innerHTML='<div class="empty">No studies in this month.</div>';return;}
-  const pending=items.filter(x=>!x.completed), done=items.filter(x=>x.completed);
-  box.innerHTML=(pending.length?'<div class="group-title">PENDING — REVISION / CATCH UP</div>'+pending.map(x=>revisionRow(x,'monthlyRevision')).join(''):'')+
-    (done.length?'<div class="group-title">COMPLETED — REVISION</div>'+done.map(x=>revisionRow(x,'monthlyRevision')).join(''):'');
-}
+  const start=new Date(d.getFullYear(),d.getMonth(),1);
+  const end=new Date(d.getFullYear(),d.getMonth()+1,0);
+  const items=getStudiesInRange(start,end);
+  const box=document.getElementById('monthlyList');
 
-function revisionRow(x,type){
-  const revised=!!data[type][x.studyId];
-  return `<label class="revision-item"><input type="checkbox" ${revised?'checked':''} onchange="toggleRevision('${type}','${escapeAttr(x.studyId)}',this.checked)"><div><div class="rsubject">${escapeHtml(x.subject||'Study')}</div><div class="rtopic">${renderTopic(x.topic)}</div><div class="revision-date">${x.completed?'Completed':'Not Completed'}: ${displayDate(x.plannedDate)}</div></div><span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span></label>`;
+  document.getElementById('monthLabel').textContent=
+    d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+
+  if(!items.length){
+    box.innerHTML='<div class="empty">এই মাসে কোনো Study নেই।</div>';
+    return;
+  }
+
+  // HEADER COUNT = ONLY the checkboxes in this Monthly Revision list.
+  const revisedCount=items.reduce(
+    (n,x)=>n+(data.monthlyRevision[x.studyId]===true?1:0),0
+  );
+  const pendingCount=items.length-revisedCount;
+
+  const pendingRoutine=items.filter(x=>!x.completed);
+  const completedRoutine=items.filter(x=>x.completed);
+
+  box.innerHTML=`
+    <div class="rev">
+      <div class="rev-head">
+        <span>${pendingCount} PENDING</span>
+        <span>${revisedCount}/${items.length} DONE</span>
+      </div>
+      <small>Checkbox = revision done</small>
+    </div>
+
+    ${pendingRoutine.length ? `
+      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
+      <div class="revision-list">
+        ${pendingRoutine.map(x=>{
+          const revised=!!data.monthlyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('monthlyRevision','${escapeAttr(x.studyId)}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+
+    ${completedRoutine.length ? `
+      <div class="revision-group-title">COMPLETED — REVISION</div>
+      <div class="revision-list">
+        ${completedRoutine.map(x=>{
+          const revised=!!data.monthlyRevision[x.studyId];
+          return `<label class="revision-item">
+            <input type="checkbox" ${revised?'checked':''}
+              onchange="toggleRevision('monthlyRevision','${escapeAttr(x.studyId)}',this.checked)">
+            <div>
+              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
+              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
+              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
+            </div>
+            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
+          </label>`;
+        }).join('')}
+      </div>` : ''}
+  `;
 }
 
 function toggleRevision(type,id,value){
-  if(type!=='weeklyRevision'&&type!=='monthlyRevision')return;
+  if(type!=='weeklyRevision' && type!=='monthlyRevision') return;
+
   data[type] ||= {};
-  if(value)data[type][id]=true;else delete data[type][id];
-  save();render();
+
+  if(value===true) data[type][id]=true;
+  else delete data[type][id];
+
+  save();
+  render();
 }
 
 function calendarStatus(d){
-  const k=iso(d), list=entries(d), total=list.length, done=list.filter((x,i)=>isDone(x,k,i)).length;
-  const today=iso(todayDhaka()), previousPending=getPreviousPendingStudies(d).length;
-  if(!inPlan(d))return {type:'outside',done,total,isToday:false,carry:false};
-  if(total===0 && previousPending>0)return {type:'carry',done,total,isToday:k===today,carry:true};
-  if(total===0)return {type:'empty',done,total,isToday:k===today,carry:false};
-  const allDone=done===total;
-  if(k<today && !allDone)return {type:'missed',done,total,isToday:false,carry:previousPending>0};
-  if(allDone && previousPending>0)return {type:'carry-done',done,total,isToday:k===today,carry:true};
-  if(allDone)return {type:'done',done,total,isToday:k===today,carry:false};
-  if(done>0)return {type:'partial',done,total,isToday:k===today,carry:previousPending>0};
-  return {type:previousPending>0?'carry':'partial',done,total,isToday:k===today,carry:previousPending>0};
+  const k=iso(d);
+  const list=entries(d);
+  const total=list.length;
+  const done=list.filter((x,i)=>isDone(x,k,i)).length;
+  const todayKey=iso(todayDhaka());
+  const isToday=k===todayKey;
+
+  if(!inPlan(d)) return {type:'outside',done,total,isToday};
+
+  if(total===0) return {type:'empty',done,total,isToday};
+
+  if(k<todayKey && done<total){
+    return {type:'missed',done,total,isToday};
+  }
+
+  if(done===total) return {type:'done',done,total,isToday};
+  if(done>0) return {type:'partial',done,total,isToday};
+
+  return {type:'pending',done,total,isToday};
 }
 
 function renderCalendar(){
-  const box=document.getElementById('calendar'), y=calCursor.getFullYear(),m=calCursor.getMonth();
-  document.getElementById('calMonth').textContent=calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
-  let h=['MON','TUE','WED','THU','FRI','SAT','SUN'].map(x=>`<div class="cal-head">${x}</div>`).join('');
-  const first=new Date(y,m,1), offset=(first.getDay()+6)%7, days=new Date(y,m+1,0).getDate();
-  for(let i=0;i<offset;i++)h+='<div></div>';
+  const box=document.getElementById('calendar');
+  const y=calCursor.getFullYear(),m=calCursor.getMonth();
+
+  document.getElementById('calMonth').textContent=
+    calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
+
+  let h=['MON','TUE','WED','THU','FRI','SAT','SUN']
+    .map(x=>`<div class="cal-head">${x}</div>`).join('');
+
+  const first=new Date(y,m,1);
+  const offset=(first.getDay()+6)%7;
+  const days=new Date(y,m+1,0).getDate();
+
+  for(let i=0;i<offset;i++) h+='<div></div>';
+
   for(let n=1;n<=days;n++){
-    const d=new Date(y,m,n),k=iso(d),s=calendarStatus(d); let cls='cal-day '+s.type+(s.isToday?' today':'');
-    const label={done:'STUDY DONE',missed:'MISSED',carry:'CARRY FORWARD',partial:'PARTIAL', 'carry-done':'CARRY + DONE',empty:'NO STUDY',outside:''}[s.type];
-    h+=`<div class="${cls}" ${s.type!=='outside'?`onclick="selectDate('${k}')"`:''}><div class="n">${n}</div><div class="mini">${s.total?s.done+'/'+s.total:(s.carry?'CARRY':'—')}</div>${label?`<div class="state">${label}</div>`:''}</div>`;
+    const d=new Date(y,m,n), k=iso(d);
+    const st=calendarStatus(d);
+
+    let cls='cal-day '+st.type;
+    if(st.isToday) cls+=' today';
+
+    const label={
+      done:'ALL DONE',
+      partial:'PARTIAL',
+      missed:'MISSED',
+      pending:'PENDING',
+      empty:'NO STUDY',
+      outside:''
+    }[st.type];
+
+    const mini=st.total ? `${st.done}/${st.total}` : '—';
+
+    h+=`<div class="${cls}" ${st.type!=='outside'?`onclick="selectDate('${k}')"`:''} title="${label}">
+      <div class="n">${n}</div>
+      <div class="mini">${mini}</div>
+      ${st.total?`<div class="cal-status">${label}</div>`:''}
+    </div>`;
   }
+
   box.innerHTML=h;
 }
 
-function selectDate(k){const d=new Date(k+'T00:00:00');if(!inPlan(d))return;selected=d;calCursor=new Date(d.getFullYear(),d.getMonth(),1);render()}
-function moveDay(n){const d=cloneDate(selected);d.setDate(d.getDate()+n);if(d<START||d>END)return;selected=d;calCursor=new Date(d.getFullYear(),d.getMonth(),1);render()}
-function goToday(){const d=todayDhaka();selected=cloneDate(inPlan(d)?d:(d<START?START:END));calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);render()}
-function changeMonth(n){calCursor.setMonth(calCursor.getMonth()+n);renderCalendar()}
+function selectDate(k){
+  const d=new Date(k+'T00:00:00');
+  if(!inPlan(d)) return;
 
-function openBulk(){document.getElementById('bulkModal').classList.add('open')}
-function closeBulk(){document.getElementById('bulkModal').classList.remove('open')}
-function parsePlanDate(s){const raw=String(s).trim(),m=raw.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})$/);if(!m)return new Date(raw);const months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'],mi=months.indexOf(m[2].slice(0,3).toLowerCase());if(mi<0)return null;const d=new Date(+m[3],mi,+m[1]);return d.getFullYear()===+m[3]&&d.getMonth()===mi&&d.getDate()===+m[1]?d:null}
-function parseRoutineBulk(raw){const lines=String(raw||'').split(/\r?\n/),result=[];let current=null;for(const rawLine of lines){const line=rawLine.trim();if(!line)continue;const parts=line.split('|').map(x=>x.trim()),pd=parts.length>=3?parsePlanDate(parts[0]):null;if(parts.length>=3&&pd&&inPlan(pd)){if(current)result.push(current);current={date:iso(pd),subject:parts[1]||'Study',topic:parts.slice(2).join(' | ').trim()};continue}if(current)current.topic+=(current.topic?'\n':'')+rawLine.trimEnd()}if(current)result.push(current);return result}
-function importBulk(){const rows=parseRoutineBulk(document.getElementById('bulkInput').value);if(!rows.length){alert('No valid routine found. Format: 01 Oct 2026 | Subject | Topic');return}rows.forEach(r=>{data.routine[r.date] ||= [];data.routine[r.date].push({uid:makeUid(),subject:r.subject,topic:r.topic})});save();document.getElementById('bulkInput').value='';closeBulk();render()}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function renderTopic(s){let text=String(s??'Untitled').replace(/\\r?\\n/g,'\n');let lines=text.split(/\r?\n/);return lines.map(escapeHtml).join('<br>')}
-function escapeAttr(s){return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")}
+  selected=d;
+  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+  render();
+}
 
-// New UI listens to the existing cloud layer, but keeps the same storage key/data model.
-(function installCloudBridge(){
-  const apply=()=>{
-    try{data=loadDataSafely();ensureStudyUids();render();}catch(e){console.error('[Soikat 200D] UI APPLY FAILED',e)}
-  };
-  window.addEventListener('soikat-200d-cloud-updated',apply);
-  window.addEventListener('soikat-cloud-synced',apply);
-  window.addEventListener('storage',e=>{if(e.key===KEY)apply()});
-  const poll=()=>{try{if(window.SoikatCloud?.syncApp)window.SoikatCloud.syncApp(KEY,'soikat_200d_plan')}catch(e){console.warn('[Soikat 200D] cloud poll',e)}};
-  setTimeout(poll,800);setInterval(poll,5000);
-})();
+function changeMonth(n){
+  calCursor.setMonth(calCursor.getMonth()+n);
+  renderCalendar();
+}
 
-selected=cloneDate((()=>{const d=todayDhaka();return inPlan(d)?d:(d<START?START:END)})());
+function openBulk(){
+  document.getElementById('bulkModal').classList.add('open');
+}
+
+function closeBulk(){
+  document.getElementById('bulkModal').classList.remove('open');
+}
+document.getElementById('archiveModal')?.addEventListener('click',e=>{
+  if(e.target.id==='archiveModal') closeArchive();
+});
+
+/*
+  BULK FORMAT
+  -----------
+  A new study starts ONLY when a line matches:
+  Date | Subject | Topic
+
+  Every following non-date line becomes part of that same Topic,
+  preserving line breaks. Therefore a multiline topic is ONE study.
+*/
+function parsePlanDate(s){
+  const raw=String(s).trim();
+  const m=raw.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})$/);
+  if(!m) return new Date(raw);
+
+  const months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+  const mi=months.indexOf(m[2].slice(0,3).toLowerCase());
+  if(mi<0) return null;
+
+  const d=new Date(Number(m[3]),mi,Number(m[1]));
+  if(d.getFullYear()!==Number(m[3]) || d.getMonth()!==mi || d.getDate()!==Number(m[1])) return null;
+  return d;
+}
+
+function parseRoutineBulk(raw){
+  const lines=String(raw||'').split(/\r?\n/);
+  const result=[];
+  let current=null;
+
+  for(const rawLine of lines){
+    // Keep the original line content, but use a trimmed copy for detecting headers.
+    const line=rawLine.trim();
+    if(!line) continue;
+
+    const parts=line.split('|').map(x=>x.trim());
+    const parsedDate=parts.length>=3 ? parsePlanDate(parts[0]) : null;
+
+    // Date | Subject | starts a NEW study.
+    if(parts.length>=3 && parsedDate && inPlan(parsedDate)){
+      if(current) result.push(current);
+
+      current={
+        date:iso(parsedDate),
+        subject:parts[1]||'Study',
+        topic:parts.slice(2).join(' | ').trim()
+      };
+      continue;
+    }
+
+    // No new Date | Subject | Topic line:
+    // this line belongs to the current study's multiline Topic.
+    if(current){
+      current.topic += (current.topic ? '\n' : '') + rawLine.trimEnd();
+    }
+  }
+
+  if(current) result.push(current);
+  return result;
+}
+
+function importBulk(){
+  const input=document.getElementById('bulkInput');
+  const rows=parseRoutineBulk(input.value);
+
+  if(!rows.length){
+    alert('কোনো valid routine পাওয়া যায়নি। Format: 01 Oct 2026 | Bangla | Topic');
+    return;
+  }
+
+  rows.forEach(row=>{
+    data.routine[row.date] ||= [];
+
+    data.routine[row.date].push({
+      uid:makeUid(),
+      subject:row.subject,
+      topic:row.topic
+    });
+  });
+
+  save();
+  closeBulk();
+  input.value='';
+  render();
+
+  alert(rows.length+'টি Study routine-এ যোগ হয়েছে।');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[c]));
+}
+
+function renderTopic(s){
+  let text=String(s??'Untitled');
+
+  // Some older imports may contain the literal characters \\n instead of a real line break.
+  text=text.replace(/\\r?\\n/g,'\n');
+
+  // Real multiline topics stay line-by-line.
+  let lines=text.split(/\r?\n/);
+
+  // If an older record flattened the topic into comma-separated text,
+  // display each comma-separated part on its own line without changing storage.
+  if(lines.length===1 && /,\s*/.test(text)){
+    lines=text.split(/,\s*/);
+  }
+
+  return lines
+    .map(line=>escapeHtml(line))
+    .join('<br>');
+}
+
+function escapeAttr(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+}
+
+// Initial state.
+const bootDate=todayDhaka();
+selected=cloneDate(inPlan(bootDate)?bootDate:START);
 calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+
 render();
-if(typeof syncTrustedDate==='function')syncTrustedDate(false);
+
+// Trusted internet time sync. If offline, saved offset remains usable.
+syncTrustedDate(false);
+
+// Periodic refresh; this never clears or replaces existing study data.
+setInterval(()=>{
+  syncTrustedDate(false);
+  render();
+},15*60*1000);
 </script>
-<script src="cloud.js?v=200d-stablefix-1"></script>
-<script>
-// cloud.js is loaded after the app so its localStorage bridge is installed for all future saves.
-// Start one immediate sync after it becomes available.
-setTimeout(()=>{try{window.SoikatCloud?.syncApp?.('soikat_200d_plan_v2','soikat_200d_plan')}catch(e){}},900);
-</script>
+
+
 </body>
 </html>
