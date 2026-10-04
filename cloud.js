@@ -485,6 +485,22 @@
 
     if(app==='soikat_100k_goal') cloud=await migrateLegacyRows(app,cloud);
 
+    // REMOTE-ONLY UPDATE: if this device has no unsynced local change and
+    // its local state is exactly the last cloud-synced baseline, the cloud
+    // version is authoritative. Accept it instead of treating it as a conflict.
+    if(result.row && !outbox && meta.lastSyncedHash && localHash===meta.lastSyncedHash){
+      const cloudHash=stable(cloud||{});
+      if(cloudHash!==localHash){
+        writeLocal(key,cloud||{});
+        markSynced(key,app,cloud||{},result.row.updated_at);
+        console.log('[Soikat Cloud] REMOTE UPDATE APPLIED',app);
+        refreshPageFromCloud(app);
+      }else{
+        markSynced(key,app,cloud||{},result.row.updated_at);
+      }
+      return true;
+    }
+
     // A queued local change is authoritative for this device until it is either
     // confirmed in the cloud or superseded by a newer remote change. Never erase it silently.
     if(outbox || (meta.lastSyncedHash && localHash!==meta.lastSyncedHash)){
@@ -519,24 +535,6 @@
       const ok=await pushCloud(key,app,localState,{updatedAt:outbox?.updatedAt||new Date().toISOString()});
       if(ok && app==='soikat_100k_goal') await deleteLegacyRows(app);
       return ok;
-    }
-
-    // Normal remote-change case: this device has no unsynced local edit and
-    // its local state is exactly the last cloud version it acknowledged.
-    // Therefore a newer cloud row is authoritative and must flow into local
-    // storage + the page without requiring Realtime. This is what makes the
-    // cross-device sync resilient when a Realtime broadcast is missed.
-    if(result.row && !outbox && meta.lastSyncedHash && localHash===meta.lastSyncedHash){
-      const cloudHash=stable(cloud||{});
-      if(cloudHash!==localHash){
-        writeLocal(key,cloud||{});
-        markSynced(key,app,cloud||{},result.row.updated_at);
-        console.log('[Soikat Cloud] REMOTE POLL APPLIED',app);
-        refreshPageFromCloud(app);
-      }else{
-        markSynced(key,app,cloud||{},result.row.updated_at);
-      }
-      return true;
     }
 
     // First run with no sync history.
