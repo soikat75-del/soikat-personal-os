@@ -784,6 +784,7 @@
         console.log('[Soikat Realtime] EVENT already in localStorage — refreshing page state');
         if(row.app==='soikat_200d_plan'){
           window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
+          if(typeof window.render==='function') window.render();
         }else if(row.app==='soikat_100k_goal'){
           if(typeof window.render==='function') window.render();
         }
@@ -808,8 +809,13 @@
         console.log('[Soikat Realtime] NEW 100K CLOUD DATA APPLIED — RENDERING');
         if(typeof window.render==='function') window.render();
       }else if(row.app==='soikat_200d_plan'){
-        console.log('[Soikat Realtime] NEW 200D CLOUD DATA APPLIED — REFRESH EVENT');
+        // 200D now follows the same proven pattern as 100K: cloud -> localStorage -> render.
+        // The UI's render() reloads its in-memory `data` from localStorage, so no stale
+        // in-memory object can block a cross-device update. Keep the custom event too
+        // for compatibility with the existing bridge.
+        console.log('[Soikat Realtime] NEW 200D CLOUD DATA APPLIED — RENDERING');
         window.dispatchEvent(new CustomEvent('soikat-200d-cloud-updated'));
+        if(typeof window.render==='function') window.render();
       }else{
         refreshPageFromCloud(row.app);
       }
