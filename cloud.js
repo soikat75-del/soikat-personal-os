@@ -94,8 +94,23 @@
     return clone(cloud);
   }
 
+  // Canonical JSON used for sync comparisons. The previous implementation
+  // passed a top-level key list as JSON.stringify's replacer; for 200D this
+  // accidentally stripped nested date/study data, making every 200D state
+  // look identical. 100K appeared fine because its data is flatter.
   function stable(v){
-    try{return JSON.stringify(v, Object.keys(v||{}).sort());}catch(e){return String(v);}
+    try{
+      const sortDeep=(value)=>{
+        if(Array.isArray(value)) return value.map(sortDeep);
+        if(value && typeof value==='object'){
+          const out={};
+          Object.keys(value).sort().forEach(k=>{out[k]=sortDeep(value[k]);});
+          return out;
+        }
+        return value;
+      };
+      return JSON.stringify(sortDeep(v));
+    }catch(e){return String(v);}
   }
 
   function readLocal(key){
@@ -916,7 +931,7 @@
   }
 
   window.SoikatCloud={
-    version:'3.0.0',
+    version:'3.1.0',
     registerApp:function(storageKey,appId){
       if(storageKey&&appId)APPS[storageKey]=appId;
       if(state.session)syncApp(storageKey,appId).catch(()=>{});
