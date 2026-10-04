@@ -601,55 +601,7 @@ function addEntry(){
  const e=getEntries();e[date]=profit;saveEntries(e);
  document.getElementById("profit").value="";calendarDate=parseDate(date);render();showToast("Entry saved");
 }
-const pendingDeletes=new Set();
-
-function deleteEntry(date){
- const e=getEntries();
- if(!Object.prototype.hasOwnProperty.call(e,date)) return;
- delete e[date];
- pendingDeletes.add(date);
- saveEntries(e);
- render();
- showToast("Entry deleted");
-
- // Give the cloud layer a moment to finish the deletion. If an older
- // realtime snapshot arrives during that window, the handler below
- // immediately restores the user's deletion and re-queues the new state.
- setTimeout(()=>pendingDeletes.delete(date),4000);
-}
-
-window.addEventListener("soikat-cloud-updated",()=>{
- if(!pendingDeletes.size) return;
- const e=getEntries();
- let changed=false;
- pendingDeletes.forEach(date=>{
-   if(Object.prototype.hasOwnProperty.call(e,date)){
-     delete e[date];
-     changed=true;
-   }
- });
- if(changed){
-   saveEntries(e);
-   render();
-   console.log("[Soikat 100K] Re-applied pending deletion",[...pendingDeletes]);
- }
-});
-
-window.addEventListener("storage",event=>{
- if(event.key!==STORAGE_KEY || !pendingDeletes.size) return;
- const e=getEntries();
- let changed=false;
- pendingDeletes.forEach(date=>{
-   if(Object.prototype.hasOwnProperty.call(e,date)){
-     delete e[date];
-     changed=true;
-   }
- });
- if(changed){
-   saveEntries(e);
-   render();
- }
-});
+function deleteEntry(date){const e=getEntries();delete e[date];saveEntries(e);render();showToast("Entry deleted")}
 
 document.getElementById("addButton").addEventListener("click",addEntry);
 document.getElementById("profit").addEventListener("keydown",e=>{if(e.key==="Enter")addEntry()});
@@ -671,5 +623,7 @@ document.getElementById("entryDate").max=END_DATE;
 calendarDate=new Date(initial.getFullYear(),initial.getMonth(),1);
 render();
 </script>
+
+
 </body>
 </html>
