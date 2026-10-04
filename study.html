@@ -409,12 +409,14 @@ function render(){
   document.getElementById('dayNo').textContent=Math.max(1,Math.min(DAYS,idx));
   document.getElementById('bar').style.width=Math.min(100,Math.max(0,idx/DAYS*100))+'%';
 
-  const all=[];
-  Object.keys(data.routine).forEach(k=>{
-    const list=Array.isArray(data.routine[k])?data.routine[k]:[];
-    list.forEach((item,index)=>all.push({item,dateKey:k,index}));
-  });
-  const completed=Math.min(DAYS,all.filter(x=>isDone(x.item,x.dateKey,x.index)).length);
+  // 200D progress is DAY-based: a planned day counts as DONE only when
+  // every study scheduled for that day is completed. Empty days are not
+  // silently counted as completed.
+  const plannedDays=allDates().filter(d=>entries(d).length>0);
+  const completed=Math.min(DAYS,plannedDays.filter(d=>{
+    const k=iso(d), list=entries(d);
+    return list.length>0 && list.every((item,index)=>isDone(item,k,index));
+  }).length);
   const pct=Math.round(completed/DAYS*100);
   document.getElementById('studyDone').innerHTML=completed+' <span class="submetric">('+pct+'%)</span>';
   document.getElementById('studyLeft').innerHTML=(DAYS-completed)+' <span class="submetric">('+(100-pct)+'%)</span>';
@@ -572,7 +574,7 @@ calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
 render();
 if(typeof syncTrustedDate==='function')syncTrustedDate(false);
 </script>
-<script src="cloud.js?v=200d-redesign-1"></script>
+<script src="cloud.js?v=200d-production-2"></script>
 <script>
 // cloud.js is loaded after the app so its localStorage bridge is installed for all future saves.
 // Start one immediate sync after it becomes available.
