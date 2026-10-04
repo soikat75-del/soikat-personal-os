@@ -399,6 +399,10 @@ function recentEntries(){
 }
 
 function render(){
+  // IMPORTANT: localStorage is the single source of truth for the visible UI.
+  // Cloud/realtime writes land in localStorage first; every render reads the
+  // latest state so cross-device updates cannot get stuck in an old in-memory object.
+  data=loadDataSafely();
   normalizeDataShape();
   const now=todayDhaka();
   if(!selected || !inPlan(selected)) selected=cloneDate(inPlan(now)?now:START);
