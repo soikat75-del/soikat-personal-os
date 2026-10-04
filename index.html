@@ -3,125 +3,829 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>SOIKAT — PERSONAL OS</title>
+
 <style>
-  *{box-sizing:border-box}
-  html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif}
-  body{
-    background:#07090d;
-    color:#f5f7fb;
-    min-height:100vh;
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  min-height:100vh;
+  background:#05070b;
+  color:#f4f7fb;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow-x:hidden;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.background{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+
+.grid{
+  position:absolute;
+  inset:-50%;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:55px 55px;
+  transform:perspective(700px) rotateX(65deg) translateY(-80px);
+  animation:gridMove 18s linear infinite;
+}
+
+@keyframes gridMove{
+  from{
+    transform:perspective(700px) rotateX(65deg) translateY(-80px);
   }
-  .wrap{
-    width:min(1200px,94%);
-    margin:0 auto;
-    padding:46px 0 70px;
+  to{
+    transform:perspective(700px) rotateX(65deg) translateY(30px);
   }
-  .brand{
-    text-align:center;
-    margin-bottom:54px;
+}
+
+.glow{
+  position:absolute;
+  width:500px;
+  height:500px;
+  border-radius:50%;
+  filter:blur(100px);
+  opacity:.16;
+}
+
+.glow.one{
+  background:#2375ff;
+  top:-220px;
+  left:-180px;
+  animation:floatOne 9s ease-in-out infinite;
+}
+
+.glow.two{
+  background:#8a3ffc;
+  right:-220px;
+  bottom:-220px;
+  animation:floatTwo 11s ease-in-out infinite;
+}
+
+@keyframes floatOne{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(100px,80px)}
+}
+
+@keyframes floatTwo{
+  0%,100%{transform:translate(0,0)}
+  50%{transform:translate(-100px,-70px)}
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+  position:relative;
+  z-index:1;
+  width:min(1180px,92%);
+  min-height:100vh;
+  margin:auto;
+  padding:70px 0 45px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+  text-align:center;
+  margin-bottom:70px;
+}
+
+.logo-wrap{
+  display:inline-block;
+  position:relative;
+}
+
+.logo{
+  font-size:clamp(46px,7vw,82px);
+  font-weight:900;
+  letter-spacing:16px;
+  line-height:1;
+  margin-left:16px;
+
+  background:linear-gradient(
+    110deg,
+    #ffffff 10%,
+    #9ebcff 45%,
+    #ffffff 60%,
+    #758fff 80%,
+    #ffffff 100%
+  );
+
+  background-size:250% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+
+  animation:
+    logoReveal 1.2s ease forwards,
+    logoShine 6s linear infinite;
+}
+
+@keyframes logoReveal{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+    letter-spacing:28px;
+    filter:blur(8px);
   }
-  .brand h1{
-    margin:0;
-    font-size:40px;
-    line-height:1;
-    letter-spacing:7px;
-    font-weight:800;
+  to{
+    opacity:1;
+    transform:translateY(0);
+    letter-spacing:16px;
+    filter:blur(0);
   }
-  .brand p{
-    margin:22px 0 0;
-    color:#78869a;
-    font-size:14px;
-    letter-spacing:7px;
+}
+
+@keyframes logoShine{
+  to{
+    background-position:250% center;
   }
+}
+
+.subtitle{
+  margin-top:20px;
+  color:#748198;
+  font-size:13px;
+  letter-spacing:9px;
+  font-weight:600;
+
+  opacity:0;
+  animation:subtitleIn 1s ease .45s forwards;
+}
+
+@keyframes subtitleIn{
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.line{
+  width:90px;
+  height:1px;
+  margin:28px auto 0;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    #6d8fff,
+    transparent
+  );
+  animation:linePulse 3s ease-in-out infinite;
+}
+
+@keyframes linePulse{
+  0%,100%{width:70px;opacity:.35}
+  50%{width:150px;opacity:1}
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
+
+/* card */
+
+.card{
+  position:relative;
+  min-height:215px;
+  padding:32px;
+
+  border:1px solid rgba(125,145,175,.17);
+  border-radius:20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(18,24,34,.92),
+      rgba(8,11,17,.96)
+    );
+
+  text-decoration:none;
+  color:#fff;
+
+  overflow:hidden;
+
+  display:flex;
+  align-items:flex-end;
+
+  isolation:isolate;
+
+  opacity:0;
+  transform:translateY(25px);
+
+  animation:cardIn .7s ease forwards;
+
+  transition:
+    transform .35s cubic-bezier(.2,.8,.2,1),
+    border-color .35s ease,
+    box-shadow .35s ease,
+    background .35s ease;
+}
+
+.card:nth-child(1){animation-delay:.15s}
+.card:nth-child(2){animation-delay:.25s}
+.card:nth-child(3){animation-delay:.35s}
+.card:nth-child(4){animation-delay:.45s}
+.card:nth-child(5){animation-delay:.55s}
+
+@keyframes cardIn{
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* animated border */
+
+.card::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+
+  background:linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(100,140,255,.7),
+    transparent 70%
+  );
+
+  opacity:0;
+  z-index:-2;
+
+  transform:translateX(-100%);
+  transition:opacity .35s ease;
+}
+
+.card:hover::before{
+  opacity:1;
+  animation:borderSweep 1.2s ease;
+}
+
+@keyframes borderSweep{
+  from{
+    transform:translateX(-100%);
+  }
+  to{
+    transform:translateX(100%);
+  }
+}
+
+/* inner background */
+
+.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background:radial-gradient(
+    circle at var(--mouse-x,50%) var(--mouse-y,50%),
+    rgba(80,120,255,.13),
+    transparent 38%
+  );
+
+  opacity:0;
+  transition:opacity .35s ease;
+
+  z-index:-1;
+}
+
+.card:hover::after{
+  opacity:1;
+}
+
+/* hover */
+
+.card:hover{
+  transform:translateY(-7px) scale(1.01);
+  border-color:rgba(110,145,230,.48);
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.42),
+    0 0 35px rgba(70,110,255,.08);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20,28,42,.96),
+      rgba(9,13,21,.98)
+    );
+}
+
+/* =========================
+   CARD NUMBER
+========================= */
+
+.number{
+  position:absolute;
+  top:27px;
+  right:29px;
+
+  font-size:11px;
+  letter-spacing:2px;
+  color:#536176;
+
+  transition:
+    color .3s ease,
+    transform .3s ease;
+}
+
+.card:hover .number{
+  color:#91aaff;
+  transform:translateY(-3px);
+}
+
+/* =========================
+   ICON
+========================= */
+
+.icon{
+  position:absolute;
+  top:28px;
+  left:30px;
+
+  width:38px;
+  height:38px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid #202b3c;
+  border-radius:10px;
+
+  color:#7f91ad;
+
+  transition:
+    transform .4s cubic-bezier(.2,.8,.2,1),
+    color .3s ease,
+    border-color .3s ease,
+    background .3s ease;
+}
+
+.icon svg{
+  width:19px;
+  height:19px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.card:hover .icon{
+  transform:rotate(-6deg) scale(1.12);
+  color:#b9c8ff;
+  border-color:#3c5074;
+  background:rgba(80,110,210,.08);
+}
+
+/* =========================
+   TEXT
+========================= */
+
+.card-content{
+  position:relative;
+  z-index:2;
+}
+
+.card-title{
+  font-size:25px;
+  font-weight:750;
+  letter-spacing:-.5px;
+
+  transition:
+    transform .35s ease,
+    color .35s ease;
+}
+
+.card-description{
+  margin-top:9px;
+
+  color:#68768b;
+  font-size:11px;
+  letter-spacing:.4px;
+
+  transition:
+    color .35s ease,
+    transform .35s ease;
+}
+
+.card:hover .card-title{
+  transform:translateX(5px);
+  color:#ffffff;
+}
+
+.card:hover .card-description{
+  transform:translateX(5px);
+  color:#8796ad;
+}
+
+/* =========================
+   LIVE TV SPECIAL
+========================= */
+
+.live-card{
+  grid-column:span 2;
+
+  min-height:175px;
+
+  background:
+    linear-gradient(
+      120deg,
+      rgba(13,20,28,.98),
+      rgba(11,16,24,.98)
+    );
+}
+
+.live-card .icon{
+  color:#7d9bff;
+}
+
+.live-dot{
+  position:absolute;
+  top:20px;
+  left:74px;
+
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  color:#75849a;
+  font-size:9px;
+  letter-spacing:2px;
+}
+
+.live-dot span{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#5f8cff;
+  box-shadow:0 0 12px #5f8cff;
+  animation:livePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse{
+  0%,100%{
+    opacity:.45;
+    transform:scale(.8);
+  }
+  50%{
+    opacity:1;
+    transform:scale(1.25);
+  }
+}
+
+.live-card:hover{
+  border-color:rgba(95,140,255,.55);
+  box-shadow:
+    0 20px 65px rgba(0,0,0,.45),
+    0 0 45px rgba(65,105,255,.11);
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  text-align:center;
+  margin-top:48px;
+
+  color:#465267;
+  font-size:10px;
+  letter-spacing:2px;
+
+  opacity:0;
+  animation:footerIn 1s ease 1s forwards;
+}
+
+@keyframes footerIn{
+  to{opacity:1}
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+  .container{
+    padding-top:45px;
+  }
+
+  .header{
+    margin-bottom:45px;
+  }
+
+  .logo{
+    font-size:44px;
+    letter-spacing:9px;
+    margin-left:9px;
+  }
+
+  .subtitle{
+    font-size:10px;
+    letter-spacing:6px;
+  }
+
   .grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:22px;
+    grid-template-columns:1fr;
   }
+
+  .live-card{
+    grid-column:span 1;
+  }
+
   .card{
-    position:relative;
-    min-height:212px;
-    padding:34px 36px;
-    border:1px solid #202a37;
-    border-radius:15px;
-    background:linear-gradient(145deg,#10141a,#0b0e13);
-    text-decoration:none;
-    color:#fff;
-    display:flex;
-    align-items:flex-end;
-    overflow:hidden;
-    transition:border-color .2s ease,transform .2s ease,background .2s ease;
+    min-height:180px;
+    padding:27px;
   }
-  .card:hover{
-    transform:translateY(-2px);
-    border-color:#344253;
-    background:linear-gradient(145deg,#121821,#0c1016);
+
+  .card-title{
+    font-size:22px;
   }
+
+  .icon{
+    top:24px;
+    left:25px;
+  }
+
   .number{
-    position:absolute;
-    top:29px;
-    right:31px;
-    color:#65748a;
-    font-size:13px;
-    letter-spacing:.5px;
+    top:24px;
+    right:24px;
   }
-  .title{
-    font-size:24px;
-    font-weight:700;
-    letter-spacing:-.4px;
+
+  .live-dot{
+    left:69px;
   }
-  footer{
-    text-align:center;
-    color:#56657a;
-    font-size:11px;
-    padding:40px 0 24px;
+}
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
   }
-  @media(max-width:700px){
-    .wrap{padding-top:32px}
-    .brand{margin-bottom:38px}
-    .brand h1{font-size:31px;letter-spacing:5px}
-    .brand p{font-size:11px;letter-spacing:5px}
-    .grid{grid-template-columns:1fr}
-    .card{min-height:170px}
-  }
+}
 </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <header class="brand">
-      <h1>SOIKAT</h1>
-      <p>PERSONAL OS</p>
-    </header>
 
-    <section class="grid">
-      <a class="card" href="goal.html">
-        <span class="number">01</span>
-        <span class="title">100K GOAL</span>
-      </a>
+<!-- =========================
+     BACKGROUND
+========================= -->
 
-      <a class="card" href="study.html">
-        <span class="number">02</span>
-        <span class="title">200D PLAN</span>
-      </a>
+<div class="background">
+  <div class="grid"></div>
+  <div class="glow one"></div>
+  <div class="glow two"></div>
+</div>
 
-      <a class="card" href="todo-notes.html">
-        <span class="number">03</span>
-        <span class="title">TODO + NOTES</span>
-      </a>
 
-      <a class="card" href="reports.html">
-        <span class="number">04</span>
-        <span class="title">REPORTS</span>
-      </a>
+<main class="container">
 
-      <div class="card" aria-hidden="true">
-        <span class="number">05</span>
-        <span class="title">...</span>
+  <!-- =========================
+       HEADER
+  ========================= -->
+
+  <header class="header">
+
+    <div class="logo-wrap">
+      <h1 class="logo">SOIKAT</h1>
+    </div>
+
+    <div class="subtitle">
+      PERSONAL OS
+    </div>
+
+    <div class="line"></div>
+
+  </header>
+
+
+  <!-- =========================
+       APPS
+  ========================= -->
+
+  <section class="grid">
+
+    <!-- 100K -->
+
+    <a href="goal.html" class="card">
+
+      <span class="number">01</span>
+
+      <span class="icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3v18"/>
+          <path d="M17 7c0-2-2-3-5-3s-5 1-5 3 2 3 5 3 5 1 5 3-2 3-5 3-5-1-5-3"/>
+        </svg>
+      </span>
+
+      <div class="card-content">
+        <div class="card-title">
+          100K GOAL
+        </div>
+
+        <div class="card-description">
+          Track your financial target
+        </div>
       </div>
-    </section>
-  </main>
 
-  <footer>Built with ❤️ by Soikat</footer>
+    </a>
+
+
+    <!-- 200D -->
+
+    <a href="study.html" class="card">
+
+      <span class="number">02</span>
+
+      <span class="icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="4" y="4" width="16" height="16" rx="2"/>
+          <path d="M8 8h8"/>
+          <path d="M8 12h8"/>
+          <path d="M8 16h5"/>
+        </svg>
+      </span>
+
+      <div class="card-content">
+        <div class="card-title">
+          200D PLAN
+        </div>
+
+        <div class="card-description">
+          Study plan & progress
+        </div>
+      </div>
+
+    </a>
+
+
+    <!-- TODO -->
+
+    <a href="todo-notes.html" class="card">
+
+      <span class="number">03</span>
+
+      <span class="icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 4h14v16H5z"/>
+          <path d="M8 8h8"/>
+          <path d="M8 12h8"/>
+          <path d="M8 16h5"/>
+        </svg>
+      </span>
+
+      <div class="card-content">
+        <div class="card-title">
+          TODO + NOTES
+        </div>
+
+        <div class="card-description">
+          Tasks, ideas & personal notes
+        </div>
+      </div>
+
+    </a>
+
+
+    <!-- REPORTS -->
+
+    <a href="reports.html" class="card">
+
+      <span class="number">04</span>
+
+      <span class="icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M5 19V9"/>
+          <path d="M12 19V5"/>
+          <path d="M19 19v-7"/>
+        </svg>
+      </span>
+
+      <div class="card-content">
+        <div class="card-title">
+          REPORTS
+        </div>
+
+        <div class="card-description">
+          Review your progress
+        </div>
+      </div>
+
+    </a>
+
+
+    <!-- LIVE TV -->
+
+    <a href="live-tv.html" class="card live-card">
+
+      <span class="number">05</span>
+
+      <span class="icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="6" width="18" height="13" rx="2"/>
+          <path d="M8 3l4 3 4-3"/>
+          <path d="M9 11l6 3-6 3z"/>
+        </svg>
+      </span>
+
+      <div class="live-dot">
+        <span></span>
+        LIVE
+      </div>
+
+      <div class="card-content">
+
+        <div class="card-title">
+          LIVE TV
+        </div>
+
+        <div class="card-description">
+          Watch live channels
+        </div>
+
+      </div>
+
+    </a>
+
+  </section>
+
+
+  <footer>
+    BUILT WITH LOVE BY SOIKAT
+  </footer>
+
+</main>
+
+
+<script>
+/* =========================================
+   MOUSE FOLLOW GLOW
+========================================= */
+
+document.querySelectorAll(".card").forEach(card => {
+
+  card.addEventListener("mousemove", event => {
+
+    const rect = card.getBoundingClientRect();
+
+    const x =
+      ((event.clientX - rect.left) / rect.width) * 100;
+
+    const y =
+      ((event.clientY - rect.top) / rect.height) * 100;
+
+    card.style.setProperty("--mouse-x", x + "%");
+    card.style.setProperty("--mouse-y", y + "%");
+
+  });
+
+  card.addEventListener("mouseleave", () => {
+
+    card.style.setProperty("--mouse-x", "50%");
+    card.style.setProperty("--mouse-y", "50%");
+
+  });
+
+});
+</script>
+
 </body>
 </html>
