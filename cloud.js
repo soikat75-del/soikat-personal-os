@@ -552,27 +552,19 @@
       return ok;
     }
 
-    // First run with no sync history.
+    // First run / missing baseline. For 200D the cloud row is the canonical
+    // shared state. A device may already have an older local copy (for example
+    // before it was signed in); treating that as a permanent conflict prevents
+    // the device from ever establishing a baseline and therefore prevents
+    // future cross-device updates. Keep a safety copy, then restore cloud.
     if(result.row){
-      // If local already exactly matches cloud, simply establish the baseline.
-      if(localHash===stable(cloud||{})){
-        writeLocal(key,cloud||{});
-        markSynced(key,app,cloud||{},result.row.updated_at);
-        return true;
-      }
-
-      // No baseline exists and both sides contain different data. Do NOT
-      // silently choose one: preserve the local copy and surface a conflict.
-      // A fresh/empty device can safely restore from cloud.
-      if(local!==null && meaningful(localState)){
-        saveSafetyCopy(key,localState,'first sync conflict: local and cloud both contain data');
-        saveSafetyCopy(key,cloud||{},'first sync conflict: cloud version preserved');
-        setStatus(`SYNC CONFLICT · ${app} · LOCAL SAFE`,'error');
-        console.warn('[Soikat Cloud] FIRST SYNC CONFLICT — NO OVERWRITE',app);
-        return false;
+      if(localHash!==stable(cloud||{}) && local!==null && meaningful(localState)){
+        saveSafetyCopy(key,localState,'200D first sync: cloud authoritative; local copy preserved');
       }
       writeLocal(key,cloud||{});
       markSynced(key,app,cloud||{},result.row.updated_at);
+      console.log('[Soikat Cloud] BASELINE ESTABLISHED FROM CLOUD',app);
+      refreshPageFromCloud(app);
       return true;
     }
 
