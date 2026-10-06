@@ -1642,7 +1642,9 @@ function parseDate(v){
  const [y,m,d]=v.split("-").map(Number);
 
  return new Date(y,m-1,d);
+
 }
+
 
 function dateKey(d){
 
@@ -1650,27 +1652,33 @@ function dateKey(d){
 
 }
 
+
 function money(v){
 
  return "৳"+Math.round(v).toLocaleString("en-IN");
 
 }
 
+
 function percent(v){
 
  if(!isFinite(v)||v<=0){
+
   return "0%";
+
  }
 
  return v.toFixed(1).replace(".0","")+"%";
 
 }
 
+
 function daysInclusive(a,b){
 
  return Math.floor((b-a)/86400000)+1;
 
 }
+
 
 function getEntries(){
 
@@ -1688,6 +1696,7 @@ function getEntries(){
 
 }
 
+
 function saveEntries(e){
 
  localStorage.setItem(
@@ -1696,6 +1705,7 @@ function saveEntries(e){
  );
 
 }
+
 
 function totalIncome(e){
 
@@ -1707,6 +1717,7 @@ function totalIncome(e){
 
 }
 
+
 function rangeTotal(e,a,b){
 
  let total=0;
@@ -1717,7 +1728,9 @@ function rangeTotal(e,a,b){
    const d=parseDate(k);
 
    if(d>=a&&d<=b){
+
     total+=Number(v||0);
+
    }
 
   }
@@ -1726,6 +1739,7 @@ function rangeTotal(e,a,b){
  return total;
 
 }
+
 
 function showToast(msg){
 
@@ -1822,6 +1836,7 @@ function monthRange(d){
  };
 
 }
+
 
 function currentMonthUntilSelected(selected){
 
@@ -1929,16 +1944,19 @@ function render(){
  const selectedKey=
   dateKey(selected);
 
+
  const hasSelectedEntry=
   Object.prototype.hasOwnProperty.call(
    entries,
    selectedKey
   );
 
+
  const selectedNet=
   Number(
    entries[selectedKey]||0
   );
+
 
  let projectedAverage=0;
 
@@ -2090,9 +2108,21 @@ function render(){
     "bad"
    }">
     ${percent(pace)} pace
+   </strong>
+   with an average of
+   <strong class="${
+    currentAverage>=DAILY_TARGET?
+    "good":
+    "bad"
+   }">
+    ${money(currentAverage)}/day
    </strong>.
    You need
-   <strong>
+   <strong class="${
+    projectedAverage<=DAILY_TARGET?
+    "good":
+    "bad"
+   }">
     ${money(projectedAverage)}/day
    </strong>
    from today through the end of the month
@@ -2231,6 +2261,7 @@ function renderCalendar(){
    1
   );
 
+
  const last=
   new Date(
    year,
@@ -2302,7 +2333,9 @@ function renderCalendar(){
 
 
   if(!inRange){
+
    cls+=" outside";
+
   }
 
 
@@ -2368,6 +2401,7 @@ function renderCalendar(){
      has?
      `
       <span class="dot"></span>
+
       <span class="day-income">
        ${money(value)}
       </span>
