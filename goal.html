@@ -1299,6 +1299,131 @@ footer{
   width:38px;
  }
 }
+
+/* ================= MOBILE WIDTH FIX ONLY ================= */
+
+@media(max-width:600px){
+
+ html,
+ body{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:hidden;
+ }
+
+ .container{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:hidden;
+ }
+
+ .topbar{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) minmax(0,auto);
+  gap:6px;
+ }
+
+ .back,
+ .brand,
+ .top-date{
+  min-width:0;
+  max-width:100%;
+ }
+
+ .brand{
+  width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+ }
+
+ .top-date{
+  overflow:hidden;
+  text-overflow:ellipsis;
+ }
+
+ .title,
+ .title > div,
+ .goal,
+ .main-grid,
+ .main-grid > div,
+ .panel,
+ .calendar-panel,
+ .overview,
+ .daily-entry-panel,
+ .recent-panel{
+  min-width:0;
+  max-width:100%;
+ }
+
+ .title > div:first-child{
+  overflow:hidden;
+ }
+
+ .period{
+  overflow:hidden;
+  text-overflow:ellipsis;
+ }
+
+ .calendar-head,
+ .calendar-head > div,
+ .calendar-grid,
+ .weekdays{
+  min-width:0;
+  max-width:100%;
+ }
+
+ .calendar-head > div:first-child{
+  overflow:hidden;
+ }
+
+ .month-title{
+  white-space:nowrap;
+ }
+
+ .monthly-report-btn{
+  max-width:100%;
+ }
+
+ .metric-grid,
+ .entry-layout{
+  min-width:0;
+  max-width:100%;
+ }
+
+}
+
+@media(max-width:380px){
+
+ .topbar{
+  grid-template-columns:auto minmax(0,1fr) minmax(0,auto);
+  gap:4px;
+ }
+
+ .back{
+  font-size:9px;
+ }
+
+ .brand{
+  font-size:8px;
+  letter-spacing:.02em;
+ }
+
+ .top-date{
+  font-size:7px;
+  max-width:100%;
+ }
+
+ .calendar-head > div:first-child{
+  min-width:0;
+ }
+
+}
+
 </style>
 </head>
 
