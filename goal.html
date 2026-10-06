@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>100K Goal — Soikat Personal OS</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+ width:100%;
+ max-width:100%;
+ overflow-x:hidden;
+}
 
 :root{
  --bg:#07111d;
@@ -960,7 +966,9 @@ footer{
 
  .container{
   width:100%;
+  max-width:none;
   padding:0 10px;
+  margin:0;
  }
 
  .topbar{
@@ -1195,7 +1203,9 @@ footer{
 
  .container{
   width:100%;
+  max-width:none;
   padding:0 8px;
+  margin:0;
  }
 
  .topbar{
