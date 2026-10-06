@@ -1924,46 +1924,51 @@ function render(){
   DAILY_TARGET;
 
 
-/*
-  IMPORTANT:
+/* ================= PROJECTED AVERAGE ================= */
 
-  Projected Average means:
-  "How much per day is needed from TODAY
-   through the end of this month?"
+ const selectedKey=
+  dateKey(selected);
 
-  Therefore TODAY is included in the
-  remaining-day count.
-
-  Example:
-  October has 31 days.
-  On October 1:
-  remaining days = 31
-  target = 31 × 220
-  projected average = 220/day
-
-  This avoids the incorrect ৳227/day
-  calculation that happened when October 1
-  was excluded from the remaining days.
-*/
-
- const remainingDays=
-  Math.max(
-   1,
-   info.month.days-
-   (elapsedDays-1)
+ const hasSelectedEntry=
+  Object.prototype.hasOwnProperty.call(
+   entries,
+   selectedKey
   );
 
-
- const remainingAmount=
-  Math.max(
-   0,
-   monthlyTarget-actual
+ const selectedNet=
+  Number(
+   entries[selectedKey]||0
   );
 
+ let projectedAverage=0;
 
- const projectedAverage=
-  remainingAmount/
-  remainingDays;
+ if(
+  hasSelectedEntry &&
+  selectedNet>=DAILY_TARGET
+ ){
+
+  projectedAverage=0;
+
+ }else{
+
+  const remainingDays=
+   Math.max(
+    1,
+    info.month.days-
+    elapsedDays+1
+   );
+
+  const remainingAmount=
+   Math.max(
+    0,
+    monthlyTarget-actual
+   );
+
+  projectedAverage=
+   remainingAmount/
+   remainingDays;
+
+ }
 
 
  const currentAverage=
@@ -2379,10 +2384,10 @@ function renderCalendar(){
  grid.innerHTML=html;
 
 
- /*
-  Tooltip only on desktop.
-  No tooltip on mobile/touch.
- */
+/*
+ Tooltip only on desktop.
+ No tooltip on mobile/touch.
+*/
 
  if(
   window.matchMedia(
@@ -3338,24 +3343,21 @@ const initial=
 document
  .getElementById(
   "entryDate"
- )
- .value=
+ ).value=
  dateKey(initial);
 
 
 document
  .getElementById(
   "entryDate"
- )
- .min=
+ ).min=
  START_DATE;
 
 
 document
  .getElementById(
   "entryDate"
- )
- .max=
+ ).max=
  END_DATE;
 
 
@@ -3364,7 +3366,7 @@ calendarDate=
   initial.getFullYear(),
   initial.getMonth(),
   1
- );
+);
 
 
 render();
