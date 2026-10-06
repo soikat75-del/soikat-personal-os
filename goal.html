@@ -4,233 +4,1242 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>100K Goal — Soikat Personal OS</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
 :root{
- --bg:#07111d;--panel:#0d1a29;--line:#21354d;--text:#f5f8fc;--muted:#8191a7;
- --green:#35e58f;--blue:#4da3ff;--purple:#a879ff;--orange:#ffb43d;--cyan:#36d8e8;--pink:#ff70b5;--red:#ff6570;--yellow:#ffc44d;
+ --bg:#07111d;
+ --panel:#0d1a29;
+ --line:#21354d;
+ --text:#f5f8fc;
+ --muted:#8191a7;
+ --green:#35e58f;
+ --blue:#4da3ff;
+ --purple:#a879ff;
+ --orange:#ffb43d;
+ --cyan:#36d8e8;
+ --pink:#ff70b5;
+ --red:#ff6570;
+ --yellow:#ffc44d;
 }
-body{min-height:100vh;color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(circle at 8% 0%,rgba(45,120,255,.13),transparent 28%),radial-gradient(circle at 92% 12%,rgba(166,105,255,.11),transparent 27%),var(--bg)}
-.container{width:min(1320px,calc(100% - 42px));margin:auto}
-.topbar{height:72px;border-bottom:1px solid rgba(105,140,180,.18);display:flex;align-items:center;justify-content:space-between}
-.back{color:#a9b6c8;text-decoration:none;font-size:13px}.back:hover{color:#fff}
-.brand{font-size:15px;font-weight:700;letter-spacing:.18em}.top-date{color:#8291a5;font-size:12px}
-.title{padding:34px 0 22px;display:flex;justify-content:space-between;align-items:end}
-.kicker{color:#708097;font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
-h1{font-size:34px;letter-spacing:-.03em}.period{margin-top:7px;color:var(--muted);font-size:13px}
-.pill{padding:8px 13px;border:1px solid #2b405d;background:#102238;border-radius:999px;color:#a3b6cc;font-size:11px}
-.goal{background:linear-gradient(135deg,#10243a,#0d1a2b);border:1px solid #28415f;border-radius:16px;padding:25px;box-shadow:0 16px 45px rgba(0,0,0,.18)}
-.goal-top{display:flex;justify-content:space-between;align-items:end}.goal-label{color:#8ea0b7;font-size:12px;text-transform:uppercase;letter-spacing:.13em}
-.amount{font-size:40px;font-weight:700;margin-top:5px}.percent{font-size:26px;color:var(--green);font-weight:700}
-.bar{height:11px;background:#17283b;border-radius:99px;margin-top:20px;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,#26d879,#4ee8a1);border-radius:99px;transition:width .35s ease}
-.goal-bottom{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#7f90a6}
-.main-grid{display:grid;grid-template-columns:1.08fr 1fr;gap:16px;margin-top:16px}
-.panel{background:linear-gradient(145deg,#0d1927,#0b1520);border:1px solid var(--line);border-radius:15px;padding:22px}
-.panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:19px}.panel-title{font-size:17px;font-weight:650}
-.panel-tag{font-size:10px;color:#7f90a6;border:1px solid #26384f;border-radius:20px;padding:5px 8px}
-.calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.month-title{font-size:17px;font-weight:650}
-.calendar-nav{display:flex;gap:6px}.nav-btn{width:32px;height:32px;padding:0;background:#0b1725;border:1px solid #26384e;color:#b9c7d8;font-size:17px}.nav-btn:hover{background:#132338}
-.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.weekdays div{text-align:center;color:#667890;font-size:10px;padding-bottom:6px}
-.day{min-height:39px;border:1px solid #17283b;background:#091522;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#aebbd0;font-size:11px;cursor:pointer;position:relative}
-.day:hover{border-color:#3b5d80;background:#102238}.day.empty{background:transparent;border-color:transparent;cursor:default}
-.day.outside{opacity:.35}.day.good{background:rgba(53,229,143,.13);border-color:rgba(53,229,143,.38);color:#75e9ab}
-.day.partial{background:rgba(255,196,77,.13);border-color:rgba(255,196,77,.40);color:#ffd06b}
-.day.below{background:rgba(255,101,112,.13);border-color:rgba(255,101,112,.38);color:#ff8b93}
-.day.selected{outline:2px solid var(--blue);outline-offset:1px}.day.today{box-shadow:inset 0 0 0 1px #d9e7ff}
-.day .dot{position:absolute;width:4px;height:4px;border-radius:50%;right:5px;top:5px;background:currentColor}
-.calendar-legend{display:flex;flex-wrap:wrap;gap:13px;margin-top:13px;color:#73839a;font-size:10px}.legend-item{display:flex;align-items:center;gap:5px}.legend-dot{width:7px;height:7px;border-radius:50%}.legend-green{background:var(--green)}.legend-yellow{background:var(--yellow)}.legend-red{background:var(--red)}.legend-gray{background:#667890}
-.overview{margin-top:16px}.overview-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.pace-number{font-size:35px;font-weight:750;color:var(--green)}
-.pace-label{font-size:11px;color:#8394aa;letter-spacing:.1em;text-transform:uppercase}.pace-sub{font-size:12px;color:#72839a;margin-top:3px}
-.pace-bar{height:10px;background:#17283b;border-radius:99px;overflow:hidden;margin:10px 0 6px}.pace-fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#26d879,#4ee8a1);transition:.3s}
-.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{background:#09131e;border:1px solid #1c2b3e;border-radius:9px;padding:12px}.metric span{display:block;color:#74859b;font-size:10px}.metric strong{display:block;margin-top:6px;font-size:15px}
-.metric.green strong{color:var(--green)}.metric.blue strong{color:var(--blue)}.metric.orange strong{color:var(--orange)}.metric.red strong{color:var(--red)}
-.report{margin-top:12px;padding:12px 14px;border-radius:9px;background:rgba(77,163,255,.07);border:1px solid rgba(77,163,255,.18);font-size:11px;line-height:1.55;color:#9cafc5}.report strong{color:#fff}.report .good{color:var(--green)}.report .bad{color:var(--red)}
-label{display:block;font-size:10px;color:#8190a5;letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
-input{width:100%;background:#08121d;border:1px solid #26384e;border-radius:9px;padding:13px;color:#fff;outline:none;margin-bottom:14px}
-input:focus{border-color:#3e78ad}
-button{width:100%;border:0;border-radius:9px;padding:13px;font-weight:700;background:linear-gradient(90deg,#2788ff,#6a67ff);color:white;cursor:pointer}button:hover{filter:brightness(1.1)}
-.entry-layout{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini{background:#09131e;border:1px solid #1c2b3e;border-radius:9px;padding:10px}.mini span{display:block;color:#74859b;font-size:10px}.mini strong{display:block;margin-top:5px;font-size:13px}
-.table-panel{margin-top:16px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;color:#718198;font-weight:500;padding:0 8px 11px;border-bottom:1px solid #213047}td{padding:12px 8px;border-bottom:1px solid #182638}
-.net{color:var(--green);font-weight:700}.positive{color:var(--green)}.negative{color:var(--red)}
-.status{display:inline-block;font-size:9px;padding:4px 7px;border-radius:20px;background:rgba(53,229,143,.1);color:var(--green);border:1px solid rgba(53,229,143,.25)}.status-partial{background:rgba(255,196,77,.09);color:var(--yellow);border-color:rgba(255,196,77,.25)}.status-below{background:rgba(255,101,112,.08);color:var(--red);border-color:rgba(255,101,112,.25)}
-.delete-btn{width:auto;padding:4px 7px;font-size:9px;background:transparent;border:1px solid #2b394b;color:#7e8da2}.delete-btn:hover{color:var(--red);border-color:#70404a}
-footer{text-align:center;color:#56657a;font-size:11px;padding:40px 0 24px}
-.toast{position:fixed;left:50%;bottom:25px;transform:translateX(-50%) translateY(20px);background:#edf2f7;color:#09101a;padding:10px 15px;border-radius:8px;font-size:12px;opacity:0;pointer-events:none;transition:.25s ease}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:1000px){.main-grid{grid-template-columns:1fr}.entry-layout{grid-template-columns:1fr}}
-@media(max-width:850px){.container{width:calc(100% - 28px)}.title{align-items:start;gap:15px;flex-direction:column}.metric-grid{grid-template-columns:1fr}}
-@media(max-width:600px){.topbar{height:68px}.top-date{display:none}h1{font-size:29px}.goal{padding:22px}.goal-top{align-items:flex-start;flex-direction:column}.amount{font-size:32px}.percent{font-size:21px}.day{min-height:34px;font-size:10px}}
 
-/* ===== CALENDAR POLISH ===== */
+body{
+ min-height:100vh;
+ color:var(--text);
+ font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ background:
+ radial-gradient(circle at 8% 0%,rgba(45,120,255,.13),transparent 28%),
+ radial-gradient(circle at 92% 12%,rgba(166,105,255,.11),transparent 27%),
+ var(--bg);
+}
+
+.container{
+ width:min(1320px,calc(100% - 42px));
+ margin:auto;
+}
+
+.topbar{
+ height:58px;
+ border-bottom:1px solid rgba(105,140,180,.18);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:14px;
+}
+
+.back{
+ color:#a9b6c8;
+ text-decoration:none;
+ font-size:13px;
+ white-space:nowrap;
+}
+
+.back:hover{color:#fff}
+
+.brand{
+ font-size:15px;
+ font-weight:700;
+ letter-spacing:.18em;
+ white-space:nowrap;
+ text-align:center;
+}
+
+.top-date{
+ color:#8291a5;
+ font-size:12px;
+ white-space:nowrap;
+}
+
+/* ================= TITLE ================= */
+
+.title{
+ padding:20px 0 14px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:15px;
+}
+
+.kicker{
+ color:#708097;
+ font-size:11px;
+ letter-spacing:.18em;
+ text-transform:uppercase;
+ margin-bottom:5px;
+}
+
+h1{
+ font-size:29px;
+ letter-spacing:-.03em;
+}
+
+.period{
+ margin-top:4px;
+ color:var(--muted);
+ font-size:12px;
+}
+
+.pill{
+ padding:8px 13px;
+ border:1px solid #2b405d;
+ background:#102238;
+ border-radius:999px;
+ color:#a3b6cc;
+ font-size:11px;
+ white-space:nowrap;
+ flex-shrink:0;
+}
+
+/* ================= GOAL ================= */
+
+.goal{
+ background:linear-gradient(135deg,#10243a,#0d1a2b);
+ border:1px solid #28415f;
+ border-radius:13px;
+ padding:18px;
+ box-shadow:0 16px 45px rgba(0,0,0,.18);
+}
+
+.goal-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:end;
+}
+
+.goal-label{
+ color:#8ea0b7;
+ font-size:12px;
+ text-transform:uppercase;
+ letter-spacing:.13em;
+}
+
+.amount{
+ font-size:34px;
+ font-weight:700;
+ margin-top:5px;
+}
+
+.percent{
+ font-size:26px;
+ color:var(--green);
+ font-weight:700;
+}
+
+.bar{
+ height:8px;
+ background:#17283b;
+ border-radius:99px;
+ margin-top:14px;
+ overflow:hidden;
+}
+
+.fill{
+ height:100%;
+ width:0;
+ background:linear-gradient(90deg,#26d879,#4ee8a1);
+ border-radius:99px;
+ transition:width .35s ease;
+}
+
+.goal-bottom{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin-top:7px;
+ font-size:11px;
+ color:#7f90a6;
+}
+
+.days-left{
+ color:#8eb6df;
+ font-weight:700;
+ white-space:nowrap;
+}
+
+/* ================= MAIN ================= */
+
+.main-grid{
+ display:grid;
+ grid-template-columns:1.08fr 1fr;
+ gap:10px;
+ margin-top:10px;
+}
+
+.panel{
+ background:linear-gradient(145deg,#0d1927,#0b1520);
+ border:1px solid var(--line);
+ border-radius:12px;
+ padding:15px;
+}
+
+.panel-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:12px;
+}
+
+.panel-title{
+ font-size:15px;
+ font-weight:650;
+}
+
+.panel-tag{
+ font-size:10px;
+ color:#7f90a6;
+ border:1px solid #26384f;
+ border-radius:20px;
+ padding:5px 8px;
+}
+
+/* ================= CALENDAR ================= */
+
 .calendar-panel{
-  padding:24px;
+ padding:16px;
 }
+
+.calendar-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:10px;
+ gap:8px;
+}
+
+.month-title{
+ font-size:15px;
+ font-weight:650;
+}
+
+.calendar-nav{
+ display:flex;
+ gap:6px;
+}
+
+.nav-btn{
+ width:32px;
+ height:32px;
+ padding:0;
+ background:#0b1725;
+ border:1px solid #26384e;
+ color:#b9c7d8;
+ font-size:17px;
+ cursor:pointer;
+}
+
+.nav-btn:hover{
+ background:#132338;
+}
+
+.weekdays,
 .calendar-grid{
-  gap:7px;
+ display:grid;
+ grid-template-columns:repeat(7,1fr);
+ gap:4px;
 }
+
+.weekdays div{
+ text-align:center;
+ color:#667890;
+ font-size:9px;
+ padding-bottom:4px;
+}
+
 .day{
-  min-height:54px;
-  border-radius:10px;
-  font-size:13px;
-  transition:transform .15s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease;
+ min-height:43px;
+ border:1px solid #17283b;
+ background:#091522;
+ border-radius:7px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#aebbd0;
+ font-size:11px;
+ cursor:pointer;
+ position:relative;
+ transition:
+  transform .15s ease,
+  border-color .15s ease,
+  background .15s ease,
+  box-shadow .15s ease;
 }
-.day:not(.empty):hover{
-  transform:translateY(-2px);
-  border-color:#5b86b0;
-  box-shadow:0 8px 20px rgba(0,0,0,.22);
-  z-index:5;
+
+.day:hover{
+ border-color:#3b5d80;
+ background:#102238;
 }
-.day.good:hover{box-shadow:0 8px 22px rgba(53,229,143,.13)}
-.day.partial:hover{box-shadow:0 8px 22px rgba(255,196,77,.13)}
-.day.below:hover{box-shadow:0 8px 22px rgba(255,101,112,.13)}
-.day .day-number{position:relative;z-index:2}
+
+.day.empty{
+ background:transparent;
+ border-color:transparent;
+ cursor:default;
+}
+
+.day.outside{
+ opacity:.35;
+}
+
+.day.good{
+ background:rgba(53,229,143,.13);
+ border-color:rgba(53,229,143,.38);
+ color:#75e9ab;
+}
+
+.day.partial{
+ background:rgba(255,196,77,.13);
+ border-color:rgba(255,196,77,.40);
+ color:#ffd06b;
+}
+
+.day.below{
+ background:rgba(255,101,112,.13);
+ border-color:rgba(255,101,112,.38);
+ color:#ff8b93;
+}
+
+.day.selected{
+ outline:2px solid var(--blue);
+ outline-offset:1px;
+}
+
+.day.today{
+ box-shadow:inset 0 0 0 1px #d9e7ff;
+}
+
+.day .dot{
+ position:absolute;
+ width:4px;
+ height:4px;
+ border-radius:50%;
+ right:5px;
+ top:5px;
+ background:currentColor;
+}
+
+.day .day-number{
+ position:relative;
+ z-index:2;
+}
+
 .day .day-income{
-  position:absolute;
-  left:6px;
-  right:6px;
-  bottom:5px;
-  text-align:center;
-  font-size:9px;
-  font-weight:700;
-  color:inherit;
-  opacity:.95;
+ position:absolute;
+ left:6px;
+ right:6px;
+ bottom:4px;
+ text-align:center;
+ font-size:8px;
+ font-weight:700;
+ color:inherit;
+ opacity:.95;
 }
-.day.no-entry .day-income{display:none}
+
+.day.no-entry .day-income{
+ display:none;
+}
+
+.day:not(.empty):hover{
+ transform:translateY(-2px);
+ border-color:#5b86b0;
+ box-shadow:0 8px 20px rgba(0,0,0,.22);
+ z-index:5;
+}
+
+.day.good:hover{
+ box-shadow:0 8px 22px rgba(53,229,143,.13);
+}
+
+.day.partial:hover{
+ box-shadow:0 8px 22px rgba(255,196,77,.13);
+}
+
+.day.below:hover{
+ box-shadow:0 8px 22px rgba(255,101,112,.13);
+}
+
+/* ================= LEGEND ================= */
+
+.calendar-legend{
+ display:flex;
+ flex-wrap:wrap;
+ gap:9px;
+ margin-top:8px;
+ color:#73839a;
+ font-size:9px;
+}
+
+.legend-item{
+ display:flex;
+ align-items:center;
+ gap:5px;
+}
+
+.legend-dot{
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ flex:0 0 7px;
+}
+
+.legend-green{background:var(--green)}
+.legend-yellow{background:var(--yellow)}
+.legend-red{background:var(--red)}
+.legend-gray{background:#667890}
+
+/* ================= TOOLTIP ================= */
+
 .day-tooltip{
-  position:fixed;
-  z-index:9999;
-  pointer-events:none;
-  min-width:150px;
-  max-width:210px;
-  padding:10px 11px;
-  border:1px solid #35506e;
-  border-radius:9px;
-  background:#0b1725;
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
-  color:#dbe6f3;
-  font-size:11px;
-  line-height:1.45;
-  opacity:0;
-  transform:translateY(5px);
-  transition:opacity .12s ease,transform .12s ease;
-}
-.day-tooltip.show{opacity:1;transform:translateY(0)}
-.day-tooltip .tt-date{color:#9db0c6;margin-bottom:4px}
-.day-tooltip .tt-net{font-size:16px;font-weight:800;color:#fff;margin-bottom:3px}
-.day-tooltip .tt-status{margin-top:0;color:#dbe6f3}
-.calendar-month-link{
-  color:#8eb6df;
-  text-decoration:none;
-  font-size:10px;
-  margin-left:8px;
-}
-.calendar-month-link:hover{color:#fff}
-@media(max-width:600px){
-  .calendar-panel{padding:16px}
-  .day{min-height:48px}
-  .day .day-income{font-size:8px}
+ position:fixed;
+ z-index:9999;
+ pointer-events:none;
+ min-width:150px;
+ max-width:210px;
+ padding:10px 11px;
+ border:1px solid #35506e;
+ border-radius:9px;
+ background:#0b1725;
+ box-shadow:0 12px 30px rgba(0,0,0,.35);
+ color:#dbe6f3;
+ font-size:11px;
+ line-height:1.45;
+ opacity:0;
+ transform:translateY(5px);
+ transition:opacity .12s ease,transform .12s ease;
 }
 
+.day-tooltip.show{
+ opacity:1;
+ transform:translateY(0);
+}
 
-/* ===== COMPACT UI FINISH ===== */
-.topbar{height:58px}
-.title{padding:20px 0 14px}
-.kicker{margin-bottom:5px}
-h1{font-size:29px}
-.period{margin-top:4px;font-size:12px}
-.goal{padding:18px;border-radius:13px}
-.amount{font-size:34px}
-.bar{height:8px;margin-top:14px}
-.goal-bottom{margin-top:7px;font-size:11px}
-.main-grid{gap:10px;margin-top:10px}
-.panel{padding:15px;border-radius:12px}
-.panel-head{margin-bottom:12px}
-.panel-title{font-size:15px}
-.calendar-panel{padding:16px}
-.calendar-head{margin-bottom:10px}
-.month-title{font-size:15px}
-.calendar-grid{gap:4px}
-.weekdays,.calendar-grid{gap:4px}
-.weekdays div{padding-bottom:4px;font-size:9px}
-.day{min-height:43px;border-radius:7px;font-size:11px}
-.day .day-income{bottom:4px;font-size:8px}
-.calendar-legend{gap:9px;margin-top:8px;font-size:9px}
-.overview{margin-top:10px}
-.overview-top{margin-bottom:10px}
-.pace-number{font-size:29px}
-.pace-bar{height:8px;margin:7px 0 5px}
-.metric-grid{gap:6px}
-.metric{padding:9px}
-.metric strong{margin-top:4px;font-size:13px}
-.report{margin-top:8px;padding:9px 11px}
-.entry-layout{gap:6px}
-.mini{padding:8px}
-input{padding:10px;margin-bottom:10px}
-button{padding:10px}
-.recent-panel{margin-top:10px}
-td{padding:9px 7px}
-footer{padding:24px 0 16px}
-.calendar-month-link{margin-left:7px;font-size:9px}
+.day-tooltip .tt-date{
+ color:#9db0c6;
+ margin-bottom:4px;
+}
+
+.day-tooltip .tt-net{
+ font-size:16px;
+ font-weight:800;
+ color:#fff;
+ margin-bottom:3px;
+}
+
+.day-tooltip .tt-status{
+ margin-top:0;
+ color:#dbe6f3;
+}
+
+/* ================= OVERVIEW ================= */
+
+.overview{
+ margin-top:10px;
+}
+
+.overview-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:10px;
+}
+
+.pace-number{
+ font-size:29px;
+ font-weight:750;
+ color:var(--green);
+}
+
+.pace-label{
+ font-size:11px;
+ color:#8394aa;
+ letter-spacing:.1em;
+ text-transform:uppercase;
+}
+
+.pace-sub{
+ font-size:12px;
+ color:#72839a;
+ margin-top:3px;
+}
+
+.pace-bar{
+ height:8px;
+ background:#17283b;
+ border-radius:99px;
+ overflow:hidden;
+ margin:7px 0 5px;
+}
+
+.pace-fill{
+ height:100%;
+ width:0;
+ border-radius:99px;
+ background:linear-gradient(90deg,#26d879,#4ee8a1);
+ transition:.3s;
+}
+
+.metric-grid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:6px;
+}
+
+.metric{
+ background:#09131e;
+ border:1px solid #1c2b3e;
+ border-radius:9px;
+ padding:9px;
+}
+
+.metric span{
+ display:block;
+ color:#74859b;
+ font-size:10px;
+}
+
+.metric strong{
+ display:block;
+ margin-top:4px;
+ font-size:13px;
+}
+
+.metric.green strong{color:var(--green)}
+.metric.blue strong{color:var(--blue)}
+.metric.orange strong{color:var(--orange)}
+.metric.red strong{color:var(--red)}
+
+.report{
+ margin-top:8px;
+ padding:9px 11px;
+ border-radius:9px;
+ background:rgba(77,163,255,.07);
+ border:1px solid rgba(77,163,255,.18);
+ font-size:11px;
+ line-height:1.55;
+ color:#9cafc5;
+}
+
+.report strong{color:#fff}
+.report .good{color:var(--green)}
+.report .bad{color:var(--red)}
+
+/* ================= DAILY ENTRY ================= */
+
+label{
+ display:block;
+ font-size:10px;
+ color:#8190a5;
+ letter-spacing:.1em;
+ text-transform:uppercase;
+ margin-bottom:7px;
+}
+
+input{
+ width:100%;
+ background:#08121d;
+ border:1px solid #26384e;
+ border-radius:9px;
+ padding:10px;
+ color:#fff;
+ outline:none;
+ margin-bottom:10px;
+}
+
+input:focus{
+ border-color:#3e78ad;
+}
+
+button{
+ width:100%;
+ border:0;
+ border-radius:9px;
+ padding:10px;
+ font-weight:700;
+ background:linear-gradient(90deg,#2788ff,#6a67ff);
+ color:white;
+ cursor:pointer;
+}
+
+button:hover{
+ filter:brightness(1.1);
+}
+
+.entry-layout{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:6px;
+}
+
+.mini{
+ background:#09131e;
+ border:1px solid #1c2b3e;
+ border-radius:9px;
+ padding:8px;
+}
+
+.mini span{
+ display:block;
+ color:#74859b;
+ font-size:10px;
+}
+
+.mini strong{
+ display:block;
+ margin-top:5px;
+ font-size:13px;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap{
+ overflow-x:auto;
+}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ font-size:12px;
+}
+
+th{
+ text-align:left;
+ color:#718198;
+ font-weight:500;
+ padding:0 8px 11px;
+ border-bottom:1px solid #213047;
+}
+
+td{
+ padding:9px 7px;
+ border-bottom:1px solid #182638;
+}
+
+.net{
+ color:var(--green);
+ font-weight:700;
+}
+
+.positive{color:var(--green)}
+.negative{color:var(--red)}
+
+.status{
+ display:inline-block;
+ font-size:9px;
+ padding:4px 7px;
+ border-radius:20px;
+ background:rgba(53,229,143,.1);
+ color:var(--green);
+ border:1px solid rgba(53,229,143,.25);
+}
+
+.status-partial{
+ background:rgba(255,196,77,.09);
+ color:var(--yellow);
+ border-color:rgba(255,196,77,.25);
+}
+
+.status-below{
+ background:rgba(255,101,112,.08);
+ color:var(--red);
+ border-color:rgba(255,101,112,.25);
+}
+
+.delete-btn{
+ width:auto;
+ padding:4px 7px;
+ font-size:9px;
+ background:transparent;
+ border:1px solid #2b394b;
+ color:#7e8da2;
+}
+
+.delete-btn:hover{
+ color:var(--red);
+ border-color:#70404a;
+}
+
+/* ================= MONTHLY REPORT ================= */
+
 .monthly-report-btn{
-  width:auto;
-  padding:5px 8px;
-  margin-left:7px;
-  background:transparent;
-  border:1px solid #29425e;
-  color:#8eb6df;
-  font-size:9px;
-  font-weight:600;
-  border-radius:7px;
+ width:auto;
+ padding:5px 8px;
+ margin-left:7px;
+ background:transparent;
+ border:1px solid #29425e;
+ color:#8eb6df;
+ font-size:9px;
+ font-weight:600;
+ border-radius:7px;
 }
-.monthly-report-btn:hover{background:#102238;color:#fff;filter:none}
 
-/* Monthly report modal */
+.monthly-report-btn:hover{
+ background:#102238;
+ color:#fff;
+ filter:none;
+}
+
 .report-modal{
-  position:fixed;inset:0;z-index:10000;
-  display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(0,0,0,.68);
+ position:fixed;
+ inset:0;
+ z-index:10000;
+ display:none;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+ background:rgba(0,0,0,.68);
 }
-.report-modal.open{display:flex}
+
+.report-modal.open{
+ display:flex;
+}
+
 .report-box{
-  width:min(620px,100%);max-height:86vh;overflow:auto;
-  background:#0d1927;border:1px solid #29425e;border-radius:13px;
-  box-shadow:0 24px 70px rgba(0,0,0,.45);padding:16px;
+ width:min(620px,100%);
+ max-height:86vh;
+ overflow:auto;
+ background:#0d1927;
+ border:1px solid #29425e;
+ border-radius:13px;
+ box-shadow:0 24px 70px rgba(0,0,0,.45);
+ padding:16px;
 }
+
 .report-box-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;margin-bottom:12px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ margin-bottom:12px;
 }
-.report-box-title{font-size:16px;font-weight:700}
+
+.report-box-title{
+ font-size:16px;
+ font-weight:700;
+}
+
 .report-close{
-  width:30px;height:30px;padding:0;background:#0a1521;
-  border:1px solid #26384e;color:#aebbd0;font-size:17px;
+ width:30px;
+ height:30px;
+ padding:0;
+ background:#0a1521;
+ border:1px solid #26384e;
+ color:#aebbd0;
+ font-size:17px;
 }
+
 .report-summary{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:6px;
+ margin-bottom:12px;
 }
+
 .report-stat{
-  background:#09131e;border:1px solid #1c2b3e;border-radius:8px;padding:8px;
+ background:#09131e;
+ border:1px solid #1c2b3e;
+ border-radius:8px;
+ padding:8px;
 }
-.report-stat span{display:block;color:#74859b;font-size:9px}
-.report-stat strong{display:block;margin-top:4px;font-size:13px}
-.report-list{border-top:1px solid #1c2b3e}
+
+.report-stat span{
+ display:block;
+ color:#74859b;
+ font-size:9px;
+}
+
+.report-stat strong{
+ display:block;
+ margin-top:4px;
+ font-size:13px;
+}
+
+.report-list{
+ border-top:1px solid #1c2b3e;
+}
+
 .report-row{
-  display:grid;grid-template-columns:85px 1fr 80px;
-  gap:8px;align-items:center;padding:8px 0;
-  border-bottom:1px solid #182638;font-size:11px;
+ display:grid;
+ grid-template-columns:85px 1fr 80px;
+ gap:8px;
+ align-items:center;
+ padding:8px 0;
+ border-bottom:1px solid #182638;
+ font-size:11px;
 }
-.report-row .r-date{color:#8191a7}
-.report-row .r-net{color:var(--green);font-weight:700;text-align:right}
-.report-note{color:#8191a7;font-size:10px;margin-top:9px}
+
+.report-row .r-date{
+ color:#8191a7;
+}
+
+.report-row .r-net{
+ color:var(--green);
+ font-weight:700;
+ text-align:right;
+}
+
+.report-note{
+ color:#8191a7;
+ font-size:10px;
+ margin-top:9px;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:35px;
+ margin-top:38px;
+ padding:0 0 20px;
+ color:#8292a2;
+ font-size:11px;
+ letter-spacing:4px;
+ animation:fadeUp 1s .55s both;
+}
+
+.footer-line{
+ width:150px;
+ height:1px;
+ background:linear-gradient(90deg,transparent,#526b82);
+}
+
+.footer-line.right{
+ background:linear-gradient(90deg,#526b82,transparent);
+}
+
+.heart{
+ color:#ff416c;
+ font-size:14px;
+ display:inline-block;
+ animation:heartbeat 1.8s infinite;
+}
+
+@keyframes heartbeat{
+ 0%,100%{transform:scale(1)}
+ 10%{transform:scale(1.22)}
+ 20%{transform:scale(1)}
+ 30%{transform:scale(1.12)}
+}
+
+@keyframes fadeUp{
+ from{
+  opacity:0;
+  transform:translateY(8px);
+ }
+ to{
+  opacity:1;
+  transform:translateY(0);
+ }
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+ position:fixed;
+ left:50%;
+ bottom:25px;
+ transform:translateX(-50%) translateY(20px);
+ background:#edf2f7;
+ color:#09101a;
+ padding:10px 15px;
+ border-radius:8px;
+ font-size:12px;
+ opacity:0;
+ pointer-events:none;
+ transition:.25s ease;
+}
+
+.toast.show{
+ opacity:1;
+ transform:translateX(-50%) translateY(0);
+}
+
+/* ================= TABLET ================= */
+
+@media(max-width:1000px){
+
+ .main-grid{
+  grid-template-columns:1fr;
+ }
+
+ .entry-layout{
+  grid-template-columns:1fr;
+ }
+}
+
+@media(max-width:850px){
+
+ .container{
+  width:calc(100% - 28px);
+ }
+
+ .title{
+  align-items:center;
+  gap:15px;
+  flex-direction:row;
+ }
+
+ .metric-grid{
+  grid-template-columns:1fr;
+ }
+}
+
+/* ================= MOBILE ================= */
+
 @media(max-width:600px){
-  .report-summary{grid-template-columns:repeat(2,1fr)}
-  .report-row{grid-template-columns:72px 1fr 70px}
+
+ .container{
+  width:calc(100% - 20px);
+ }
+
+ .topbar{
+  height:58px;
+  gap:7px;
+ }
+
+ .back{
+  font-size:11px;
+  flex-shrink:0;
+ }
+
+ .brand{
+  font-size:10px;
+  letter-spacing:.07em;
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+ }
+
+ .top-date{
+  display:none;
+ }
+
+ .title{
+  padding:18px 0 12px;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+ }
+
+ .kicker{
+  font-size:9px;
+  letter-spacing:.13em;
+  margin-bottom:4px;
+ }
+
+ h1{
+  font-size:27px;
+ }
+
+ .period{
+  font-size:9px;
+  line-height:1.45;
+  max-width:220px;
+ }
+
+ .pill{
+  padding:7px 9px;
+  font-size:9px;
+  flex-shrink:0;
+ }
+
+ .goal{
+  padding:16px;
+ }
+
+ .goal-top{
+  align-items:flex-start;
+ }
+
+ .amount{
+  font-size:31px;
+ }
+
+ .percent{
+  font-size:21px;
+ }
+
+ .goal-bottom{
+  font-size:9px;
+  flex-wrap:nowrap;
+ }
+
+ .days-left{
+  font-size:9px;
+ }
+
+ .calendar-panel{
+  padding:13px;
+ }
+
+ .calendar-head{
+  gap:5px;
+  margin-bottom:9px;
+ }
+
+ .month-title{
+  font-size:14px;
+ }
+
+ .calendar-nav{
+  gap:4px;
+ }
+
+ .nav-btn{
+  width:29px;
+  height:29px;
+  font-size:16px;
+ }
+
+ .weekdays,
+ .calendar-grid{
+  gap:3px;
+ }
+
+ .weekdays div{
+  font-size:8px;
+  padding-bottom:3px;
+ }
+
+ .day{
+  min-height:45px;
+  border-radius:6px;
+  font-size:10px;
+ }
+
+ .day .day-income{
+  left:2px;
+  right:2px;
+  bottom:3px;
+  font-size:7px;
+ }
+
+ .day .dot{
+  width:3px;
+  height:3px;
+  right:3px;
+  top:3px;
+ }
+
+ .day:not(.empty):hover{
+  transform:none;
+  box-shadow:none;
+ }
+
+ .day.good:hover,
+ .day.partial:hover,
+ .day.below:hover{
+  box-shadow:none;
+ }
+
+ .day-tooltip{
+  display:none !important;
+ }
+
+ .calendar-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:8px;
+  color:#73839a;
+  font-size:9px;
+ }
+
+ .legend-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+ }
+
+ .legend-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  flex:0 0 7px;
+ }
+
+ .pace-number{
+  font-size:26px;
+ }
+
+ .pace-label{
+  font-size:10px;
+ }
+
+ .pace-sub{
+  font-size:10px;
+  line-height:1.4;
+ }
+
+ .panel{
+  padding:13px;
+ }
+
+ .panel-title{
+  font-size:14px;
+ }
+
+ .panel-tag{
+  font-size:9px;
+ }
+
+ .input{
+  padding:10px;
+ }
+
+ .report-summary{
+  grid-template-columns:repeat(2,1fr);
+ }
+
+ .report-row{
+  grid-template-columns:72px 1fr 70px;
+ }
+
+ footer{
+  width:100%;
+  overflow:hidden;
+  padding:0 0 14px;
+  font-size:9px;
+  letter-spacing:2px;
+  gap:12px;
+ }
+
+ .footer-line{
+  width:55px;
+ }
+
+ .heart{
+  font-size:13px;
+ }
 }
 
+/* ================= VERY SMALL PHONE ================= */
+
+@media(max-width:380px){
+
+ .container{
+  width:calc(100% - 16px);
+ }
+
+ .topbar{
+  gap:5px;
+ }
+
+ .back{
+  font-size:10px;
+ }
+
+ .brand{
+  font-size:9px;
+  letter-spacing:.05em;
+ }
+
+ .title{
+  gap:6px;
+ }
+
+ .kicker{
+  font-size:8px;
+ }
+
+ h1{
+  font-size:24px;
+ }
+
+ .period{
+  font-size:8px;
+  max-width:190px;
+ }
+
+ .pill{
+  font-size:8px;
+  padding:6px 7px;
+ }
+
+ .goal{
+  padding:14px;
+ }
+
+ .amount{
+  font-size:28px;
+ }
+
+ .percent{
+  font-size:19px;
+ }
+
+ .goal-bottom{
+  font-size:8px;
+ }
+
+ .days-left{
+  font-size:8px;
+ }
+
+ .calendar-panel{
+  padding:10px;
+ }
+
+ .month-title{
+  font-size:13px;
+ }
+
+ .monthly-report-btn{
+  font-size:7px;
+  padding:3px 5px;
+ }
+
+ .nav-btn{
+  width:27px;
+  height:27px;
+ }
+
+ .day{
+  min-height:41px;
+  font-size:9px;
+ }
+
+ .day .day-income{
+  font-size:6.5px;
+ }
+
+ footer{
+  font-size:8px;
+  gap:8px;
+ }
+
+ .footer-line{
+  width:38px;
+ }
+}
 </style>
-
-
 </head>
+
 <body>
+
 <div class="container">
 
 <div class="topbar">
@@ -240,390 +1249,2127 @@ footer{padding:24px 0 16px}
 </div>
 
 <section class="title">
+
  <div>
   <div class="kicker">Personal Target</div>
-  <h1>100K GOAL</h1>
-  <div class="period">457 day target period · Fixed daily target ৳220</div>
+  <h1>৳1,00,000</h1>
+  <div class="period">A 457-day journey toward the target</div>
  </div>
+
  <div class="pill">৳220 / DAY</div>
+
 </section>
 
 <section class="goal">
+
  <div class="goal-top">
-  <div><div class="goal-label">Overall Progress</div><div class="amount" id="overallAmount">৳0</div></div>
+
+  <div>
+   <div class="goal-label">Overall Progress</div>
+   <div class="amount" id="overallAmount">৳0</div>
+  </div>
+
   <div class="percent" id="overallPercent">0%</div>
+
  </div>
- <div class="bar"><div class="fill" id="overallFill"></div></div>
- <div class="goal-bottom"><span id="earnedLabel">৳0 earned</span><span>Target ৳1,00,000</span></div>
+
+ <div class="bar">
+  <div class="fill" id="overallFill"></div>
+ </div>
+
+ <div class="goal-bottom">
+  <span id="earnedLabel">৳0 earned</span>
+  <span class="days-left" id="daysLeft">457 DAYS LEFT</span>
+  <span>Target ৳1,00,000</span>
+ </div>
+
 </section>
 
 <section class="main-grid">
 
- <div>
-  <div class="panel calendar-panel">
-   <div class="calendar-head">
-    <div><span class="month-title" id="calendarTitle">October 2026</span><button class="monthly-report-btn" id="monthlyReportBtn" type="button">Monthly Report →</button></div>
-    <div class="calendar-nav">
-     <button class="nav-btn" id="prevMonth">‹</button>
-     <button class="nav-btn" id="nextMonth">›</button>
-    </div>
+<div>
+
+ <div class="panel calendar-panel">
+
+  <div class="calendar-head">
+
+   <div>
+    <span class="month-title" id="calendarTitle">October 2026</span>
+
+    <button
+     class="monthly-report-btn"
+     id="monthlyReportBtn"
+     type="button">
+     Monthly Report →
+    </button>
    </div>
 
-   <div class="weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
-   <div class="calendar-grid" id="calendarGrid"></div>
+   <div class="calendar-nav">
 
-   <div class="calendar-legend">
-    <div class="legend-item"><span class="legend-dot legend-green"></span>100%+ met</div>
-    <div class="legend-item"><span class="legend-dot legend-yellow"></span>80–99%</div>
-    <div class="legend-item"><span class="legend-dot legend-red"></span>&lt;80%</div>
-    <div class="legend-item"><span class="legend-dot legend-gray"></span>No entry</div>
+    <button
+     class="nav-btn"
+     id="prevMonth">
+     ‹
+    </button>
+
+    <button
+     class="nav-btn"
+     id="nextMonth">
+     ›
+    </button>
+
    </div>
+
   </div>
 
-  <div class="panel overview">
-   <div class="overview-top">
-    <div>
-     <div class="pace-label">Monthly Pace · <span id="overviewMonth">October 2026</span></div>
-     <div class="pace-sub">Progress is based on how much should have been earned by today.</div>
-    </div>
-    <div class="pace-number" id="pacePercent">0%</div>
-   </div>
-
-   <div class="pace-bar"><div class="pace-fill" id="paceFill"></div></div>
-
-   <div class="metric-grid">
-    <div class="metric"><span>Expected by Today</span><strong id="expectedToday">৳0</strong></div>
-    <div class="metric green"><span>Actual So Far</span><strong id="actualToday">৳0</strong></div>
-    <div class="metric blue"><span>Current Average</span><strong id="currentAverage">৳0/day</strong></div>
-    <div class="metric"><span>Monthly Target</span><strong id="monthlyTarget">৳0</strong></div>
-    <div class="metric orange"><span>Projected Month-End</span><strong id="projectedEnd">৳0</strong></div>
-    <div class="metric red"><span>Projected Shortfall</span><strong id="projectedShortfall">৳0</strong></div>
-   </div>
-
-   <div class="report" id="paceReport">Add daily entries to generate the pace report.</div>
+  <div class="weekdays">
+   <div>Sun</div>
+   <div>Mon</div>
+   <div>Tue</div>
+   <div>Wed</div>
+   <div>Thu</div>
+   <div>Fri</div>
+   <div>Sat</div>
   </div>
+
+  <div
+   class="calendar-grid"
+   id="calendarGrid">
+  </div>
+
+  <div class="calendar-legend">
+
+   <div class="legend-item">
+    <span class="legend-dot legend-green"></span>
+    100%+ met
+   </div>
+
+   <div class="legend-item">
+    <span class="legend-dot legend-yellow"></span>
+    80–99%
+   </div>
+
+   <div class="legend-item">
+    <span class="legend-dot legend-red"></span>
+    &lt;80%
+   </div>
+
+   <div class="legend-item">
+    <span class="legend-dot legend-gray"></span>
+    No entry
+   </div>
+
+  </div>
+
  </div>
 
- <div>
-  <div class="panel">
-   <div class="panel-head"><div class="panel-title">Daily Entry</div><div class="panel-tag">NET ONLY</div></div>
+ <div class="panel overview">
 
-   <label for="entryDate">Date</label>
-   <input id="entryDate" type="date">
+  <div class="overview-top">
 
-   <label for="profit">Net Profit</label>
-   <input id="profit" type="number" min="0" step="1" placeholder="৳ Enter net profit">
+   <div>
 
-   <button id="addButton">Add Entry</button>
+    <div class="pace-label">
+     Monthly Pace ·
+     <span id="overviewMonth">
+      October 2026
+     </span>
+    </div>
 
-   <div class="entry-layout" style="margin-top:14px">
-    <div class="mini"><span>Daily Target</span><strong>৳220</strong></div>
-    <div class="mini"><span>Selected Net</span><strong id="todayNet">—</strong></div>
-    <div class="mini"><span>Difference</span><strong id="difference">—</strong></div>
-    <div class="mini"><span>Achievement</span><strong id="achievement">—</strong></div>
+    <div class="pace-sub">
+     Progress is based on how much should have been earned by today.
+    </div>
+
+   </div>
+
+   <div
+    class="pace-number"
+    id="pacePercent">
+    0%
+   </div>
+
+  </div>
+
+  <div class="pace-bar">
+   <div
+    class="pace-fill"
+    id="paceFill">
    </div>
   </div>
 
-  <div class="panel recent-panel">
-   <div class="panel-head"><div class="panel-title">Recent Entries</div><div class="panel-tag">LATEST 10</div></div>
-   <div class="table-wrap">
-    <table>
-     <thead><tr><th>Date</th><th>Net</th><th>Target</th><th>Diff</th><th>Achievement</th><th>Status</th><th></th></tr></thead>
-     <tbody id="recentEntriesBody"></tbody>
-    </table>
+  <div class="metric-grid">
+
+   <div class="metric">
+    <span>Expected by Today</span>
+    <strong id="expectedToday">৳0</strong>
    </div>
+
+   <div class="metric green">
+    <span>Actual So Far</span>
+    <strong id="actualToday">৳0</strong>
+   </div>
+
+   <div class="metric blue">
+    <span>Projected Average</span>
+    <strong id="currentAverage">৳220/day</strong>
+   </div>
+
+   <div class="metric">
+    <span>Monthly Target</span>
+    <strong id="monthlyTarget">৳0</strong>
+   </div>
+
+   <div class="metric orange">
+    <span>Projected Month-End</span>
+    <strong id="projectedEnd">৳0</strong>
+   </div>
+
+   <div class="metric red">
+    <span>Projected Shortfall</span>
+    <strong id="projectedShortfall">৳0</strong>
+   </div>
+
   </div>
+
+  <div
+   class="report"
+   id="paceReport">
+   Add daily entries to generate the pace report.
+  </div>
+
  </div>
+
+</div>
+
+<div>
+
+ <div class="panel daily-entry-panel">
+
+  <div class="panel-head">
+   <div class="panel-title">Daily Entry</div>
+   <div class="panel-tag">NET ONLY</div>
+  </div>
+
+  <label for="entryDate">Date</label>
+
+  <input
+   id="entryDate"
+   type="date">
+
+  <label for="profit">Net Profit</label>
+
+  <input
+   id="profit"
+   type="number"
+   min="0"
+   step="1"
+   placeholder="৳ Enter net profit">
+
+  <button id="addButton">
+   Add Entry
+  </button>
+
+  <div
+   class="entry-layout"
+   style="margin-top:14px">
+
+   <div class="mini">
+    <span>Daily Target</span>
+    <strong>৳220</strong>
+   </div>
+
+   <div class="mini">
+    <span>Selected Net</span>
+    <strong id="todayNet">—</strong>
+   </div>
+
+   <div class="mini">
+    <span>Difference</span>
+    <strong id="difference">—</strong>
+   </div>
+
+   <div class="mini">
+    <span>Achievement</span>
+    <strong id="achievement">—</strong>
+   </div>
+
+  </div>
+
+ </div>
+
+ <div class="panel recent-panel">
+
+  <div class="panel-head">
+   <div class="panel-title">Recent Entries</div>
+   <div class="panel-tag">LATEST 10</div>
+  </div>
+
+  <div class="table-wrap">
+
+   <table>
+
+    <thead>
+     <tr>
+      <th>Date</th>
+      <th>Net</th>
+      <th>Target</th>
+      <th>Diff</th>
+      <th>Achievement</th>
+      <th>Status</th>
+      <th></th>
+     </tr>
+    </thead>
+
+    <tbody id="recentEntriesBody"></tbody>
+
+   </table>
+
+  </div>
+
+ </div>
+
+</div>
 
 </section>
 
-<section class="panel table-panel" style="display:none;">
- <div class="panel-head"><div class="panel-title">Recent Entries</div><div class="panel-tag">LATEST 10</div></div>
- <div class="table-wrap">
-  <table>
-   <thead><tr><th>Date</th><th>Net</th><th>Target</th><th>Diff</th><th>Achievement</th><th>Status</th><th></th></tr></thead>
-   <tbody id="entriesBody"></tbody>
-  </table>
- </div>
-</section>
+<footer>
 
-<footer>Built with ❤️ by Soikat</footer>
+ <span class="footer-line"></span>
+
+ <span>
+  Built with
+  <span class="heart">♥</span>
+  by Soikat
+ </span>
+
+ <span class="footer-line right"></span>
+
+</footer>
+
 </div>
 
+<div
+ class="report-modal"
+ id="reportModal">
 
-<div class="report-modal" id="reportModal">
-  <div class="report-box">
-    <div class="report-box-head">
-      <div class="report-box-title" id="reportTitle">Monthly Report</div>
-      <button class="report-close" type="button" onclick="closeMonthlyReport()">×</button>
-    </div>
-    <div class="report-summary">
-      <div class="report-stat"><span>MONTHLY TARGET</span><strong id="reportTarget">৳0</strong></div>
-      <div class="report-stat"><span>ACTUAL</span><strong id="reportActual">৳0</strong></div>
-      <div class="report-stat"><span>ACHIEVEMENT</span><strong id="reportAchievement">0%</strong></div>
-      <div class="report-stat"><span>AVERAGE / DAY</span><strong id="reportAverage">৳0</strong></div>
-    </div>
-    <div class="report-list" id="reportList"></div>
-    <div class="report-note" id="reportNote"></div>
+ <div class="report-box">
+
+  <div class="report-box-head">
+
+   <div
+    class="report-box-title"
+    id="reportTitle">
+    Monthly Report
+   </div>
+
+   <button
+    class="report-close"
+    type="button"
+    onclick="closeMonthlyReport()">
+    ×
+   </button>
+
   </div>
+
+  <div class="report-summary">
+
+   <div class="report-stat">
+    <span>MONTHLY TARGET</span>
+    <strong id="reportTarget">৳0</strong>
+   </div>
+
+   <div class="report-stat">
+    <span>ACTUAL</span>
+    <strong id="reportActual">৳0</strong>
+   </div>
+
+   <div class="report-stat">
+    <span>ACHIEVEMENT</span>
+    <strong id="reportAchievement">0%</strong>
+   </div>
+
+   <div class="report-stat">
+    <span>AVERAGE / DAY</span>
+    <strong id="reportAverage">৳0</strong>
+   </div>
+
+  </div>
+
+  <div
+   class="report-list"
+   id="reportList">
+  </div>
+
+  <div
+   class="report-note"
+   id="reportNote">
+  </div>
+
+ </div>
+
 </div>
 
-<div class="day-tooltip" id="dayTooltip"></div>
-<div class="toast" id="toast"></div>
+<div
+ class="day-tooltip"
+ id="dayTooltip">
+</div>
+
+<div
+ class="toast"
+ id="toast">
+</div>
 
 <script>
+
 const TARGET=100000;
 const DAILY_TARGET=220;
+
 const START_DATE="2026-10-01";
 const END_DATE="2027-12-31";
+
 const STORAGE_KEY="soikat_1l_goal_entries_v4";
 
 const startDate=parseDate(START_DATE);
 const endDate=parseDate(END_DATE);
+
 let calendarDate=new Date(2026,9,1);
 
-function parseDate(v){const [y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d)}
-function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
-function money(v){return "৳"+Math.round(v).toLocaleString("en-IN")}
-function percent(v){if(!isFinite(v)||v<=0)return "0%";return v.toFixed(1).replace(".0","")+"%"}
-function daysInclusive(a,b){return Math.floor((b-a)/86400000)+1}
-function getEntries(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{}}catch{return {}}}
-function saveEntries(e){localStorage.setItem(STORAGE_KEY,JSON.stringify(e))}
-function totalIncome(e){return Object.values(e).reduce((s,v)=>s+Number(v||0),0)}
-function rangeTotal(e,a,b){let t=0;Object.entries(e).forEach(([k,v])=>{const d=parseDate(k);if(d>=a&&d<=b)t+=Number(v||0)});return t}
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800)}
 
-function monthRange(d){
- const a=new Date(d.getFullYear(),d.getMonth(),1);
- const b=new Date(d.getFullYear(),d.getMonth()+1,0);
- return {start:a,end:b,days:b.getDate()};
-}
-function currentMonthUntilSelected(selected){
- const m=monthRange(selected);
- const end=selected<m.end?selected:m.end;
- return {start:m.start,end,month:m};
+/* ================= HELPERS ================= */
+
+function parseDate(v){
+
+ const [y,m,d]=v.split("-").map(Number);
+
+ return new Date(y,m-1,d);
 }
 
-function render(){
- const e=getEntries(), total=totalIncome(e);
- const overall=Math.min(100,total/TARGET*100);
- document.getElementById("overallAmount").textContent=money(total);
- document.getElementById("overallPercent").textContent=percent(overall);
- document.getElementById("overallFill").style.width=Math.min(100,overall)+"%";
- document.getElementById("earnedLabel").textContent=money(total)+" earned";
+function dateKey(d){
 
- const selected=parseDate(document.getElementById("entryDate").value);
- const info=currentMonthUntilSelected(selected);
- const expectedDays=daysInclusive(info.start,info.end);
- const actual=rangeTotal(e,info.start,info.end);
- const expected=expectedDays*DAILY_TARGET;
- const pace=expected?actual/expected*100:0;
- const fullTarget=info.month.days*DAILY_TARGET;
- const currentAverage=expectedDays?actual/expectedDays:0;
- const projected=currentAverage*info.month.days;
- const shortfall=projected-fullTarget;
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 
- document.getElementById("overviewMonth").textContent=selected.toLocaleDateString("en-US",{month:"long",year:"numeric"});
- document.getElementById("pacePercent").textContent=percent(pace);
- document.getElementById("paceFill").style.width=Math.min(100,Math.max(0,pace))+"%";
- document.getElementById("expectedToday").textContent=money(expected);
- document.getElementById("actualToday").textContent=money(actual);
- document.getElementById("currentAverage").textContent=money(currentAverage)+"/day";
- document.getElementById("monthlyTarget").textContent=money(fullTarget);
- document.getElementById("projectedEnd").textContent=money(projected);
- document.getElementById("projectedShortfall").textContent=(shortfall>=0?"+":"−")+money(Math.abs(shortfall));
- document.getElementById("projectedShortfall").style.color=shortfall>=0?"var(--green)":"var(--red)";
+}
 
- const report=document.getElementById("paceReport");
- if(expectedDays===0){
-   report.textContent="No data yet.";
- }else if(pace>=100){
-   report.innerHTML=`You are currently at <strong class="good">${percent(pace)} pace</strong>. At the current average of <strong>${money(currentAverage)}/day</strong>, the projected month-end is <strong>${money(projected)}</strong> — ${shortfall>=0?`about <strong class="good">${money(shortfall)} ahead</strong> of target.`:""}`;
- }else{
-   report.innerHTML=`You are currently at <strong class="bad">${percent(pace)} pace</strong>. At the current average of <strong>${money(currentAverage)}/day</strong>, you may finish ${selected.toLocaleDateString("en-US",{month:"long"})} with <strong class="bad">${money(Math.abs(shortfall))} shortfall</strong> from the target.`;
+function money(v){
+
+ return "৳"+Math.round(v).toLocaleString("en-IN");
+
+}
+
+function percent(v){
+
+ if(!isFinite(v)||v<=0){
+  return "0%";
  }
 
- const key=dateKey(selected),has=Object.prototype.hasOwnProperty.call(e,key),net=Number(e[key]||0);
- const diff=net-DAILY_TARGET;
- document.getElementById("todayNet").textContent=has?money(net):"—";
- document.getElementById("difference").textContent=has?(diff>=0?"+":"−")+money(Math.abs(diff)):"—";
- document.getElementById("achievement").textContent=has?percent(net/DAILY_TARGET*100):"—";
- document.getElementById("difference").style.color=has?(diff>=0?"var(--green)":"var(--red)"):"var(--text)";
- document.getElementById("achievement").style.color=has?(net>=DAILY_TARGET?"var(--green)":net>=DAILY_TARGET*.8?"var(--yellow)":"var(--red)"):"var(--text)";
+ return v.toFixed(1).replace(".0","")+"%";
 
- renderCalendar();
- renderTable(e);
 }
 
-function renderCalendar(){
- const grid=document.getElementById("calendarGrid");
- const title=document.getElementById("calendarTitle");
- const y=calendarDate.getFullYear(),m=calendarDate.getMonth();
- title.textContent=new Date(y,m,1).toLocaleDateString("en-US",{month:"long",year:"numeric"});
- const first=new Date(y,m,1),last=new Date(y,m+1,0),firstDay=first.getDay(),entries=getEntries();
- let html="";
- for(let i=0;i<firstDay;i++)html+=`<div class="day empty"></div>`;
- for(let n=1;n<=last.getDate();n++){
-   const d=new Date(y,m,n),key=dateKey(d),inRange=d>=startDate&&d<=endDate;
-   const has=Object.prototype.hasOwnProperty.call(entries,key),value=Number(entries[key]||0);
-   let cls="day";
-   if(!inRange)cls+=" outside";
-   if(has){
-     const ratio=value/DAILY_TARGET;
-     cls+=ratio>=1?" good":ratio>=.8?" partial":" below";
+function daysInclusive(a,b){
+
+ return Math.floor((b-a)/86400000)+1;
+
+}
+
+function getEntries(){
+
+ try{
+
+  return JSON.parse(
+   localStorage.getItem(STORAGE_KEY)
+  )||{};
+
+ }catch{
+
+  return {};
+
+ }
+
+}
+
+function saveEntries(e){
+
+ localStorage.setItem(
+  STORAGE_KEY,
+  JSON.stringify(e)
+ );
+
+}
+
+function totalIncome(e){
+
+ return Object.values(e)
+  .reduce(
+   (s,v)=>s+Number(v||0),
+   0
+  );
+
+}
+
+function rangeTotal(e,a,b){
+
+ let total=0;
+
+ Object.entries(e).forEach(
+  ([k,v])=>{
+
+   const d=parseDate(k);
+
+   if(d>=a&&d<=b){
+    total+=Number(v||0);
    }
-   if(key===document.getElementById("entryDate").value)cls+=" selected";
-   if(key===dateKey(new Date()))cls+=" today";
-   html+=`<div class="${cls} ${has?'has-entry':'no-entry'}"
+
+  }
+ );
+
+ return total;
+
+}
+
+function showToast(msg){
+
+ const toast=
+  document.getElementById("toast");
+
+ toast.textContent=msg;
+
+ toast.classList.add("show");
+
+ setTimeout(
+  ()=>{
+   toast.classList.remove("show");
+  },
+  1800
+ );
+
+}
+
+
+/* ================= COUNTDOWN ================= */
+
+function updateDaysLeft(){
+
+ const now=new Date();
+
+ const today=new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  now.getDate()
+ );
+
+ let daysLeft;
+
+ if(today<startDate){
+
+  daysLeft=
+   daysInclusive(
+    startDate,
+    endDate
+   );
+
+ }else if(today>endDate){
+
+  daysLeft=0;
+
+ }else{
+
+  daysLeft=
+   Math.max(
+    0,
+    Math.floor(
+     (endDate-today)/86400000
+    )
+   );
+
+ }
+
+ document.getElementById(
+  "daysLeft"
+ ).textContent=
+  daysLeft+
+  (
+   daysLeft===1?
+   " DAY LEFT":
+   " DAYS LEFT"
+  );
+
+}
+
+
+/* ================= MONTH ================= */
+
+function monthRange(d){
+
+ const start=
+  new Date(
+   d.getFullYear(),
+   d.getMonth(),
+   1
+  );
+
+ const end=
+  new Date(
+   d.getFullYear(),
+   d.getMonth()+1,
+   0
+  );
+
+ return{
+  start,
+  end,
+  days:end.getDate()
+ };
+
+}
+
+function currentMonthUntilSelected(selected){
+
+ const month=monthRange(selected);
+
+ const end=
+  selected<month.end?
+  selected:
+  month.end;
+
+ return{
+  start:month.start,
+  end,
+  month
+ };
+
+}
+
+
+/* ================= RENDER ================= */
+
+function render(){
+
+ const entries=getEntries();
+
+ const total=totalIncome(entries);
+
+ const overall=
+  Math.min(
+   100,
+   total/TARGET*100
+  );
+
+ document.getElementById(
+  "overallAmount"
+ ).textContent=money(total);
+
+ document.getElementById(
+  "overallPercent"
+ ).textContent=percent(overall);
+
+ document.getElementById(
+  "overallFill"
+ ).style.width=
+  Math.min(
+   100,
+   overall
+  )+"%";
+
+ document.getElementById(
+  "earnedLabel"
+ ).textContent=
+  money(total)+" earned";
+
+ updateDaysLeft();
+
+
+ const selected=
+  parseDate(
+   document.getElementById(
+    "entryDate"
+   ).value
+  );
+
+
+ const info=
+  currentMonthUntilSelected(
+   selected
+  );
+
+
+ const elapsedDays=
+  daysInclusive(
+   info.start,
+   info.end
+  );
+
+
+ const actual=
+  rangeTotal(
+   entries,
+   info.start,
+   info.end
+  );
+
+
+ const expected=
+  elapsedDays*
+  DAILY_TARGET;
+
+
+ const pace=
+  expected?
+  actual/expected*100:
+  0;
+
+
+ const monthlyTarget=
+  info.month.days*
+  DAILY_TARGET;
+
+
+/*
+  IMPORTANT:
+
+  Projected Average means:
+  "How much per day is needed from TODAY
+   through the end of this month?"
+
+  Therefore TODAY is included in the
+  remaining-day count.
+
+  Example:
+  October has 31 days.
+  On October 1:
+  remaining days = 31
+  target = 31 × 220
+  projected average = 220/day
+
+  This avoids the incorrect ৳227/day
+  calculation that happened when October 1
+  was excluded from the remaining days.
+*/
+
+ const remainingDays=
+  Math.max(
+   1,
+   info.month.days-
+   (elapsedDays-1)
+  );
+
+
+ const remainingAmount=
+  Math.max(
+   0,
+   monthlyTarget-actual
+  );
+
+
+ const projectedAverage=
+  remainingAmount/
+  remainingDays;
+
+
+ const currentAverage=
+  elapsedDays?
+  actual/elapsedDays:
+  0;
+
+
+ const projectedMonthEnd=
+  currentAverage*
+  info.month.days;
+
+
+ const shortfall=
+  projectedMonthEnd-
+  monthlyTarget;
+
+
+ document.getElementById(
+  "overviewMonth"
+ ).textContent=
+  selected.toLocaleDateString(
+   "en-US",
+   {
+    month:"long",
+    year:"numeric"
+   }
+  );
+
+
+ document.getElementById(
+  "pacePercent"
+ ).textContent=
+  percent(pace);
+
+
+ document.getElementById(
+  "paceFill"
+ ).style.width=
+  Math.min(
+   100,
+   Math.max(
+    0,
+    pace
+   )
+  )+"%";
+
+
+ document.getElementById(
+  "expectedToday"
+ ).textContent=
+  money(expected);
+
+
+ document.getElementById(
+  "actualToday"
+ ).textContent=
+  money(actual);
+
+
+ document.getElementById(
+  "currentAverage"
+ ).textContent=
+  money(projectedAverage)+
+  "/day";
+
+
+ document.getElementById(
+  "monthlyTarget"
+ ).textContent=
+  money(monthlyTarget);
+
+
+ document.getElementById(
+  "projectedEnd"
+ ).textContent=
+  money(projectedMonthEnd);
+
+
+ document.getElementById(
+  "projectedShortfall"
+ ).textContent=
+  (
+   shortfall>=0?
+   "+":
+   "−"
+  )+
+  money(
+   Math.abs(shortfall)
+  );
+
+
+ document.getElementById(
+  "projectedShortfall"
+ ).style.color=
+  shortfall>=0?
+  "var(--green)":
+  "var(--red)";
+
+
+ const report=
+  document.getElementById(
+   "paceReport"
+  );
+
+
+ if(elapsedDays===0){
+
+  report.textContent=
+   "No data yet.";
+
+ }else{
+
+  report.innerHTML=
+   `You are currently at
+   <strong class="${
+    pace>=100?
+    "good":
+    "bad"
+   }">
+    ${percent(pace)} pace
+   </strong>.
+   You need
+   <strong>
+    ${money(projectedAverage)}/day
+   </strong>
+   from today through the end of the month
+   to reach the monthly target.`;
+
+ }
+
+
+ const key=
+  dateKey(selected);
+
+
+ const has=
+  Object.prototype.hasOwnProperty.call(
+   entries,
+   key
+  );
+
+
+ const net=
+  Number(
+   entries[key]||0
+  );
+
+
+ const diff=
+  net-DAILY_TARGET;
+
+
+ document.getElementById(
+  "todayNet"
+ ).textContent=
+  has?
+  money(net):
+  "—";
+
+
+ document.getElementById(
+  "difference"
+ ).textContent=
+  has?
+  (
+   diff>=0?
+   "+":
+   "−"
+  )+
+  money(
+   Math.abs(diff)
+  ):
+  "—";
+
+
+ document.getElementById(
+  "achievement"
+ ).textContent=
+  has?
+  percent(
+   net/DAILY_TARGET*100
+  ):
+  "—";
+
+
+ document.getElementById(
+  "difference"
+ ).style.color=
+  has?
+  (
+   diff>=0?
+   "var(--green)":
+   "var(--red)"
+  ):
+  "var(--text)";
+
+
+ document.getElementById(
+  "achievement"
+ ).style.color=
+  has?
+  (
+   net>=DAILY_TARGET?
+   "var(--green)":
+   net>=DAILY_TARGET*.8?
+   "var(--yellow)":
+   "var(--red)"
+  ):
+  "var(--text)";
+
+
+ renderCalendar();
+
+ renderTable(entries);
+
+}
+
+
+/* ================= CALENDAR ================= */
+
+function renderCalendar(){
+
+ const grid=
+  document.getElementById(
+   "calendarGrid"
+  );
+
+ const title=
+  document.getElementById(
+   "calendarTitle"
+  );
+
+
+ const year=
+  calendarDate.getFullYear();
+
+ const month=
+  calendarDate.getMonth();
+
+
+ title.textContent=
+  new Date(
+   year,
+   month,
+   1
+  ).toLocaleDateString(
+   "en-US",
+   {
+    month:"long",
+    year:"numeric"
+   }
+  );
+
+
+ const first=
+  new Date(
+   year,
+   month,
+   1
+  );
+
+ const last=
+  new Date(
+   year,
+   month+1,
+   0
+  );
+
+
+ const firstDay=
+  first.getDay();
+
+
+ const entries=
+  getEntries();
+
+
+ let html="";
+
+
+ for(
+  let i=0;
+  i<firstDay;
+  i++
+ ){
+
+  html+=
+   `<div class="day empty"></div>`;
+
+ }
+
+
+ for(
+  let n=1;
+  n<=last.getDate();
+  n++
+ ){
+
+  const d=
+   new Date(
+    year,
+    month,
+    n
+   );
+
+
+  const key=
+   dateKey(d);
+
+
+  const inRange=
+   d>=startDate&&
+   d<=endDate;
+
+
+  const has=
+   Object.prototype.hasOwnProperty.call(
+    entries,
+    key
+   );
+
+
+  const value=
+   Number(
+    entries[key]||0
+   );
+
+
+  let cls="day";
+
+
+  if(!inRange){
+   cls+=" outside";
+  }
+
+
+  if(has){
+
+   const ratio=
+    value/DAILY_TARGET;
+
+
+   cls+=
+    ratio>=1?
+    " good":
+    ratio>=.8?
+    " partial":
+    " below";
+
+  }
+
+
+  if(
+   key===
+   document.getElementById(
+    "entryDate"
+   ).value
+  ){
+
+   cls+=" selected";
+
+  }
+
+
+  if(
+   key===
+   dateKey(new Date())
+  ){
+
+   cls+=" today";
+
+  }
+
+
+  html+=`
+   <div
+    class="${cls} ${
+     has?
+     "has-entry":
+     "no-entry"
+    }"
     data-date="${key}"
     data-net="${has?value:''}"
     data-inrange="${inRange}"
-    ${inRange?`onclick="selectCalendarDate('${key}')"`:""}
-    onmouseenter="showDayTooltip(event,this)"
-    onmousemove="moveDayTooltip(event)"
-    onmouseleave="hideDayTooltip()">
-    <span class="day-number">${n}</span>
-    ${has?`<span class="dot"></span><span class="day-income">${money(value)}</span>`:""}
-  </div>`;
+    ${
+     inRange?
+     `onclick="selectCalendarDate('${key}')"`:
+     ""
+    }>
+
+    <span class="day-number">
+     ${n}
+    </span>
+
+    ${
+     has?
+     `
+      <span class="dot"></span>
+      <span class="day-income">
+       ${money(value)}
+      </span>
+     `:
+     ""
+    }
+
+   </div>
+  `;
+
  }
+
+
  grid.innerHTML=html;
-}
-
-function renderTable(e){
- const body=document.getElementById("recentEntriesBody") || document.getElementById("entriesBody");
- const rows=Object.entries(e).sort((a,b)=>b[0].localeCompare(a[0]));
- if(!rows.length){body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:#596a7f;padding:35px 10px">No entries yet</td></tr>`;return}
- body.innerHTML=rows.slice(0,10).map(([date,value])=>{
-   const net=Number(value||0),diff=net-DAILY_TARGET,ach=net/DAILY_TARGET*100;
-   const status=ach>=100?["GOOD","status"]:ach>=80?["PARTIAL","status status-partial"]:["BELOW","status status-below"];
-   const formatted=parseDate(date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-   return `<tr><td>${formatted}</td><td class="net">${money(net)}</td><td>${money(DAILY_TARGET)}</td><td class="${diff>=0?"positive":"negative"}">${diff>=0?"+":"−"}${money(Math.abs(diff))}</td><td>${percent(ach)}</td><td><span class="${status[1]}">${status[0]}</span></td><td><button class="delete-btn" onclick="deleteEntry('${date}')">Delete</button></td></tr>`;
- }).join("");
-}
 
 
-function showDayTooltip(event,el){
-  if(!el.dataset.inrange || el.classList.contains("empty")) return;
-  const key=el.dataset.date;
-  const d=parseDate(key);
-  const has=el.dataset.net!=="";
-  const tt=document.getElementById("dayTooltip");
-  if(!has){
-    tt.innerHTML=`<div class="tt-date">${d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}</div><div>No entry</div>`;
-  }else{
-    const net=Number(el.dataset.net);
-    const ach=net/DAILY_TARGET*100;
-    const diff=net-DAILY_TARGET;
-    const color=ach>=100?"var(--green)":ach>=80?"var(--yellow)":"var(--red)";
-    const diffText=diff>=0?"+"+money(Math.abs(diff)):"−"+money(Math.abs(diff));
-    const belowText=diff<0?" below daily target":diff>0?" above daily target":" at daily target";
-    tt.innerHTML=`<div class="tt-net">${money(net)}</div><div class="tt-status" style="color:${color}">Achievement ${percent(ach)} · ${diffText}${belowText}.</div>`;
-  }
-  tt.classList.add("show");
-  moveDayTooltip(event);
+ /*
+  Tooltip only on desktop.
+  No tooltip on mobile/touch.
+ */
+
+ if(
+  window.matchMedia(
+   "(hover: hover) and (pointer: fine)"
+  ).matches
+ ){
+
+  grid.querySelectorAll(
+   ".day:not(.empty)[data-inrange='true']"
+  ).forEach(
+   day=>{
+
+    day.addEventListener(
+     "mouseenter",
+     e=>showDayTooltip(
+      e,
+      day
+     )
+    );
+
+    day.addEventListener(
+     "mousemove",
+     moveDayTooltip
+    );
+
+    day.addEventListener(
+     "mouseleave",
+     hideDayTooltip
+    );
+
+   }
+  );
+
+ }
+
 }
+
+
+/* ================= TABLE ================= */
+
+function renderTable(entries){
+
+ const body=
+  document.getElementById(
+   "recentEntriesBody"
+  );
+
+
+ const rows=
+  Object.entries(entries)
+  .sort(
+   (a,b)=>
+    b[0].localeCompare(
+     a[0]
+    )
+  );
+
+
+ if(!rows.length){
+
+  body.innerHTML=`
+   <tr>
+    <td
+     colspan="7"
+     style="
+      text-align:center;
+      color:#596a7f;
+      padding:35px 10px">
+     No entries yet
+    </td>
+   </tr>
+  `;
+
+  return;
+
+ }
+
+
+ body.innerHTML=
+  rows
+  .slice(0,10)
+  .map(
+   ([date,value])=>{
+
+    const net=
+     Number(value||0);
+
+    const diff=
+     net-DAILY_TARGET;
+
+    const achievement=
+     net/
+     DAILY_TARGET*
+     100;
+
+
+    const status=
+     achievement>=100?
+     ["GOOD","status"]:
+     achievement>=80?
+     ["PARTIAL","status status-partial"]:
+     ["BELOW","status status-below"];
+
+
+    const formatted=
+     parseDate(date)
+     .toLocaleDateString(
+      "en-GB",
+      {
+       day:"2-digit",
+       month:"short",
+       year:"numeric"
+      }
+     );
+
+
+    return `
+     <tr>
+
+      <td>
+       ${formatted}
+      </td>
+
+      <td class="net">
+       ${money(net)}
+      </td>
+
+      <td>
+       ${money(DAILY_TARGET)}
+      </td>
+
+      <td
+       class="${
+        diff>=0?
+        "positive":
+        "negative"
+       }">
+
+       ${
+        diff>=0?
+        "+":
+        "−"
+       }${money(
+        Math.abs(diff)
+       )}
+
+      </td>
+
+      <td>
+       ${percent(achievement)}
+      </td>
+
+      <td>
+       <span class="${status[1]}">
+        ${status[0]}
+       </span>
+      </td>
+
+      <td>
+       <button
+        class="delete-btn"
+        onclick="deleteEntry('${date}')">
+        Delete
+       </button>
+      </td>
+
+     </tr>
+    `;
+
+   }
+  )
+  .join("");
+
+}
+
+
+/* ================= TOOLTIP ================= */
+
+function showDayTooltip(
+ event,
+ el
+){
+
+ if(
+  !window.matchMedia(
+   "(hover: hover) and (pointer: fine)"
+  ).matches
+ ){
+
+  return;
+
+ }
+
+
+ if(
+  !el.dataset.inrange||
+  el.classList.contains("empty")
+ ){
+
+  return;
+
+ }
+
+
+ const key=
+  el.dataset.date;
+
+
+ const date=
+  parseDate(key);
+
+
+ const has=
+  el.dataset.net!=="";
+
+
+ const tooltip=
+  document.getElementById(
+   "dayTooltip"
+  );
+
+
+ if(!has){
+
+  tooltip.innerHTML=
+   `
+    <div class="tt-date">
+     ${date.toLocaleDateString(
+      "en-GB",
+      {
+       day:"2-digit",
+       month:"short",
+       year:"numeric"
+      }
+     )}
+    </div>
+
+    <div>
+     No entry
+    </div>
+   `;
+
+ }else{
+
+  const net=
+   Number(
+    el.dataset.net
+   );
+
+
+  const achievement=
+   net/
+   DAILY_TARGET*
+   100;
+
+
+  const diff=
+   net-
+   DAILY_TARGET;
+
+
+  const color=
+   achievement>=100?
+   "var(--green)":
+   achievement>=80?
+   "var(--yellow)":
+   "var(--red)";
+
+
+  const diffText=
+   diff>=0?
+   "+"+
+   money(
+    Math.abs(diff)
+   ):
+   "−"+
+   money(
+    Math.abs(diff)
+   );
+
+
+  const direction=
+   diff<0?
+   " below daily target":
+   diff>0?
+   " above daily target":
+   " at daily target";
+
+
+  tooltip.innerHTML=
+   `
+    <div class="tt-net">
+     ${money(net)}
+    </div>
+
+    <div
+     class="tt-status"
+     style="color:${color}">
+
+     Achievement
+     ${percent(achievement)}
+     ·
+     ${diffText}
+     ${direction}.
+
+    </div>
+   `;
+
+ }
+
+
+ tooltip.classList.add("show");
+
+ moveDayTooltip(event);
+
+}
+
+
 function moveDayTooltip(event){
-  const tt=document.getElementById("dayTooltip");
-  if(!tt.classList.contains("show")) return;
-  const pad=14;
-  let x=event.clientX+pad, y=event.clientY+pad;
-  const rect=tt.getBoundingClientRect();
-  if(x+rect.width>window.innerWidth-8) x=event.clientX-rect.width-pad;
-  if(y+rect.height>window.innerHeight-8) y=event.clientY-rect.height-pad;
-  tt.style.left=Math.max(8,x)+"px";
-  tt.style.top=Math.max(8,y)+"px";
-}
-function hideDayTooltip(){
-  document.getElementById("dayTooltip").classList.remove("show");
+
+ const tooltip=
+  document.getElementById(
+   "dayTooltip"
+  );
+
+
+ if(
+  !tooltip.classList.contains("show")
+ ){
+
+  return;
+
+ }
+
+
+ const padding=14;
+
+
+ let x=
+  event.clientX+
+  padding;
+
+
+ let y=
+  event.clientY+
+  padding;
+
+
+ const rect=
+  tooltip.getBoundingClientRect();
+
+
+ if(
+  x+
+  rect.width>
+  window.innerWidth-8
+ ){
+
+  x=
+   event.clientX-
+   rect.width-
+   padding;
+
+ }
+
+
+ if(
+  y+
+  rect.height>
+  window.innerHeight-8
+ ){
+
+  y=
+   event.clientY-
+   rect.height-
+   padding;
+
+ }
+
+
+ tooltip.style.left=
+  Math.max(
+   8,
+   x
+  )+"px";
+
+
+ tooltip.style.top=
+  Math.max(
+   8,
+   y
+  )+"px";
+
 }
 
+
+function hideDayTooltip(){
+
+ document
+  .getElementById(
+   "dayTooltip"
+  )
+  .classList.remove(
+   "show"
+  );
+
+}
+
+
+/* ================= MONTHLY REPORT ================= */
 
 function openMonthlyReport(){
-  const {start,end,days}=monthRange(calendarDate);
-  const e=getEntries();
-  const rows=Object.entries(e)
-    .map(([date,value])=>({date,value:Number(value||0),d:parseDate(date)}))
-    .filter(x=>x.d>=start && x.d<=end)
-    .sort((a,b)=>a.date.localeCompare(b.date));
 
-  const total=rows.reduce((s,x)=>s+x.value,0);
-  const target=days*DAILY_TARGET;
-  const achievement=target?total/target*100:0;
-  const average=rows.length?total/rows.length:0;
+ const {
+  start,
+  end,
+  days
+ }=
+  monthRange(
+   calendarDate
+  );
 
-  document.getElementById("reportTitle").textContent=
-    `Monthly Report · ${start.toLocaleDateString("en-US",{month:"long",year:"numeric"})}`;
-  document.getElementById("reportTarget").textContent=money(target);
-  document.getElementById("reportActual").textContent=money(total);
-  document.getElementById("reportAchievement").textContent=percent(achievement);
-  document.getElementById("reportAverage").textContent=money(average);
 
-  const list=document.getElementById("reportList");
-  if(!rows.length){
-    list.innerHTML=`<div style="padding:18px 0;text-align:center;color:#596a7f;font-size:11px">No entries for this month.</div>`;
-  }else{
-    list.innerHTML=rows.map(x=>{
-      const diff=x.value-DAILY_TARGET;
-      const ach=x.value/DAILY_TARGET*100;
-      const status=ach>=100?"GOOD":ach>=80?"PARTIAL":"BELOW";
-      const cls=ach>=100?"positive":ach>=80?"":"negative";
-      return `<div class="report-row">
-        <span class="r-date">${x.d.toLocaleDateString("en-GB",{day:"2-digit",month:"short"})}</span>
-        <span>${status}</span>
-        <span class="r-net ${cls}">${money(x.value)}</span>
-      </div>`;
-    }).join("");
-  }
+ const entries=
+  getEntries();
 
-  const daysWithEntry=rows.length;
-  const positiveDays=rows.filter(x=>x.value>=DAILY_TARGET).length;
-  document.getElementById("reportNote").textContent=
-    `${daysWithEntry} day${daysWithEntry===1?"":"s"} with entries · ${positiveDays} day${positiveDays===1?"":"s"} met the ৳${DAILY_TARGET} daily target.`;
 
-  document.getElementById("reportModal").classList.add("open");
+ const rows=
+  Object.entries(entries)
+  .map(
+   ([date,value])=>({
+    date,
+    value:Number(value||0),
+    d:parseDate(date)
+   })
+  )
+  .filter(
+   x=>
+    x.d>=start&&
+    x.d<=end
+  )
+  .sort(
+   (a,b)=>
+    a.date.localeCompare(
+     b.date
+    )
+  );
+
+
+ const total=
+  rows.reduce(
+   (s,x)=>
+    s+x.value,
+   0
+  );
+
+
+ const target=
+  days*
+  DAILY_TARGET;
+
+
+ const achievement=
+  target?
+  total/target*100:
+  0;
+
+
+ const average=
+  rows.length?
+  total/rows.length:
+  0;
+
+
+ document.getElementById(
+  "reportTitle"
+ ).textContent=
+  `Monthly Report · ${
+   start.toLocaleDateString(
+    "en-US",
+    {
+     month:"long",
+     year:"numeric"
+    }
+   )
+  }`;
+
+
+ document.getElementById(
+  "reportTarget"
+ ).textContent=
+  money(target);
+
+
+ document.getElementById(
+  "reportActual"
+ ).textContent=
+  money(total);
+
+
+ document.getElementById(
+  "reportAchievement"
+ ).textContent=
+  percent(achievement);
+
+
+ document.getElementById(
+  "reportAverage"
+ ).textContent=
+  money(average);
+
+
+ const list=
+  document.getElementById(
+   "reportList"
+  );
+
+
+ if(!rows.length){
+
+  list.innerHTML=
+   `
+    <div
+     style="
+      padding:18px 0;
+      text-align:center;
+      color:#596a7f;
+      font-size:11px">
+
+     No entries for this month.
+
+    </div>
+   `;
+
+ }else{
+
+  list.innerHTML=
+   rows
+   .map(
+    x=>{
+
+     const achievement=
+      x.value/
+      DAILY_TARGET*
+      100;
+
+
+     const status=
+      achievement>=100?
+      "GOOD":
+      achievement>=80?
+      "PARTIAL":
+      "BELOW";
+
+
+     const cls=
+      achievement>=100?
+      "positive":
+      achievement>=80?
+      "":
+      "negative";
+
+
+     return `
+      <div class="report-row">
+
+       <span class="r-date">
+        ${x.d.toLocaleDateString(
+         "en-GB",
+         {
+          day:"2-digit",
+          month:"short"
+         }
+        )}
+       </span>
+
+       <span>
+        ${status}
+       </span>
+
+       <span
+        class="r-net ${cls}">
+
+        ${money(x.value)}
+
+       </span>
+
+      </div>
+     `;
+
+    }
+   )
+   .join("");
+
+ }
+
+
+ const daysWithEntry=
+  rows.length;
+
+
+ const positiveDays=
+  rows.filter(
+   x=>
+    x.value>=DAILY_TARGET
+  ).length;
+
+
+ document.getElementById(
+  "reportNote"
+ ).textContent=
+  `${daysWithEntry} day${
+   daysWithEntry===1?
+   "":
+   "s"
+  } with entries · ${
+   positiveDays
+  } day${
+   positiveDays===1?
+   "":
+   "s"
+  } met the ৳${DAILY_TARGET} daily target.`;
+
+
+ document
+  .getElementById(
+   "reportModal"
+  )
+  .classList.add(
+   "open"
+  );
+
 }
+
 
 function closeMonthlyReport(){
-  document.getElementById("reportModal").classList.remove("open");
+
+ document
+  .getElementById(
+   "reportModal"
+  )
+  .classList.remove(
+   "open"
+  );
+
 }
 
-document.getElementById("monthlyReportBtn").addEventListener("click",openMonthlyReport);
-document.getElementById("reportModal").addEventListener("click",e=>{
-  if(e.target.id==="reportModal") closeMonthlyReport();
-});
 
-function selectCalendarDate(key){document.getElementById("entryDate").value=key;calendarDate=parseDate(key);render()}
+document
+ .getElementById(
+  "monthlyReportBtn"
+ )
+ .addEventListener(
+  "click",
+  openMonthlyReport
+ );
+
+
+document
+ .getElementById(
+  "reportModal"
+ )
+ .addEventListener(
+  "click",
+  e=>{
+
+   if(
+    e.target.id===
+    "reportModal"
+   ){
+
+    closeMonthlyReport();
+
+   }
+
+  }
+);
+
+
+/* ================= CALENDAR DATE ================= */
+
+function selectCalendarDate(key){
+
+ document.getElementById(
+  "entryDate"
+ ).value=key;
+
+ calendarDate=
+  parseDate(key);
+
+ hideDayTooltip();
+
+ /*
+  No scroll here.
+  Selecting a calendar date only
+  changes the selected date.
+ */
+
+ render();
+
+}
+
+
+/* ================= ADD ENTRY ================= */
+
 function addEntry(){
- const date=document.getElementById("entryDate").value,profit=Number(document.getElementById("profit").value);
- if(!date){showToast("Select a date");return}
- if(date<START_DATE||date>END_DATE){showToast("Date must be inside the goal period");return}
- if(!Number.isFinite(profit)||profit<0){showToast("Enter a valid net profit");return}
- const e=getEntries();e[date]=profit;saveEntries(e);
- document.getElementById("profit").value="";calendarDate=parseDate(date);render();showToast("Entry saved");
+
+ const date=
+  document.getElementById(
+   "entryDate"
+  ).value;
+
+
+ const profit=
+  Number(
+   document.getElementById(
+    "profit"
+   ).value
+  );
+
+
+ if(!date){
+
+  showToast(
+   "Select a date"
+  );
+
+  return;
+
+ }
+
+
+ if(
+  date<START_DATE||
+  date>END_DATE
+ ){
+
+  showToast(
+   "Date must be inside the goal period"
+  );
+
+  return;
+
+ }
+
+
+ if(
+  !Number.isFinite(profit)||
+  profit<0
+ ){
+
+  showToast(
+   "Enter a valid net profit"
+  );
+
+  return;
+
+ }
+
+
+ const entries=
+  getEntries();
+
+
+ entries[date]=profit;
+
+
+ saveEntries(entries);
+
+
+ document.getElementById(
+  "profit"
+ ).value="";
+
+
+ calendarDate=
+  parseDate(date);
+
+
+ render();
+
+
+ showToast(
+  "Entry saved"
+ );
+
 }
-function deleteEntry(date){const e=getEntries();delete e[date];saveEntries(e);render();showToast("Entry deleted")}
 
-document.getElementById("addButton").addEventListener("click",addEntry);
-document.getElementById("profit").addEventListener("keydown",e=>{if(e.key==="Enter")addEntry()});
-document.getElementById("entryDate").addEventListener("change",()=>{calendarDate=parseDate(document.getElementById("entryDate").value);render()});
-document.getElementById("prevMonth").addEventListener("click",()=>{
- const n=new Date(calendarDate.getFullYear(),calendarDate.getMonth()-1,1);
- if(n>=new Date(startDate.getFullYear(),startDate.getMonth(),1)){calendarDate=n;renderCalendar()}
-});
-document.getElementById("nextMonth").addEventListener("click",()=>{
- const n=new Date(calendarDate.getFullYear(),calendarDate.getMonth()+1,1);
- if(n<=new Date(endDate.getFullYear(),endDate.getMonth(),1)){calendarDate=n;renderCalendar()}
-});
 
-const today=new Date();
-const initial=today<startDate?startDate:today>endDate?endDate:today;
-document.getElementById("entryDate").value=dateKey(initial);
-document.getElementById("entryDate").min=START_DATE;
-document.getElementById("entryDate").max=END_DATE;
-calendarDate=new Date(initial.getFullYear(),initial.getMonth(),1);
+function deleteEntry(date){
+
+ const entries=
+  getEntries();
+
+
+ delete entries[date];
+
+
+ saveEntries(entries);
+
+
+ render();
+
+
+ showToast(
+  "Entry deleted"
+ );
+
+}
+
+
+/* ================= EVENTS ================= */
+
+document
+ .getElementById(
+  "addButton"
+ )
+ .addEventListener(
+  "click",
+  addEntry
+ );
+
+
+document
+ .getElementById(
+  "profit"
+ )
+ .addEventListener(
+  "keydown",
+  e=>{
+
+   if(e.key==="Enter"){
+    addEntry();
+   }
+
+  }
+ );
+
+
+document
+ .getElementById(
+  "entryDate"
+ )
+ .addEventListener(
+  "change",
+  ()=>{
+
+   calendarDate=
+    parseDate(
+     document.getElementById(
+      "entryDate"
+     ).value
+    );
+
+   render();
+
+  }
+ );
+
+
+/* ================= MONTH NAVIGATION ================= */
+
+document
+ .getElementById(
+  "prevMonth"
+ )
+ .addEventListener(
+  "click",
+  ()=>{
+
+   const next=
+    new Date(
+     calendarDate.getFullYear(),
+     calendarDate.getMonth()-1,
+     1
+    );
+
+
+   const firstMonth=
+    new Date(
+     startDate.getFullYear(),
+     startDate.getMonth(),
+     1
+    );
+
+
+   if(next>=firstMonth){
+
+    calendarDate=next;
+
+    hideDayTooltip();
+
+    renderCalendar();
+
+   }
+
+  }
+ );
+
+
+document
+ .getElementById(
+  "nextMonth"
+ )
+ .addEventListener(
+  "click",
+  ()=>{
+
+   const next=
+    new Date(
+     calendarDate.getFullYear(),
+     calendarDate.getMonth()+1,
+     1
+    );
+
+
+   const lastMonth=
+    new Date(
+     endDate.getFullYear(),
+     endDate.getMonth(),
+     1
+    );
+
+
+   if(next<=lastMonth){
+
+    calendarDate=next;
+
+    hideDayTooltip();
+
+    renderCalendar();
+
+   }
+
+  }
+ );
+
+
+/* ================= INITIAL ================= */
+
+const today=
+ new Date();
+
+
+const initial=
+ today<startDate?
+ startDate:
+ today>endDate?
+ endDate:
+ today;
+
+
+document
+ .getElementById(
+  "entryDate"
+ )
+ .value=
+ dateKey(initial);
+
+
+document
+ .getElementById(
+  "entryDate"
+ )
+ .min=
+ START_DATE;
+
+
+document
+ .getElementById(
+  "entryDate"
+ )
+ .max=
+ END_DATE;
+
+
+calendarDate=
+ new Date(
+  initial.getFullYear(),
+  initial.getMonth(),
+  1
+ );
+
+
 render();
-</script>
 
+</script>
 
 </body>
 </html>
