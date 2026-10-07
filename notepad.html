@@ -378,14 +378,22 @@ function load(){
   try{notes=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{notes=[]}
   try{archive=JSON.parse(localStorage.getItem(ARCHIVE_KEY)||"[]")}catch{archive=[]}
   purgeExpiredArchive();
-  if(!notes.length){
-    notes=[
-      {id:crypto.randomUUID(),title:"BCS Preparation Plan",content:"Follow 200 Days Study Plan\nDaily 2-3 focused sessions\nWeekly revision (Friday)",updated:now(),pinned:true,reminder:null,countdownDate:null},
-      {id:crypto.randomUUID(),title:"Important Links",content:"",updated:now(),pinned:false,reminder:null,countdownDate:null},
-      {id:crypto.randomUUID(),title:"Monthly Goals",content:"",updated:now(),pinned:false,reminder:null,countdownDate:null}
-    ];
-    persist();
-  }
+
+  // No default/demo notes on new devices.
+  // Also remove only the exact built-in demo notes from older versions.
+  const before=notes.length;
+  notes=notes.filter(n=>{
+    const title=String(n?.title||"");
+    const content=String(n?.content||"");
+    if(title==="BCS Preparation Plan" &&
+       content==="Follow 200 Days Study Plan\nDaily 2-3 focused sessions\nWeekly revision (Friday)" &&
+       n.pinned===true && !n.reminder && !n.countdownDate) return false;
+    if((title==="Important Links" || title==="Monthly Goals") &&
+       content==="" && n.pinned===false && !n.reminder && !n.countdownDate) return false;
+    return true;
+  });
+  if(notes.length!==before) persist();
+
   currentId=notes[0]?.id||null;
   draftMode=false;
   render();
