@@ -37,15 +37,15 @@ body::after{
   transform-origin:center bottom;
 }
 .topbar{
-  height:72px;border-bottom:1px solid rgba(105,140,180,.18);
+  height:58px;border-bottom:1px solid rgba(105,140,180,.18);
   display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
   gap:20px;padding:0 32px;position:sticky;top:0;z-index:50;
-  background:rgba(3,9,20,.62);backdrop-filter:blur(14px);
+  background:transparent;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
 .back{color:#82a9df;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.5px;justify-self:start}
 .back:hover{color:#fff}
 .logo{
-  font-size:25px;font-weight:900;letter-spacing:8px;
+  font-size:15px;font-weight:700;letter-spacing:.18em;
   background:linear-gradient(110deg,#72a9ff,#fff 32%,#a9baff 55%,#927cff);
   background-size:250% auto;
   -webkit-background-clip:text;background-clip:text;color:transparent;
@@ -53,6 +53,7 @@ body::after{
     brandReveal .8s ease forwards,
     brandShine 6s linear infinite,
     brandBreath 4s ease-in-out infinite;
+  will-change:background-position,transform,text-shadow,opacity;
 }
 .clock{justify-self:end;color:#8fa8d0;font-size:13px}
 .app{width:min(1480px,96%);margin:auto;padding:16px 0 0;display:grid;grid-template-columns:340px minmax(0,1fr);gap:12px}
@@ -144,7 +145,12 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 .reminder-display{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
 .reminder-fixed{color:#68b0ff}.reminder-live{color:#b99cff}.reminder-sep{color:#4f678b}
 @media(max-width:600px){
-  .feature-btn{width:34px;height:34px;font-size:14px}
+  .toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;min-width:0;overflow:hidden}
+  .current-date-box{flex:1 1 auto;min-width:0;width:auto;margin-top:8px;overflow:hidden}
+  .current-date-box span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toolbar .spacer{display:none}
+  .feature-btn{width:34px;height:34px;min-width:34px;flex:0 0 34px;font-size:14px}
+  .toolbar .icon-btn{width:36px;height:36px;min-width:36px;flex:0 0 36px}
   .feature-row{grid-template-columns:1fr}
   .feature-box{width:100%}
 }
@@ -203,7 +209,7 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   .pin{right:12px;top:12px;font-size:14px}
   .editor{padding:10px;min-height:520px;border-radius:14px}
   .title-input{height:50px;font-size:18px;padding:0 13px}
-  .toolbar{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px 38px 38px;gap:7px;margin:12px 0}
+  .toolbar{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px 38px;gap:7px;margin:12px 0;align-items:center}
   .date-box{width:auto;height:38px;min-width:0;padding:0 9px;font-size:11px;white-space:nowrap;overflow:hidden}
   .date-box span{overflow:hidden;text-overflow:ellipsis}
   .spacer{display:none}
@@ -251,7 +257,7 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 <body>
 
 <header class="topbar">
-  <a class="back" href="javascript:history.back()">← BACK</a>
+  <a class="back" href="javascript:history.back()">← Back</a>
   <div class="logo">SOIKAT · NOTEPAD</div>
   <div class="clock" id="clock"></div>
 </header>
