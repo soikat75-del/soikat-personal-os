@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SOIKAT — NOTEPAD</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#030914;
+  --panel:#071321;
+  --panel2:#091727;
+  --line:#1b3557;
+  --blue:#3d96ff;
+  --purple:#8d63ff;
+  --text:#f3f6ff;
+  --muted:#8198bd;
+  --red:#ff416c;
+  --green:#28dca7;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{overflow-x:hidden}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;
+  background:
+    radial-gradient(circle at 8% 0%,rgba(28,92,210,.23),transparent 32%),
+    radial-gradient(circle at 100% 100%,rgba(113,48,220,.17),transparent 32%),
+    linear-gradient(135deg,#020812,#050d19 55%,#080412);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(70,120,255,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(70,120,255,.035) 1px,transparent 1px);
+  background-size:72px 72px;
+  transform:perspective(700px) rotateX(58deg) scale(1.5) translateY(12%);
+  transform-origin:center bottom;
+}
+.topbar{
+  height:72px;border-bottom:1px solid rgba(105,140,180,.18);
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  gap:20px;padding:0 32px;position:sticky;top:0;z-index:50;
+  background:rgba(3,9,20,.62);backdrop-filter:blur(14px);
+}
+.back{color:#82a9df;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.5px;justify-self:start}
+.back:hover{color:#fff}
+.logo{
+  font-size:25px;font-weight:900;letter-spacing:8px;
+  background:linear-gradient(110deg,#72a9ff,#fff 32%,#a9baff 55%,#927cff);
+  background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:
+    brandReveal .8s ease forwards,
+    brandShine 6s linear infinite,
+    brandBreath 4s ease-in-out infinite;
+}
+.clock{justify-self:end;color:#8fa8d0;font-size:13px}
+.app{width:min(1480px,96%);margin:auto;padding:16px 0 0;display:grid;grid-template-columns:340px minmax(0,1fr);gap:12px}
+.panel{background:rgba(7,19,33,.82);border:1px solid var(--line);border-radius:17px;box-shadow:0 18px 55px rgba(0,0,0,.18);overflow:hidden}
+.sidebar{padding:14px;height:calc(100vh - 112px);min-height:520px}
+.new-btn{
+  width:100%;height:52px;border:0;border-radius:13px;color:#fff;font-size:20px;font-weight:700;
+  background:linear-gradient(110deg,#3198ff,#7257ff);box-shadow:0 12px 30px rgba(59,117,255,.2)
+}
+.new-btn span{font-size:30px;font-weight:300;vertical-align:-2px;margin-right:14px}
+.search{margin-top:12px;height:46px;border:1px solid #29476e;border-radius:12px;display:flex;align-items:center;padding:0 16px;background:#071525}
+.search-icon{font-size:24px;color:#87a5d2;margin-right:12px}
+.search input{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:15px}
+.search input::placeholder{color:#7890b5}
+.archive-btn{width:100%;height:40px;margin-top:10px;border:1px solid #29476e;border-radius:10px;background:#071525;color:#89a6d1;font-size:12px;cursor:pointer}.archive-btn:hover{border-color:#3b8fff;color:#fff}.notes{margin-top:12px;height:calc(100% - 170px);overflow:auto;padding-right:2px}
+.notes::-webkit-scrollbar,.editor-body::-webkit-scrollbar{width:5px}
+.notes::-webkit-scrollbar-thumb,.editor-body::-webkit-scrollbar-thumb{background:#29466a;border-radius:10px}
+.note{
+  position:relative;border:1px solid #1e395c;border-radius:12px;background:linear-gradient(90deg,#0a1728,#091625);
+  padding:15px 16px 14px 30px;margin-bottom:10px;cursor:pointer;transition:.18s
+}
+.note::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:5px;border-radius:0 5px 5px 0;background:#3e91ff}
+.note:nth-child(2)::before{background:#9a5dff}
+.note:nth-child(3)::before{background:#2ce0aa}
+.note:nth-child(4)::before{background:#ffd329}
+.note:nth-child(5)::before{background:#ff426d}
+.note:nth-child(6)::before{background:#ff9a35}
+.note.active{border-color:#328eff;box-shadow:0 0 0 1px #328eff33 inset}
+.note-title{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:28px}
+.pin{position:absolute;right:16px;top:15px;color:#579cff;font-size:15px}
+.editor{height:calc(100vh - 112px);min-height:520px;padding:14px 16px}
+.title-input{
+  width:100%;height:58px;border:1px solid #28486d;border-radius:13px;background:#071525;
+  color:#fff;padding:0 18px;font-size:24px;font-weight:700;outline:none
+}
+.title-input:focus{border-color:#398fff;box-shadow:0 0 0 2px #398fff18}
+.note-current-date{margin-top:8px;color:#86a1ca;font-size:12px;padding-left:2px}.note-reminder-icon{margin-left:7px;color:#68b0ff;font-size:13px}
+.toolbar{display:flex;align-items:center;gap:8px;margin:10px 0}
+.date-box,.tool-btn,.save-state{
+  height:54px;border:1px solid #223f64;border-radius:12px;background:#071525;
+  color:#89a6d1;display:flex;align-items:center;padding:0 16px
+}
+.date-box{font-size:14px}
+.current-date-box{width:max-content;margin-top:8px;height:38px;padding:0 10px;font-size:12px;gap:7px}
+.spacer{flex:1}
+.tool-btn{font-size:14px;gap:9px}.icon-btn{width:38px;height:38px;justify-content:center;padding:0;font-size:15px}.date-box{height:38px;padding:0 10px;font-size:12px}.toolbar{gap:7px}
+.tool-btn.pin-btn{color:#5ca1ff;border-color:#223f64}.tool-btn.pin-btn.pinned{border-color:#328eff;box-shadow:0 0 0 1px #328eff33 inset}
+.tool-btn.delete{color:#ff496d}
+.save-state{gap:9px}
+.dot{width:12px;height:12px;border-radius:50%;background:#28dca7;box-shadow:0 0 10px #28dca766}
+.editor-body{
+  height:calc(100% - 116px);min-height:300px;border:1px solid #223f64;border-radius:13px;
+  background:linear-gradient(145deg,#071321,#050f1b);padding:16px 20px;display:flex;flex-direction:column
+}
+.editor-checklist-btn{position:absolute;top:9px;right:10px;z-index:3;width:32px;height:32px;border:1px solid #223f64;border-radius:8px;background:#071525;color:#9ab1d4;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;padding:0}.editor-checklist-btn:hover{border-color:#3b8fff;color:#fff}.editor-body{position:relative}
+.content{flex:1;width:100%;resize:none;border:0;outline:0;background:transparent;color:#dfe9fa;font-size:18px;line-height:1.6;font-family:Arial,Helvetica,sans-serif}
+.content::placeholder{color:#6680a8}
+.counter{text-align:right;color:#7892b8;font-size:12px;padding-top:8px}
+footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-top:38px;padding:0 0 20px;color:#8292a2;font-size:11px;letter-spacing:4px}
+.footer-line{width:150px;height:1px;background:linear-gradient(90deg,transparent,#526b82)}
+.footer-line.right{background:linear-gradient(90deg,#526b82,transparent)}
+.heart{color:#ff416c;font-size:14px;display:inline-block;animation:heartbeat 1.8s infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}10%{transform:scale(1.22)}20%{transform:scale(1)}30%{transform:scale(1.12)}}
+
+
+
+
+.countdown-display{flex:none;margin-bottom:10px;padding:8px 10px;border:1px solid #29476e;border-radius:10px;background:#071525;color:#a9c5ef;font-size:13px;font-weight:700;text-align:center;letter-spacing:.2px}
+.feature-btn{width:36px;height:36px;border:1px solid #223f64;border-radius:9px;background:#071525;color:#9ab1d4;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;padding:0}
+.feature-btn:hover{border-color:#3b8fff;color:#fff}
+.feature-btn.active{border-color:#328eff;color:#fff;box-shadow:0 0 0 1px #328eff33 inset}
+.note-meta span{display:inline-flex;align-items:center}
+.feature-modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(1,6,14,.78);backdrop-filter:blur(9px);align-items:center;justify-content:center;padding:18px}
+.feature-modal.show{display:flex}
+.feature-box{width:min(430px,100%);background:#071321;border:1px solid #29476e;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.55);overflow:hidden}
+.feature-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #1b3557}
+.feature-head strong{font-size:15px;letter-spacing:1px}
+.feature-body{padding:18px}
+.feature-body label{display:block;color:#88a2c7;font-size:11px;margin:0 0 7px}
+.feature-body input[type="date"],.feature-body input[type="time"]{width:100%;height:43px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#fff;padding:0 11px;outline:0;margin-bottom:13px;cursor:pointer;color-scheme:dark;appearance:auto;-webkit-appearance:auto}.feature-body input[type="date"]::-webkit-calendar-picker-indicator,.feature-body input[type="time"]::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer;filter:invert(1)}
+.feature-body input:focus{border-color:#398fff}
+.feature-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.feature-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.feature-actions button{height:36px;border:1px solid #29476e;border-radius:8px;background:#071525;color:#9ab0d2;padding:0 12px;cursor:pointer;font-size:11px}
+.feature-actions .primary{color:#fff;border-color:#328eff;background:#12315a}
+.feature-actions .danger{color:#ff5576;border-color:#6d2940}
+.countdown-badge{color:#b99cff!important}
+.reminder-badge{color:#68b0ff!important}
+.reminder-display{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+.reminder-fixed{color:#68b0ff}.reminder-live{color:#b99cff}.reminder-sep{color:#4f678b}
+@media(max-width:600px){
+  .feature-btn{width:34px;height:34px;font-size:14px}
+  .feature-row{grid-template-columns:1fr}
+  .feature-box{width:100%}
+}
+
+.archive-reader{display:none;position:fixed;inset:0;z-index:250;background:rgba(1,6,14,.78);backdrop-filter:blur(9px);align-items:center;justify-content:center;padding:18px}
+.archive-reader.show{display:flex}
+.reader-box{width:min(760px,100%);max-height:88vh;background:#071321;border:1px solid #29476e;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.55);overflow:hidden;display:flex;flex-direction:column}
+.reader-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:17px 18px;border-bottom:1px solid #1b3557}
+.reader-title{font-size:19px;font-weight:800;color:#f3f6ff;word-break:break-word}
+.reader-date{margin-top:6px;color:#7f99bd;font-size:11px}
+.reader-content{padding:22px 24px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#dfe9fa;font-size:16px;line-height:1.7;min-height:180px}
+.reader-actions{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid #1b3557}
+.reader-actions button{height:34px;border:1px solid #29476e;border-radius:8px;background:#071525;padding:0 11px;cursor:pointer;font-size:11px}
+.reader-actions .restore{color:#35dca9;border-color:#236b59}
+.reader-actions .forever{color:#ff5576;border-color:#6d2940}
+
+.archive-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(1,6,14,.72);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:18px}
+.archive-modal.show{display:flex}
+.archive-box{width:min(720px,100%);max-height:min(720px,90vh);background:#071321;border:1px solid #29476e;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.5);overflow:hidden}
+.archive-head{height:62px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1b3557}
+.archive-head strong{font-size:16px;letter-spacing:1px}
+.archive-close{width:34px;height:34px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#9ab0d2;cursor:pointer;font-size:18px}
+.archive-list{padding:14px;overflow:auto;max-height:calc(90vh - 62px)}
+.archive-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #1d385b;border-radius:11px;background:#091727;padding:13px 14px;margin-bottom:9px}
+.archive-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.archive-date{margin-top:5px;color:#7d96ba;font-size:11px}
+.archive-actions{display:flex;gap:6px}
+.archive-actions button{height:32px;border:1px solid #29476e;border-radius:8px;background:#071525;color:#8fa8cc;padding:0 9px;cursor:pointer;font-size:11px}
+.archive-actions .read{color:#67a9ff;border-color:#28558a}.archive-actions .restore{color:#35dca9;border-color:#236b59}
+.archive-actions .forever{color:#ff5576;border-color:#6d2940}
+.archive-empty{padding:35px 15px;text-align:center;color:#6f88ad;font-size:13px}
+.empty{padding:30px;color:#6f88ad;text-align:center}
+
+.reminder-mode{margin-top:14px}
+.reminder-mode>label{display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;opacity:.7}
+.mode-switch{display:flex;gap:7px}
+.mode-btn{flex:1;height:36px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#aeb8d0;border-radius:8px;font:600 11px inherit;cursor:pointer}
+.mode-btn.active{border-color:#4d7cff;background:rgba(77,124,255,.12);color:#dce6ff}
+
+@media(max-width:900px){
+  .topbar{padding:0 16px}.app{grid-template-columns:1fr}
+  .sidebar,.editor{height:auto;min-height:0}.notes{height:auto;max-height:360px}.editor{min-height:650px}
+}
+@media(max-width:600px){
+  .topbar{height:60px;grid-template-columns:auto 1fr auto;gap:8px;padding:0 12px}
+  .logo{animation:logoPulse 2.4s ease-in-out infinite;font-size:15px;letter-spacing:2px;text-align:center;white-space:nowrap}
+  .back{font-size:10px;white-space:nowrap}.clock{font-size:9px;white-space:nowrap}
+  .app{width:94%;padding-top:12px;gap:12px}
+  .sidebar{padding:12px;border-radius:14px}
+  .new-btn{height:52px;font-size:16px}.new-btn span{font-size:25px;margin-right:10px}
+  .search{margin-top:10px;height:48px}.search-icon{font-size:21px;margin-right:9px}
+  .search input{font-size:14px}
+  .archive-btn{height:38px;font-size:11px}.notes{margin-top:12px;max-height:260px}
+  .note{padding:13px 14px 12px 25px;margin-bottom:8px}
+  .note-title{font-size:15px}
+  .pin{right:12px;top:12px;font-size:14px}
+  .editor{padding:10px;min-height:520px;border-radius:14px}
+  .title-input{height:50px;font-size:18px;padding:0 13px}
+  .toolbar{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px 38px 38px;gap:7px;margin:12px 0}
+  .date-box{width:auto;height:38px;min-width:0;padding:0 9px;font-size:11px;white-space:nowrap;overflow:hidden}
+  .date-box span{overflow:hidden;text-overflow:ellipsis}
+  .spacer{display:none}
+  .tool-btn{height:38px}
+  .icon-btn{width:38px;font-size:15px}
+  .editor-body{height:calc(100vh - 170px);min-height:0;padding:12px 13px;border-radius:11px}
+  .content{font-size:16px;line-height:1.5}
+  .counter{font-size:11px;padding-top:9px}
+  footer{gap:10px;font-size:7px;letter-spacing:1.5px;margin-top:20px;padding-bottom:15px}
+  .footer-line{width:42px}
+}
+
+.footer-soikat{color:#7c8cff;}
+
+  50%{opacity:.78;transform:scale(1.025)}
+}
+
+@keyframes brandReveal{
+ from{
+  opacity:0;
+  transform:translateY(-8px);
+  letter-spacing:.28em;
+ }
+ to{
+  opacity:1;
+  transform:translateY(0);
+  letter-spacing:.18em;
+ }
+}
+@keyframes brandShine{
+ 0%{background-position:0% center}
+ 100%{background-position:250% center}
+}
+@keyframes brandBreath{
+ 0%,100%{
+  text-shadow:0 0 20px rgba(180,210,255,.05);
+ }
+ 50%{
+  text-shadow:0 0 30px rgba(180,210,255,.14);
+ }
+}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="back" href="javascript:history.back()">← BACK</a>
+  <div class="logo">SOIKAT · NOTEPAD</div>
+  <div class="clock" id="clock"></div>
+</header>
+
+<main class="app">
+  <aside class="panel sidebar">
+    <button class="new-btn" onclick="newNote()"><span>＋</span>New Note</button>
+    <div class="search">
+      <div class="search-icon">⌕</div>
+      <input id="search" type="text" placeholder="Search notes..." oninput="renderNotes()">
+    </div>
+    <button type="button" class="archive-btn" onclick="openArchive()">🗃️ &nbsp; Archive</button>
+
+    <div class="notes" id="notes"></div>
+  </aside>
+
+  <section class="panel editor">
+    <input id="title" class="title-input" placeholder="Note title" oninput="saveCurrent()">
+    <div class="toolbar">
+      <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
+      <div class="spacer"></div>
+      <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
+      
+      <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
+      <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
+    </div>
+    <div class="editor-body">
+      <button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
+      <div id="reminderDisplay" class="countdown-display" style="display:none"></div>
+      <textarea id="content" class="content" placeholder="Start writing..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
+      <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
+    </div>
+  </section>
+</main>
+
+<div class="feature-modal" id="reminderModal" onclick="closeFeatureModal(event,'reminderModal')">
+  <div class="feature-box" onclick="event.stopPropagation()">
+    <div class="feature-head">
+      <strong>🔔 REMINDER</strong>
+      <button type="button" class="archive-close" onclick="closeFeatureModal(null,'reminderModal')">×</button>
+    </div>
+    <div class="feature-body">
+      <div class="feature-row">
+        <div>
+          <label>Date</label>
+          <input type="date" id="reminderDate">
+        </div>
+        <div>
+          <label>Time</label>
+          <input type="time" id="reminderTime">
+        </div>
+      </div>
+      <div class="reminder-mode">
+        <label>Display</label>
+        <div class="mode-switch">
+          <button type="button" id="reminderFixedBtn" class="mode-btn active">Fixed Time</button>
+          <button type="button" id="reminderLiveBtn" class="mode-btn">Live Countdown</button>
+        </div>
+      </div>
+      <div class="feature-actions">
+        <button type="button" class="danger" id="clearReminderBtn">Clear</button>
+        <button type="button" class="primary" id="saveReminderBtn">Set Reminder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="archive-modal" id="archiveModal" onclick="closeArchive(event)">
+  <div class="archive-box" onclick="event.stopPropagation()">
+    <div class="archive-head">
+      <strong>ARCHIVE</strong>
+      <button type="button" class="archive-close" onclick="closeArchive()">×</button>
+    </div>
+    <div class="archive-list" id="archiveList"></div>
+  </div>
+</div>
+
+<div class="archive-reader" id="archiveReader" onclick="closeArchiveReader(event)">
+  <div class="reader-box" onclick="event.stopPropagation()">
+    <div class="reader-head">
+      <div>
+        <div class="reader-title" id="readerTitle"></div>
+        <div class="reader-date" id="readerDate"></div>
+      </div>
+      <button type="button" class="archive-close" onclick="closeArchiveReader()">×</button>
+    </div>
+    <div class="reader-content" id="readerContent"></div>
+    <div class="reader-actions">
+      <button type="button" class="restore" id="readerRestoreBtn">Restore</button>
+      <button type="button" class="forever" id="readerForeverBtn">Delete Forever</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-line"></span>
+  <div>Built with <span class="heart">♥</span> by <span class="footer-soikat" style="color:#7c8cff !important;">Soikat</span></div>
+  <span class="footer-line right"></span>
+</footer>
+
+<script>
+const KEY="soikat_notepad_v1";
+const ARCHIVE_KEY="soikat_notepad_archive_v1";
+const ARCHIVE_DAYS=30;
+let notes=[];
+let archive=[];
+let currentId=null;
+let draftMode=false;
+let reminderTimer=null;
+
+function now(){
+  return new Date().toLocaleString("en-GB",{
+    day:"2-digit",month:"short",year:"numeric",
+    hour:"2-digit",minute:"2-digit",hour12:true
+  });
+}
+function load(){
+  try{notes=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{notes=[]}
+  try{archive=JSON.parse(localStorage.getItem(ARCHIVE_KEY)||"[]")}catch{archive=[]}
+  purgeExpiredArchive();
+  if(!notes.length){
+    notes=[
+      {id:crypto.randomUUID(),title:"BCS Preparation Plan",content:"Follow 200 Days Study Plan\nDaily 2-3 focused sessions\nWeekly revision (Friday)",updated:now(),pinned:true,reminder:null,countdownDate:null},
+      {id:crypto.randomUUID(),title:"Important Links",content:"",updated:now(),pinned:false,reminder:null,countdownDate:null},
+      {id:crypto.randomUUID(),title:"Monthly Goals",content:"",updated:now(),pinned:false,reminder:null,countdownDate:null}
+    ];
+    persist();
+  }
+  currentId=notes[0]?.id||null;
+  draftMode=false;
+  render();
+}
+function persist(){localStorage.setItem(KEY,JSON.stringify(notes))}
+function persistArchive(){localStorage.setItem(ARCHIVE_KEY,JSON.stringify(archive))}
+function purgeExpiredArchive(){
+  const limit=Date.now()-(ARCHIVE_DAYS*24*60*60*1000);
+  const before=archive.length;
+  archive=archive.filter(n=>{
+    const t=Number(n.deletedAt||0);
+    return t>limit;
+  });
+  if(archive.length!==before) persistArchive();
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function renderNotes(){
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const box=document.getElementById("notes");
+  let list=notes.filter(n=>(n.title+" "+n.content).toLowerCase().includes(q));
+  list.sort((a,b)=>(b.pinned-a.pinned)||((b.updated||"").localeCompare(a.updated||"")));
+  if(!list.length){box.innerHTML='<div class="empty">No notes found.</div>';return}
+  box.innerHTML=list.map(n=>`
+    <div class="note ${n.id===currentId?"active":""}" onclick="selectNote('${n.id}')">
+      <div class="note-title">${escapeHtml(n.title||"Untitled")}${n.reminder?'<span class="note-reminder-icon" title="Reminder set">🔔</span>':""}</div>
+      ${n.pinned?'<div class="pin">📌</div>':""}
+    </div>`).join("");
+}
+function selectNote(id){
+  draftMode=false;
+  currentId=id;
+  render();
+}
+function current(){return notes.find(n=>n.id===currentId)}
+function render(){
+  renderNotes();
+  const n=current();
+  if(!n){
+    document.getElementById("title").value="";
+    document.getElementById("content").value="";
+    document.getElementById("date").textContent=now();
+    document.getElementById("count").textContent="0";
+    updateLastEditedDisplay(null);
+    document.getElementById("pinIcon").textContent="📌";
+    document.getElementById("pinBtn").classList.remove("pinned");
+    document.getElementById("reminderBtn").classList.remove("active");
+  
+    document.getElementById("reminderDisplay").style.display="none";
+    return;
+  }
+  document.getElementById("title").value=n.title||"";
+  document.getElementById("content").value=n.content||"";
+  document.getElementById("date").textContent=n.updated||now();
+  document.getElementById("count").textContent=(n.content||"").length;
+  updateLastEditedDisplay(n);
+  document.getElementById("pinIcon").textContent="📌";
+  document.getElementById("pinBtn").classList.toggle("pinned",!!n.pinned);
+  document.getElementById("reminderBtn").classList.toggle("active",!!n.reminder);
+
+  updateReminderDisplay(n);
+}
+
+function updateLastEditedDisplay(n){
+  const el=document.getElementById("lastEdited");
+  if(!el)return;
+  el.textContent=(n && n.updated) ? n.updated : "—";
+}
+
+function saveCurrent(){
+  const title=document.getElementById("title").value;
+  const content=document.getElementById("content").value;
+  const hasText=title.trim()!=="" || content.trim()!=="";
+
+  // A completely blank new note is only a draft and is never saved.
+  if(draftMode && !hasText){
+    document.getElementById("count").textContent=content.length;
+    updateLastEditedDisplay(null);
+    return;
+  }
+
+  let n=current();
+
+  // Create the note only when the user actually writes something.
+  if(!n && hasText){
+    n={
+      id:crypto.randomUUID(),
+      title:title.trim() || "Untitled Note",
+      content:content,
+      updated:now(),
+      pinned:false,
+      reminder:null,
+      countdownDate:null
+    };
+    notes.unshift(n);
+    currentId=n.id;
+    draftMode=false;
+  }
+
+  if(!n)return;
+
+  n.title=title.trim() || "Untitled Note";
+  n.content=content;
+  n.updated=now();
+  persist();
+
+  document.getElementById("count").textContent=n.content.length;
+  updateLastEditedDisplay(n);
+  renderNotes();
+}
+function newNote(){
+  draftMode=true;
+  currentId=null;
+  document.getElementById("title").value="";
+  document.getElementById("content").value="";
+  document.getElementById("count").textContent="0";
+  updateLastEditedDisplay(null);
+  document.getElementById("pinIcon").textContent="📌";
+  document.getElementById("pinBtn").classList.remove("pinned");
+  document.getElementById("reminderBtn").classList.remove("active");
+
+  document.getElementById("reminderDisplay").style.display="none";
+  renderNotes();
+  document.getElementById("title").focus();
+}
+function deleteCurrent(){
+  const n=current();
+
+  // Blank unsaved draft: nothing to archive.
+  if(draftMode || !n){
+    draftMode=false;
+    currentId=notes[0]?.id||null;
+    render();
+    return;
+  }
+
+  // Move note to Archive instead of permanently deleting it.
+  archive.unshift({
+    ...n,
+    deletedAt:Date.now()
+  });
+
+  notes=notes.filter(x=>x.id!==n.id);
+  persist();
+  persistArchive();
+
+  currentId=notes[0]?.id||null;
+  draftMode=false;
+  render();
+}
+
+function togglePin(){
+  let n=current();
+  if(!n){
+    const title=document.getElementById("title").value.trim();
+    const content=document.getElementById("content").value;
+    if(!title && !content.trim()) return;
+    n={id:crypto.randomUUID(),title:title||"Untitled Note",content,updated:now(),pinned:false,reminder:null,countdownDate:null};
+    notes.unshift(n);
+    currentId=n.id;
+    draftMode=false;
+  }
+  n.pinned=!n.pinned;
+  n.updated=now();
+  persist();
+  render();
+}
+function formatArchiveDate(timestamp){
+  return new Date(timestamp).toLocaleString("en-GB",{
+    day:"2-digit",month:"short",year:"numeric",
+    hour:"2-digit",minute:"2-digit",hour12:true
+  });
+}
+function daysLeft(deletedAt){
+  const left=Math.ceil((deletedAt + ARCHIVE_DAYS*24*60*60*1000 - Date.now())/(24*60*60*1000));
+  return Math.max(0,left);
+}
+function openArchive(){
+  purgeExpiredArchive();
+  renderArchive();
+  document.getElementById("archiveModal").classList.add("show");
+}
+function closeArchive(event){
+  if(event && event.target!==document.getElementById("archiveModal")) return;
+  document.getElementById("archiveModal").classList.remove("show");
+}
+function renderArchive(){
+  const box=document.getElementById("archiveList");
+  if(!archive.length){
+    box.innerHTML='<div class="archive-empty">Archive is empty.</div>';
+    return;
+  }
+  box.innerHTML=archive.map(n=>`
+    <div class="archive-item">
+      <div>
+        <div class="archive-title">${escapeHtml(n.title||"Untitled Note")}</div>
+        <div class="archive-date">Deleted ${escapeHtml(formatArchiveDate(n.deletedAt))} · ${daysLeft(n.deletedAt)} day${daysLeft(n.deletedAt)===1?"":"s"} left</div>
+      </div>
+      <div class="archive-actions">
+        <button type="button" class="read" onclick="readArchivedNote('${n.id}')">Read</button>
+        <button type="button" class="restore" data-action="restore" data-id="${n.id}">Restore</button>
+        <button type="button" class="forever" data-action="forever" data-id="${n.id}" onclick="deleteForever(this.getAttribute('data-id'))">Delete Forever</button>
+      </div>
+    </div>
+  `).join("");
+}
+function restoreNote(id){
+  const n=archive.find(x=>x.id===id);
+  if(!n)return;
+  const restored={
+    id:n.id,
+    title:n.title||"Untitled Note",
+    content:n.content||"",
+    updated:n.updated||now(),
+    pinned:!!n.pinned,
+    reminder:n.reminder||null,
+    countdownDate:n.countdownDate||null
+  };
+  notes.unshift(restored);
+  archive=archive.filter(x=>x.id!==id);
+  persist();
+  persistArchive();
+  currentId=restored.id;
+  draftMode=false;
+  render();
+  renderArchive();
+}
+function deleteForever(id){
+  if(!id)return;
+  archive=archive.filter(x=>String(x.id)!==String(id));
+  persistArchive();
+  renderArchive();
+}
+
+let readerNoteId=null;
+
+function readArchivedNote(id){
+  purgeExpiredArchive();
+  const n=archive.find(x=>x.id===id);
+  if(!n)return;
+  readerNoteId=id;
+  document.getElementById("readerTitle").textContent=n.title||"Untitled Note";
+  document.getElementById("readerDate").textContent=
+    "Deleted "+formatArchiveDate(n.deletedAt)+" · "+daysLeft(n.deletedAt)+" day"+(daysLeft(n.deletedAt)===1?"":"s")+" left";
+  document.getElementById("readerContent").textContent=n.content||"(This note has no written content.)";
+  document.getElementById("archiveReader").classList.add("show");
+}
+function closeArchiveReader(event){
+  if(event && event.target!==document.getElementById("archiveReader"))return;
+  document.getElementById("archiveReader").classList.remove("show");
+  readerNoteId=null;
+}
+function restoreFromReader(){
+  if(!readerNoteId)return;
+  const id=readerNoteId;
+  closeArchiveReader();
+  restoreNote(id);
+}
+function deleteForeverFromReader(){
+  if(!readerNoteId)return;
+  const id=readerNoteId;
+
+  archive=archive.filter(x=>String(x.id)!==String(id));
+  persistArchive();
+
+  readerNoteId=null;
+  document.getElementById("archiveReader").classList.remove("show");
+  renderArchive();
+}
+
+document.getElementById("archiveList").addEventListener("click", function(e){
+  const btn=e.target.closest("button[data-action]");
+  if(!btn)return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const id=btn.getAttribute("data-id");
+  if(!id)return;
+
+  if(btn.getAttribute("data-action")==="restore"){
+    restoreNote(id);
+  }else if(btn.getAttribute("data-action")==="forever"){
+    deleteForever(id);
+  }
+});
+
+document.getElementById("readerRestoreBtn").addEventListener("click", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  restoreFromReader();
+});
+
+document.getElementById("readerForeverBtn").addEventListener("click", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  deleteForeverFromReader();
+});
+
+
+function countdownText(target){
+  if(!target)return "";
+  const end=new Date(target);
+  const diff=end.getTime()-Date.now();
+  if(diff<=0){
+    const abs=Math.abs(diff);
+    const days=Math.floor(abs/86400000);
+    const hours=Math.floor((abs%86400000)/3600000);
+    const minutes=Math.floor((abs%3600000)/60000);
+    if(days) return days+"d overdue";
+    if(hours) return hours+"h overdue";
+    return minutes+"m overdue";
+  }
+  const days=Math.floor(diff/86400000);
+  const hours=Math.floor((diff%86400000)/3600000);
+  const minutes=Math.floor((diff%3600000)/60000);
+  if(days>0)return days+"d "+hours+"h";
+  if(hours>0)return hours+"h "+minutes+"m";
+  return minutes+"m";
+}
+
+function countdownLongText(target){
+  if(!target)return "";
+  const end=new Date(target);
+  const diff=end.getTime()-Date.now();
+  const abs=Math.abs(diff);
+  const days=Math.floor(abs/86400000);
+  const hours=Math.floor((abs%86400000)/3600000);
+  const minutes=Math.floor((abs%3600000)/60000);
+  const seconds=Math.floor((abs%60000)/1000);
+  const d=days+" day"+(days===1?"":"s");
+  const h=hours+" hour"+(hours===1?"":"s");
+  const m=minutes+" minute"+(minutes===1?"":"s");
+  const s=seconds+" second"+(seconds===1?"":"s");
+  return diff>0 ? d+", "+h+", "+m+", "+s : d+", "+h+", "+m+", "+s+" overdue";
+}
+
+
+function insertChecklistItem(){
+  const el=document.getElementById("content");
+  const start=el.selectionStart;
+  const end=el.selectionEnd;
+  const before=el.value.slice(0,start);
+  const selected=el.value.slice(start,end);
+
+  // If the cursor is on a line, toggle/add a checkbox prefix.
+  const lineStart=before.lastIndexOf("\n")+1;
+  const lineEnd=el.value.indexOf("\n",start);
+  const actualEnd=lineEnd===-1?el.value.length:lineEnd;
+  const line=el.value.slice(lineStart,actualEnd);
+
+  if(/^\s*☐\s?/.test(line)){
+    const updatedLine=line.replace(/^(\s*)☐\s?/,"$1");
+    el.value=el.value.slice(0,lineStart)+updatedLine+el.value.slice(actualEnd);
+    el.selectionStart=el.selectionEnd=lineStart+updatedLine.length;
+  }else if(/^\s*☑\s?/.test(line)){
+    const updatedLine=line.replace(/^(\s*)☑\s?/,"$1");
+    el.value=el.value.slice(0,lineStart)+updatedLine+el.value.slice(actualEnd);
+    el.selectionStart=el.selectionEnd=lineStart+updatedLine.length;
+  }else{
+    const replacement="☐ "+selected;
+    el.setRangeText(replacement,start,end,"end");
+  }
+
+  saveCurrent();
+  el.focus();
+}
+
+function handleEditorEnter(e){
+  if(e.key!=="Enter" || e.isComposing) return;
+
+  const el=e.target;
+  const pos=el.selectionStart;
+  if(pos!==el.selectionEnd) return;
+
+  const before=el.value.slice(0,pos);
+  const after=el.value.slice(pos);
+
+  // Current line, without the newline before it.
+  const lineStart=before.lastIndexOf("\n")+1;
+  const line=before.slice(lineStart);
+
+  // If the previous Enter already created an empty marker,
+  // a second Enter exits the list and removes that marker.
+  const emptyMarker=/^([ \t]*)(☐|☑|[-*+#•▪▫◦→»›>])\s*$/;
+  const emptyNumber=/^([ \t]*)(\d+)([.]|।)\s*$/;
+  const emptyBangla=/^([ \t]*)([০-৯]+)([.]|।)\s*$/;
+
+  if(emptyMarker.test(line) || emptyNumber.test(line) || emptyBangla.test(line)){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    const value=el.value;
+    el.value=value.slice(0,lineStart)+"\n"+after;
+    el.selectionStart=el.selectionEnd=lineStart+1;
+    el.dispatchEvent(new Event("input",{bubbles:true}));
+    return;
+  }
+
+  let insert="";
+
+  // Checklist: ☐ Task -> Enter -> ☐
+  let m=line.match(/^([ \t]*)(☐|☑)\s+(.+)$/);
+  if(m){
+    insert="\n"+m[1]+"☐ ";
+  }
+
+  // English numbering: 1. -> 2. (or 1। -> 2।)
+  if(!insert){
+    m=line.match(/^([ \t]*)(\d+)([.]|।)\s+(.+)$/);
+    if(m){
+      insert="\n"+m[1]+(Number(m[2])+1)+m[3]+" ";
+    }
+  }
+
+  // Bangla numbering: ১। -> ২।
+  if(!insert){
+    m=line.match(/^([ \t]*)([০-৯]+)([.]|।)\s+(.+)$/);
+    if(m){
+      const bd="০১২৩৪৫৬৭৮৯";
+      const n=Number(m[2].split("").map(ch=>bd.indexOf(ch)).join(""));
+      const next=String(n+1).split("").map(ch=>bd[Number(ch)]).join("");
+      insert="\n"+m[1]+next+m[3]+" ";
+    }
+  }
+
+  // Common bullets: preserve exactly the bullet the user typed.
+  if(!insert){
+    m=line.match(/^([ \t]*)([-*+#•▪▫◦→»›>])\s+(.+)$/);
+    if(m){
+      insert="\n"+m[1]+m[2]+" ";
+    }
+  }
+
+  if(!insert) return;
+
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  el.value=before+insert+after;
+  const newPos=before.length+insert.length;
+  el.selectionStart=el.selectionEnd=newPos;
+  el.dispatchEvent(new Event("input",{bubbles:true}));
+}
+
+function updateReminderDisplay(n){
+  const box=document.getElementById("reminderDisplay");
+  if(!box)return;
+  if(!n || !n.reminder){
+    box.style.display="none";
+    box.textContent="";
+    return;
+  }
+  const d=n.reminder.display||{fixed:true,live:false};
+  const parts=[];
+  if(d.fixed) parts.push('<span class="reminder-fixed">🔔 '+escapeHtml(reminderFixedText(n.reminder))+'</span>');
+  if(d.live) parts.push('<span class="reminder-live">⏳ '+escapeHtml(reminderLiveText(n.reminder))+'</span>');
+  if(!parts.length){
+    box.style.display="none";
+    box.textContent="";
+    return;
+  }
+  box.style.display="block";
+  box.innerHTML=parts.join('<span class="reminder-sep"> | </span>');
+}
+
+function reminderTarget(r){
+  if(!r||!r.date||!r.time)return null;
+  return r.date+"T"+r.time+":00";
+}
+function reminderLiveText(r){
+  const target=reminderTarget(r);
+  if(!target)return "";
+  return countdownLongText(target);
+}
+function reminderFixedText(r){
+  if(!r||!r.date||!r.time)return "";
+  const d=new Date(r.date+"T"+r.time+":00");
+  return d.toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true});
+}
+function reminderDisplayText(r){
+  if(!r)return "";
+  return "🔔 Fixed Time: "+reminderFixedText(r)+"  |  ⏳ Live Countdown: "+reminderLiveText(r);
+}
+function setReminderMode(mode){
+  const fixedBtn=document.getElementById("reminderFixedBtn");
+  const liveBtn=document.getElementById("reminderLiveBtn");
+  const btn=mode==="fixed" ? fixedBtn : liveBtn;
+  const other=mode==="fixed" ? liveBtn : fixedBtn;
+  const currently=btn.classList.contains("active");
+  if(currently && other.classList.contains("active")){
+    btn.classList.remove("active");
+  }else if(!currently){
+    btn.classList.add("active");
+  }
+}
+function openReminder(){
+  let n=current();
+  if(!n){
+    const title=document.getElementById("title").value.trim();
+    const content=document.getElementById("content").value;
+    if(!title && !content.trim()) return;
+    n={id:crypto.randomUUID(),title:title||"Untitled Note",content,updated:now(),pinned:false,reminder:null,countdownDate:null};
+    notes.unshift(n);
+    currentId=n.id;
+    draftMode=false;
+    persist();
+    renderNotes();
+  }
+  const r=n.reminder||{};
+  document.getElementById("reminderDate").value=r.date||"";
+  document.getElementById("reminderTime").value=r.time||"";
+  const display=r.display || (r.mode==="live" ? {fixed:false,live:true} : {fixed:true,live:false});
+  document.getElementById("reminderFixedBtn").classList.toggle("active",!!display.fixed);
+  document.getElementById("reminderLiveBtn").classList.toggle("active",!!display.live);
+  document.getElementById("reminderFixedBtn").dataset.selected=display.fixed?"1":"0";
+  document.getElementById("reminderLiveBtn").dataset.selected=display.live?"1":"0";
+  document.getElementById("reminderModal").classList.add("show");
+}
+function saveReminder(){
+  const n=current();
+  if(!n)return;
+  const date=document.getElementById("reminderDate").value;
+  let time=document.getElementById("reminderTime").value;
+  if(!date)return;
+  if(!time) time="00:00";
+  const fixed=document.getElementById("reminderFixedBtn").classList.contains("active");
+  const live=document.getElementById("reminderLiveBtn").classList.contains("active");
+  n.reminder={date,time,display:{fixed,live},notified:false};
+  persist();
+  closeFeatureModal(null,"reminderModal");
+  render();
+  requestNotificationPermission();
+}
+function clearReminder(){
+  const n=current();
+  if(!n)return;
+  n.reminder=null;
+  persist();
+  closeFeatureModal(null,"reminderModal");
+  render();
+}
+function closeFeatureModal(event,id){
+  const modal=document.getElementById(id);
+  if(event && event.target!==modal)return;
+  modal.classList.remove("show");
+}
+function requestNotificationPermission(){
+  if("Notification" in window && Notification.permission==="default"){
+    Notification.requestPermission().catch(()=>{});
+  }
+}
+function checkReminders(){
+  const nowDate=new Date();
+  let changed=false;
+  notes.forEach(n=>{
+    if(!n.reminder||n.reminder.notified)return;
+    const target=new Date(reminderTarget(n.reminder));
+    if(nowDate.getTime()>=target.getTime()){
+      n.reminder.notified=true;
+      changed=true;
+      if("Notification" in window && Notification.permission==="granted"){
+        try{new Notification(n.title||"Soikat Notepad",{body:"Reminder: this note is due now."});}catch{}
+      }else{
+        // Fallback: make the note visibly marked.
+        document.title="🔔 "+(n.title||"Reminder")+" — SOIKAT";
+        setTimeout(()=>{document.title="SOIKAT — NOTEPAD"},5000);
+      }
+    }
+  });
+  if(changed){
+    persist();
+    renderNotes();
+  }
+}
+
+function updateClock(){
+  document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
+    day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true
+  });
+}
+document.getElementById("deleteBtn").addEventListener("click", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  deleteCurrent();
+});
+
+document.getElementById("pinBtn").addEventListener("click", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  togglePin();
+});
+
+
+
+
+document.getElementById("content").addEventListener("click",function(e){
+  const el=e.target;
+  const pos=el.selectionStart;
+  const value=el.value;
+  let idx=-1;
+  if(value[pos]==="☐"||value[pos]==="☑") idx=pos;
+  else if(value[pos-1]==="☐"||value[pos-1]==="☑") idx=pos-1;
+  if(idx<0)return;
+  const next=value[idx]==="☐"?"☑":"☐";
+  el.value=value.slice(0,idx)+next+value.slice(idx+1);
+  el.selectionStart=el.selectionEnd=idx+1;
+  saveCurrent();
+});
+
+document.getElementById("checklistBtn").addEventListener("click",function(e){
+  e.preventDefault();
+  insertChecklistItem();
+});
+
+document.getElementById("reminderBtn").addEventListener("click",function(e){
+  e.preventDefault();
+  openReminder();
+});
+
+// Make the native date/time pickers open reliably on supported browsers.
+["reminderDate","reminderTime"].forEach(function(id){
+  const input=document.getElementById(id);
+  if(!input)return;
+  input.addEventListener("click",function(){
+    this.focus();
+    if(typeof this.showPicker==="function"){
+      try{ this.showPicker(); }catch(e){}
+    }
+  });
+  input.addEventListener("keydown",function(e){
+    if((e.key==="Enter" || e.key==="ArrowDown") && typeof this.showPicker==="function"){
+      try{ this.showPicker(); }catch(err){}
+    }
+  });
+});
+
+
+document.getElementById("saveReminderBtn").addEventListener("click",saveReminder);
+document.getElementById("clearReminderBtn").addEventListener("click",clearReminder);
+document.getElementById("reminderFixedBtn").addEventListener("click",function(){setReminderMode("fixed")});
+document.getElementById("reminderLiveBtn").addEventListener("click",function(){setReminderMode("live")});
+
+setInterval(()=>{
+  checkReminders();
+  if(currentId){
+    const n=current();
+    if(n) updateReminderDisplay(n);
+    renderNotes();
+  }
+},1000);
+
+load();updateClock();setInterval(updateClock,1000);
+
+</script>
+</body>
+</html>
