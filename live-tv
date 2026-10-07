@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOIKAT · LIVE TV</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:#030914;
+  color:#e9f0ff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.topbar{
+  height:58px;
+  border-bottom:1px solid rgba(105,140,180,.18);
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:14px;
+  padding:0 32px;
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:transparent;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+.back{
+  color:#a9b6c8;
+  text-decoration:none;
+  font-size:13px;
+  white-space:nowrap;
+  justify-self:start;
+}
+
+.back:hover{color:#fff}
+
+.logo{
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:.18em;
+  white-space:nowrap;
+  text-align:center;
+  background:linear-gradient(
+    110deg,
+    #ffffff 10%,
+    #9ebcff 45%,
+    #ffffff 60%,
+    #758fff 80%,
+    #ffffff 100%
+  );
+  background-size:250% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:
+    brandReveal .8s ease forwards,
+    brandShine 6s linear infinite,
+    brandBreath 4s ease-in-out infinite;
+}
+
+.clock{justify-self:end;color:#8fa8d0;font-size:13px}
+
+@keyframes brandReveal{
+  from{
+    opacity:0;
+    transform:translateY(-8px);
+    letter-spacing:.28em;
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+    letter-spacing:.18em;
+  }
+}
+
+@keyframes brandShine{
+  0%{background-position:0% center}
+  100%{background-position:250% center}
+}
+
+@keyframes brandBreath{
+  0%,100%{text-shadow:0 0 20px rgba(180,210,255,.05)}
+  50%{text-shadow:0 0 30px rgba(180,210,255,.14)}
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
+  padding:28px 0 40px;
+}
+
+.player-panel{
+  width:100%;
+  background:#071321;
+  border:1px solid #1c3555;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 20px 70px rgba(0,0,0,.28);
+}
+
+.player-wrap{
+  width:100%;
+  aspect-ratio:16/9;
+  background:#02060d;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+video{
+  width:100%;
+  height:100%;
+  display:block;
+  background:#02060d;
+  object-fit:contain;
+}
+
+.player-message{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:8px;
+  color:#7186a6;
+  font-size:13px;
+  pointer-events:none;
+}
+
+.player-message strong{
+  color:#b9c9e3;
+  font-size:15px;
+}
+
+/* =========================
+   CHANNELS
+========================= */
+
+.channels-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin:28px 0 14px;
+}
+
+.channels-title{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.16em;
+  color:#a9bad4;
+}
+
+.now-playing{
+  color:#607895;
+  font-size:11px;
+  white-space:nowrap;
+}
+
+.channels{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.channel{
+  min-width:0;
+  height:76px;
+  border:1px solid #1c3555;
+  border-radius:12px;
+  background:#071321;
+  color:#dfe9fa;
+  cursor:pointer;
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  transition:border-color .18s ease,background .18s ease,transform .18s ease;
+}
+
+.channel:hover{
+  border-color:#315f94;
+  background:#091827;
+  transform:translateY(-1px);
+}
+
+.channel.active{
+  border-color:#398fff;
+  box-shadow:0 0 0 1px rgba(57,143,255,.18) inset;
+  background:#081a2c;
+}
+
+.channel-logo{
+  width:46px;
+  height:46px;
+  flex:0 0 46px;
+  border-radius:9px;
+  border:1px solid #213e61;
+  background:#030914;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  color:#6f88ac;
+  font-size:10px;
+}
+
+.channel-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.channel-info{
+  min-width:0;
+}
+
+.channel-name{
+  font-size:13px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.channel-status{
+  margin-top:5px;
+  color:#6681a7;
+  font-size:10px;
+}
+
+.live-dot{
+  display:inline-block;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#43d7a6;
+  margin-right:5px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+  .topbar{
+    padding:0 16px;
+    grid-template-columns:auto 1fr auto;
+    gap:10px;
+  }
+
+  .logo{
+    font-size:13px;
+    letter-spacing:.12em;
+  }
+
+  .clock{
+    font-size:10px;
+  }
+
+  .container{
+    width:calc(100% - 20px);
+    padding-top:18px;
+  }
+
+  .player-panel{
+    border-radius:12px;
+  }
+
+  .channels-head{
+    margin-top:20px;
+  }
+
+  .channels{
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+  }
+
+  .channel{
+    height:68px;
+    padding:9px;
+    gap:9px;
+  }
+
+  .channel-logo{
+    width:40px;
+    height:40px;
+    flex-basis:40px;
+  }
+
+  .channel-name{
+    font-size:11px;
+  }
+
+  .channel-status{
+    font-size:9px;
+  }
+}
+
+@media(max-width:390px){
+  .back{font-size:12px}
+  .logo{font-size:11px}
+  .clock{font-size:9px}
+
+  .channels{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .channel{
+    height:62px;
+  }
+
+  .channel-logo{
+    width:34px;
+    height:34px;
+    flex-basis:34px;
+  }
+}
+
+
+/* ===== FOOTER — SAME AS 200D PLAN ===== */
+footer{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:35px;
+  margin-top:38px;
+  padding:0 0 20px;
+  color:#8292a2;
+  font-size:11px;
+  letter-spacing:4px;
+}
+
+.footer-line{
+  width:150px;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#526b82);
+}
+
+.footer-line.right{
+  background:linear-gradient(90deg,#526b82,transparent);
+}
+
+.heart{
+  color:#ff416c;
+  font-size:14px;
+  display:inline-block;
+  animation:heartbeat 1.8s ease-in-out infinite;
+  transform-origin:center;
+}
+
+@keyframes heartbeat{
+  0%,100%{
+    transform:scale(1);
+  }
+  10%{
+    transform:scale(1.22);
+  }
+  20%{
+    transform:scale(1);
+  }
+  30%{
+    transform:scale(1.12);
+  }
+}
+
+.footer-soikat{
+  color:#7c8cff;
+}
+
+@media(max-width:560px){
+  footer{
+    gap:12px;
+    font-size:8px;
+    letter-spacing:2px;
+  }
+
+  .footer-line{
+    width:55px;
+  }
+}
+
+.categories{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:14px 0 12px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.categories::-webkit-scrollbar{display:none}
+.category{
+  flex:0 0 auto;
+  height:34px;
+  padding:0 14px;
+  border:1px solid #223f64;
+  border-radius:9px;
+  background:#071525;
+  color:#8299bb;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.7px;
+  cursor:pointer;
+  transition:.18s;
+}
+.category:hover{
+  border-color:#3b8fff;
+  color:#fff;
+}
+.category.active{
+  border-color:#3d96ff;
+  background:linear-gradient(110deg,#3198ff,#7257ff);
+  color:#fff;
+  box-shadow:0 0 0 1px #3d96ff55 inset,0 6px 18px rgba(59,117,255,.22);
+}
+
+
+.empty-category{
+  grid-column:1/-1;
+  min-height:150px;
+  border:1px dashed #29476e;
+  border-radius:14px;
+  background:rgba(7,21,37,.55);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:25px;
+}
+.empty-category-title{
+  color:#a9bde0;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1.5px;
+}
+.empty-category-text{
+  margin-top:7px;
+  color:#7189ac;
+  font-size:11px;
+}
+
+
+.channel-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  border-radius:inherit;
+}
+
+</style>
+
+<style>
+#debugInfo{
+  margin-top:10px;
+  padding:9px 11px;
+  border:1px solid #172b45;
+  border-radius:9px;
+  background:#050e19;
+  color:#58708f;
+  font-size:10px;
+  line-height:1.5;
+  word-break:break-word;
+}
+#debugInfo b{color:#7f9abb}
+</style>
+
+<style>
+.channels-section{padding:22px 24px 40px}
+.section-title{font-size:13px;font-weight:800;letter-spacing:.18em;margin-bottom:14px}
+.channels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.channel-card{
+  text-decoration:none;color:inherit;
+  min-height:76px;padding:14px 16px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;background:rgba(255,255,255,.035);
+  display:flex;align-items:center;gap:12px;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease
+}
+.channel-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06)}
+.channel-logo{width:42px;height:42px;border-radius:9px;display:grid;place-items:center;flex:0 0 42px;background:rgba(255,255,255,.08);overflow:hidden}
+.channel-logo img{width:100%;height:100%;object-fit:contain}
+.channel-logo span{font-weight:800;font-size:16px}
+.channel-name{font-size:14px;font-weight:700;flex:1}
+.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
+@media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
+@media(max-width:430px){.channels{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <a class="back" href="javascript:history.back()">← Back</a>
+  <div class="logo">SOIKAT · LIVE TV</div>
+  <div class="clock" id="clock">07 Oct 2026, 12:44 pm</div>
+</header>
+
+
+<div class="categories" id="categories">
+  <button class="category active" data-category="ALL">ALL</button>
+  <button class="category" data-category="SPORTS">SPORTS</button>
+  <button class="category" data-category="NEWS">NEWS</button>
+  <button class="category" data-category="MUSIC">MUSIC</button>
+  <button class="category" data-category="MOVIES">MOVIES</button>
+  <button class="category" data-category="INFOTAINMENT">INFOTAINMENT</button>
+</div>
+
+<main>
+  <section class="channels-section">
+    <div class="section-title">CHANNELS</div>
+    <div id="channels" class="channels"></div>
+  </section>
+</main>
+
+<!--
+=========================================================
+CHANNEL URLS — CHANGE THESE ONLY
+=========================================================
+
+প্রতিবার stream URL পরিবর্তন করতে হলে শুধু নিচের
+url: "..." অংশ পরিবর্তন করবে।
+
+name = Channel-এর নাম
+logo = Channel logo (optional)
+url  = Live .m3u8 stream URL
+
+=========================================================
+-->
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
+<footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by <span class="footer-soikat">Soikat</span></div><span class="footer-line right"></span></footer>
+
+<script>
+// =========================================================
+// CHANGE CHANNEL NAME + LINK HERE
+  // Source / link collection sites:
+  // Sangeet Bangla: https://famelack.com/tv/in/pfMWY9QNez7wE8
+  // 9XM: https://famelack.com/tv/in/7CIRMQUnuxC7MK
+  // Ananda TV: https://famelack.com/tv/bd/7ynlCad0Y1lkdJ
+// Clicking a channel will open its link directly.
+// =========================================================
+const CHANNELS = [
+  {
+    // Source: https://famelack.com/tv/bd/7ynlCad0Y1lkdJ
+    name:"Ananda TV",
+    category:"MOVIES",
+    logo:"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23fff%22%2F%3E%0A%3Crect%20x%3D%227%22%20y%3D%227%22%20width%3D%2286%22%20height%3D%2286%22%20rx%3D%2212%22%20fill%3D%22%23f2b900%22%2F%3E%0A%3Ccircle%20cx%3D%2250%22%20cy%3D%2248%22%20r%3D%2229%22%20fill%3D%22%23fff%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2258%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2234%22%20font-weight%3D%22900%22%20fill%3D%22%23d71920%22%3EAT%3C%2Ftext%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2284%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%229%22%20font-weight%3D%22700%22%20fill%3D%22%23111%22%3EANANDA%20TV%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
+    url:"https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/anandatv.stream/live-orgin/anandatv.stream/chunks.m3u8?nimblesessionid=1242352079"
+  },
+
+  {
+    // Source: https://famelack.com/tv/in/pfMWY9QNez7wE8
+    name:"Sangeet Bangla",
+    category:"MUSIC",
+    logo:"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23e31b23%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2261%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2258%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20fill%3D%22%23fff%22%3ES%3C%2Ftext%3E%0A%3Crect%20y%3D%2272%22%20width%3D%22100%22%20height%3D%2228%22%20fill%3D%22%23080808%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2291%22%20text-anchor%3D%22middle%22%20font-family%3D%22Noto%20Sans%20Bengali%2CArial%2Csans-serif%22%20font-size%3D%2210%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%3E%E0%A6%B8%E0%A6%99%E0%A7%8D%E0%A6%97%E0%A7%80%E0%A6%A4%20%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
+    url:"https://mumt05.tangotv.in/87NeALx2SANGEETBANGLA/index.m3u8"
+  },
+  {
+    // Source: https://famelack.com/tv/in/7CIRMQUnuxC7MK
+    name:"9XM",
+    category:"MUSIC",
+    logo:"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23f4bd18%22%2F%3E%0A%3Ctext%20x%3D%228%22%20y%3D%2262%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2242%22%20font-weight%3D%22900%22%20fill%3D%22%23050505%22%3E9X%3C%2Ftext%3E%0A%3Ccircle%20cx%3D%2276%22%20cy%3D%2250%22%20r%3D%2227%22%20fill%3D%22%23ed1b2f%22%2F%3E%0A%3Ctext%20x%3D%2276%22%20y%3D%2264%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2239%22%20font-weight%3D%22900%22%20fill%3D%22%23fff%22%3EM%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
+    url:"https://wiselp.wiseplayout.com/9XM/HD720/HD720.m3u8"
+  }
+];
+
+
+
+const channelsEl = document.getElementById("channels");
+let selectedCategory = "ALL";
+
+function renderChannels(){
+  const list = CHANNELS.filter(channel =>
+    selectedCategory === "ALL" ||
+    String(channel.category || "").toUpperCase() === selectedCategory
+  );
+
+  if(!list.length){
+    channelsEl.innerHTML = `
+      <div class="empty-category">
+        <div class="empty-category-title">NO CHANNELS</div>
+        <div class="empty-category-text">No channels are available in ${selectedCategory} yet.</div>
+      </div>`;
+    return;
+  }
+
+  channelsEl.innerHTML = list.map(channel => `
+    <a class="channel-card" href="${channel.url}" target="_blank" rel="noopener noreferrer">
+      <div class="channel-logo">
+        ${channel.logo
+          ? `<img src="${channel.logo}" alt="" referrerpolicy="no-referrer">`
+          : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
+      </div>
+      <div class="channel-name">${escapeHtml(channel.name)}</div>
+      <div class="channel-open">OPEN</div>
+    </a>
+  `).join("");
+}
+
+document.querySelectorAll(".category").forEach(button => {
+  button.addEventListener("click", function(){
+    document.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
+    this.classList.add("active");
+    selectedCategory = String(this.dataset.category || "ALL").toUpperCase();
+    renderChannels();
+  });
+});
+
+renderChannels();
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, ch => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[ch]));
+}
+
+
+function updateClock(){
+  document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
+    day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true
+  });
+}
+updateClock();
+setInterval(updateClock,1000);
+</script>
+
+
+</body>
+</html>
