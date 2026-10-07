@@ -1229,69 +1229,39 @@ body::after{
 
 .footer{
     display:flex;
-
     align-items:center;
     justify-content:center;
-
-    gap:38px;
-
-    margin-top:
-        clamp(32px,4vw,52px);
-
-    color:#7083a9;
-
-    font-size:12px;
-
-    letter-spacing:3px;
-
-    white-space:nowrap;
+    gap:35px;
+    margin-top:38px;
+    padding:0 0 20px;
+    color:#8292a2;
+    font-size:11px;
+    letter-spacing:4px;
+    animation:fadeUp 1s .55s both;
 }
 
-.footer::before,
-.footer::after{
-    content:"";
-
-    width:
-        clamp(70px,20vw,260px);
-
+.footer-line{
+    width:150px;
     height:1px;
-
-    flex-shrink:0;
+    background:linear-gradient(90deg,transparent,#526b82);
 }
 
-.footer::before{
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            #4d70d7
-        );
-}
-
-.footer::after{
-    background:
-        linear-gradient(
-            90deg,
-            #4d70d7,
-            transparent
-        );
+.footer-line.right{
+    background:linear-gradient(90deg,#526b82,transparent);
 }
 
 .heart{
-    color:#ff4275;
-
-    font-size:17px;
-
+    color:#ff416c;
+    font-size:14px;
     display:inline-block;
-
-    animation:
-        heartBeat 1.7s ease-in-out infinite;
+    animation:heartbeat 1.8s infinite;
 }
 
-@keyframes heartBeat{
-    50%{
-        transform:scale(1.22);
-    }
+@keyframes heartbeat{
+    0%,100%{transform:scale(1)}
+    10%{transform:scale(1.22)}
+    20%{transform:scale(1)}
+    30%{transform:scale(1.12)}
 }
 
 
@@ -1796,17 +1766,9 @@ body::after{
 <!-- ================= FOOTER ================= -->
 
 <footer class="footer">
-
-    <span></span>
-
-    <div>
-        Built with
-        <span class="heart">♥</span>
-        by Soikat
-    </div>
-
-    <span></span>
-
+    <span class="footer-line"></span>
+    <div>Built with <span class="heart">♥</span> by Soikat</div>
+    <span class="footer-line right"></span>
 </footer>
 
 
