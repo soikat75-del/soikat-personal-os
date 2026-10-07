@@ -144,6 +144,14 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 .reminder-badge{color:#68b0ff!important}
 .reminder-display{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
 .reminder-fixed{color:#68b0ff}.reminder-live{color:#b99cff}.reminder-sep{color:#4f678b}
+.editor{position:relative}
+.mobile-editor-close{display:none}
+@media(max-width:600px){
+  .editor{display:none;position:fixed;inset:0;z-index:120;width:100%;height:100dvh;min-height:0;margin:0;padding:10px;border-radius:0;overflow:auto;background:#030914}
+  .editor.mobile-open{display:block}
+  .mobile-editor-close{display:flex;position:absolute;right:10px;top:10px;width:36px;height:36px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#b8c9e3;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:5}
+}
+
 @media(max-width:600px){
   .toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;min-width:0;overflow:hidden}
   .current-date-box{flex:1 1 auto;min-width:0;width:auto;margin-top:8px;overflow:hidden}
@@ -195,13 +203,22 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   .sidebar,.editor{height:auto;min-height:0}.notes{height:auto;max-height:360px}.editor{min-height:650px}
 }
 @media(max-width:600px){
-  .topbar{height:60px;grid-template-columns:auto 1fr auto;gap:8px;padding:0 12px}
-  .logo{animation:logoPulse 2.4s ease-in-out infinite;font-size:15px;letter-spacing:2px;text-align:center;white-space:nowrap}
-  .back{font-size:10px;white-space:nowrap}.clock{font-size:9px;white-space:nowrap}
-  .app{width:94%;padding-top:12px;gap:12px}
+  .topbar{height:48px;grid-template-columns:auto minmax(0,1fr) auto;gap:5px;padding:0 8px}
+  .logo{font-size:10px;letter-spacing:1.2px;text-align:center;white-space:nowrap;min-width:0}
+  .back{font-size:9px;white-space:nowrap}.clock{display:block;justify-self:end;font-size:8px;white-space:nowrap;color:#8fa8d0;min-width:max-content}
+  .app{width:94%;padding-top:6px;gap:10px}
   .sidebar{padding:12px;border-radius:14px}
-  .new-btn{height:52px;font-size:16px}.new-btn span{font-size:25px;margin-right:10px}
-  .search{margin-top:10px;height:48px}.search-icon{font-size:21px;margin-right:9px}
+
+  .mobile-actions{display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:7px;align-items:center}
+  .mobile-actions .new-btn{height:46px;font-size:15px;margin:0}
+  .mobile-actions .new-btn span{font-size:22px;margin-right:8px}
+  .mobile-actions .search-toggle,.mobile-actions .archive-btn{width:42px;height:42px;margin:0;padding:0;border:1px solid #29476e;border-radius:10px;background:#071525;color:#9ab1d4;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .mobile-actions .search-toggle{font-size:22px}
+  .mobile-actions .archive-btn{font-size:18px}
+  .mobile-actions .archive-btn span{display:none}
+  .search{display:none;margin:8px 0 0;height:42px}
+  .search.mobile-search-open{display:flex}
+  .search-icon{font-size:21px;margin-right:9px}
   .search input{font-size:14px}
   .archive-btn{height:38px;font-size:11px}.notes{margin-top:12px;max-height:260px}
   .note{padding:13px 14px 12px 25px;margin-bottom:8px}
@@ -264,17 +281,21 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 
 <main class="app">
   <aside class="panel sidebar">
-    <button class="new-btn" onclick="newNote()"><span>＋</span>New Note</button>
-    <div class="search">
+    <div class="mobile-actions">
+      <button class="new-btn" type="button" onclick="newNote()"><span>＋</span>New Note</button>
+      <button class="search-toggle" type="button" aria-label="Search" onclick="toggleMobileSearch()">⌕</button>
+      <button type="button" class="archive-btn" onclick="openArchive()"><span>🗃️ &nbsp; Archive</span>🗃️</button>
+    </div>
+    <div class="search" id="searchBox">
       <div class="search-icon">⌕</div>
       <input id="search" type="text" placeholder="Search notes..." oninput="renderNotes()">
     </div>
-    <button type="button" class="archive-btn" onclick="openArchive()">🗃️ &nbsp; Archive</button>
 
     <div class="notes" id="notes"></div>
   </aside>
 
-  <section class="panel editor">
+  <section class="panel editor" id="editorPanel">
+    <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
     <input id="title" class="title-input" placeholder="Note title" oninput="saveCurrent()">
     <div class="toolbar">
       <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
@@ -427,6 +448,9 @@ function renderNotes(){
 function selectNote(id){
   draftMode=false;
   currentId=id;
+  if(window.innerWidth<=600){
+    document.getElementById("editorPanel").classList.add("mobile-open");
+  }
   render();
 }
 function current(){return notes.find(n=>n.id===currentId)}
@@ -508,6 +532,9 @@ function saveCurrent(){
 function newNote(){
   draftMode=true;
   currentId=null;
+  if(window.innerWidth<=600){
+    document.getElementById("editorPanel").classList.add("mobile-open");
+  }
   document.getElementById("title").value="";
   document.getElementById("content").value="";
   document.getElementById("count").textContent="0";
@@ -968,6 +995,26 @@ function checkReminders(){
   if(changed){
     persist();
     renderNotes();
+  }
+}
+
+function toggleMobileSearch(){
+  if(window.innerWidth>600)return;
+  const box=document.getElementById("searchBox");
+  if(!box)return;
+  box.classList.toggle("mobile-search-open");
+  if(box.classList.contains("mobile-search-open")){
+    document.getElementById("search").focus();
+  }
+}
+function closeMobileEditor(){
+  const panel=document.getElementById("editorPanel");
+  if(!panel)return;
+  panel.classList.remove("mobile-open");
+  if(draftMode && !current()){
+    draftMode=false;
+    currentId=notes[0]?.id||null;
+    render();
   }
 }
 
