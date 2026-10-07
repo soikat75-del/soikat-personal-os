@@ -38,10 +38,11 @@ button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
 .stat b{display:block;font-size:16px;margin-top:3px}.stat small{color:var(--muted);font-size:9px}
 
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-top:10px}
-.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.section-title{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px}
 .section-title h2{margin:0;font-size:14px}.tag{font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:4px 6px;border-radius:6px}
 .daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:9px 10px;border-radius:8px;margin-bottom:6px}
 .daybar strong{font-size:12px}.daybar span{font-size:10px;color:var(--muted)}
+.routine-head{gap:10px}.routine-head h2{flex:none}.routine-head{margin-bottom:8px}.routine-head>button{padding:6px 8px;font-size:9px}.routine-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:6px}.routine-nav button{padding:7px 8px;font-size:9px;white-space:nowrap;min-width:0}
 .study-row{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #162238}
 .study-row:last-child{border-bottom:0}
 .check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
@@ -88,9 +89,13 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .cal-day.outside{opacity:.28;cursor:default;background:#070b14}
 .delete-routine{border:1px solid #71313d;color:var(--red);background:#160c10;padding:5px 8px;font-size:8px;border-radius:6px;cursor:pointer}
 .delete-routine:hover{border-color:var(--red)}
+.routine-card{
+  scroll-margin-top:70px;
+}
+
 .routine-item{
   display:grid;
-  grid-template-columns:30px minmax(0,1fr) 30px;
+  grid-template-columns:22px minmax(0,1fr) 30px;
   gap:6px;
   align-items:center;
   padding:9px 0;
@@ -117,8 +122,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
   margin-top:2px;
 }
 .routine-action{
-  width:30px;
-  height:30px;
+  width:22px;
+  height:22px;
   padding:0;
   display:flex;
   align-items:center;
@@ -127,8 +132,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
   flex:none;
 }
 .routine-action svg{
-  width:14px;
-  height:14px;
+  width:11px;
+  height:11px;
   stroke:currentColor;
   fill:none;
   stroke-width:2;
@@ -136,16 +141,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
   stroke-linejoin:round;
 }
 .routine-action.check-action{
-  color:var(--muted);
-}
-.routine-action.check-action:hover{
-  color:var(--green);
-  border-color:#1d7358;
-}
-.routine-action.check-action.done{
-  color:var(--green);
-  background:#0d2a21;
-  border-color:#1d7358;
+  width:16px;
+  height:16px;
+  margin:0;
+  padding:0;
+  accent-color:var(--green);
+  cursor:pointer;
+  border:0;
+  background:transparent;
+  appearance:auto;
+  -webkit-appearance:checkbox;
+  justify-self:start;
 }
 .routine-action.delete-action{
   color:var(--red);
@@ -265,6 +271,9 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 }
 @media(max-width:560px){
   .wrap{padding:76px 12px 18px}
+  .routine-nav{grid-template-columns:1fr 1fr auto;gap:5px}
+  .routine-nav button{font-size:8px;padding:7px 5px}
+
   header{padding:0 10px}
   footer{gap:12px;font-size:8px;letter-spacing:2px}
   .footer-line{width:55px}
@@ -309,10 +318,7 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   <div class="header-range">01 Oct 2026 → 18 Apr 2027</div>
 </header>
 
-<div class="top-actions" style="justify-content:flex-end;margin-bottom:0">
-  <button onclick="openBulk()">SET ROUTINE</button>
-  <button onclick="syncTrustedDate(true)">SYNC DATE</button>
-</div>
+
 
 <section class="hero">
   <div class="card">
@@ -332,8 +338,16 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 <section class="grid">
   <div>
     <div class="card routine-card">
-      <div class="section-title"><h2>ROUTINE</h2><span class="tag" id="selectedDateLabel">TODAY</span></div>
+      <div class="section-title routine-head">
+        <h2>ROUTINE</h2>
+        <button type="button" onclick="openBulk()">SET ROUTINE</button>
+      </div>
       <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
+      <div class="routine-nav">
+        <button type="button" onclick="changeRoutineDay(-1)">PREVIOUS DAY</button>
+        <button type="button" onclick="goToday()">TODAY</button>
+        <button type="button" onclick="changeRoutineDay(1)">NEXT DAY</button>
+      </div>
       <div id="routineList"></div>
     </div>
 
@@ -647,7 +661,7 @@ function getPreviousPendingStudies(current){
 function render(){
   const now=todayDhaka();
 
-  let current=inPlan(now)?cloneDate(now):cloneDate(selected);
+  let current=cloneDate(selected);
   if(current<START) current=cloneDate(START);
   if(current>END) current=cloneDate(END);
 
@@ -694,9 +708,6 @@ function render(){
 
   document.getElementById('routineDate').textContent=fmt(current);
   document.getElementById('routineDay').textContent='DAY '+idx+' / 200';
-  document.getElementById('selectedDateLabel').textContent=
-    iso(current)===iso(now)?'TODAY':'SELECTED';
-
   renderRoutine(current);
   renderWeekly(current);
   renderMonthly(current);
@@ -719,17 +730,14 @@ function renderRoutine(d){
 
     return `<div class="routine-item" data-study-id="${escapeAttr(id)}" data-date="${escapeAttr(k)}">
 
-      <button
-        type="button"
-        class="routine-action check-action ${checked?'done':''}"
+      <input
+        type="checkbox"
+        class="routine-action check-action"
+        ${checked?'checked':''}
         title="${checked?'Undo':'Complete'}"
         aria-label="${checked?'Undo':'Complete'}"
-        onclick="toggleRoutineById(this)"
+        onchange="toggleRoutineById(this)"
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M20 6 9 17l-5-5"></path>
-        </svg>
-      </button>
 
       <div class="routine-content">
         <span class="subject">${escapeHtml(x.subject||'Study')}</span>
@@ -1012,6 +1020,7 @@ function renderCalendar(){
 
   for(let n=1;n<=days;n++){
     const d=new Date(y,m,n), k=iso(d);
+    if(!inPlan(d)) continue;
     const st=calendarStatus(d);
 
     let cls='cal-day '+st.type;
@@ -1065,17 +1074,52 @@ function selectDate(k){
     }
 
     if(routineCard){
-      routineCard.scrollIntoView({
-        behavior:'smooth',
-        block:'start'
+      const top=routineCard.getBoundingClientRect().top + window.scrollY - 66;
+      window.scrollTo({
+        top:Math.max(0,top),
+        behavior:'smooth'
       });
     }
   });
 }
 
 function changeMonth(n){
-  calCursor.setMonth(calCursor.getMonth()+n);
+  const next=new Date(calCursor.getFullYear(),calCursor.getMonth()+n,1);
+  const startMonth=new Date(START.getFullYear(),START.getMonth(),1);
+  const endMonth=new Date(END.getFullYear(),END.getMonth(),1);
+
+  if(next<startMonth || next>endMonth) return;
+
+  calCursor=next;
   renderCalendar();
+}
+
+function changeRoutineDay(delta){
+  let next=cloneDate(selected);
+  next.setDate(next.getDate()+delta);
+
+  if(next<START || next>END) return;
+
+  selected=next;
+  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+  render();
+}
+
+function goToday(){
+  const now=todayDhaka();
+  const today=inPlan(now)?cloneDate(now):cloneDate(START);
+
+  selected=today;
+  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
+  render();
+
+  requestAnimationFrame(()=>{
+    const routineCard=document.querySelector('.routine-card');
+    if(routineCard){
+      const top=routineCard.getBoundingClientRect().top + window.scrollY - 66;
+      window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+    }
+  });
 }
 
 function openBulk(){
