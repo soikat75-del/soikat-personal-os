@@ -14,10 +14,11 @@
 body{margin:0;background:radial-gradient(circle at 20% 0%,#101a30 0,#070b14 38%,#050810 100%);
 font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
 .wrap{max-width:1200px;margin:auto;padding:14px 16px 24px}
-header{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;min-height:40px;border-bottom:1px solid var(--line);padding:0 0 7px;margin-bottom:10px}
+header{position:fixed;top:0;left:0;right:0;z-index:1000;height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid rgba(105,140,180,.18);padding:0 16px;background:rgba(7,11,20,.58);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .header-back{justify-self:start;color:var(--muted);text-decoration:none;font-size:10px;white-space:nowrap;transition:.15s}
 .header-back:hover{color:var(--text)}
-.header-brand{justify-self:center;font-weight:800;letter-spacing:.13em;font-size:12px;white-space:nowrap}
+.header-brand{justify-self:center;font-weight:800;letter-spacing:.13em;font-size:12px;white-space:nowrap;background:linear-gradient(110deg,#ffffff 10%,#9ebcff 45%,#ffffff 60%,#758fff 80%,#ffffff 100%);background-size:250% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 6s linear infinite}
+@keyframes logoShine{to{background-position:250% center}}
 .header-range{justify-self:end;color:var(--muted);font-size:9px;white-space:nowrap}
 .brand{font-weight:800;letter-spacing:.16em;font-size:15px}.brand span{color:var(--blue)}
 .sub{font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:5px}
@@ -177,7 +178,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .bulk{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;min-height:240px;resize:vertical}
 .note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:8px}
-footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
+footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-top:38px;padding:0 0 20px;color:#8292a2;font-size:11px;letter-spacing:4px}.footer-line{width:150px;height:1px;background:linear-gradient(90deg,transparent,#526b82)}.footer-line.right{background:linear-gradient(90deg,#526b82,transparent)}.heart{color:#ff416c;font-size:14px;display:inline-block;animation:heartbeat 1.8s infinite}@keyframes heartbeat{0%,100%{transform:scale(1)}10%{transform:scale(1.22)}20%{transform:scale(1)}30%{transform:scale(1.12)}}
 /* ===== FIXED DESKTOP LAYOUT =====
    The four main work areas keep their positions.
    Their internal content scrolls instead of pushing the
@@ -251,6 +252,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 }
 
 @media(max-width:850px){
+  body{padding-top:58px}
   .hero,.grid{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
   .routine-card,.calendar-card,.weekly-card,.monthly-card{height:auto}
@@ -262,7 +264,10 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
   .header-brand{font-size:12px;letter-spacing:.12em}
 }
 @media(max-width:560px){
-  .wrap{padding:18px 12px}
+  .wrap{padding:76px 12px 18px}
+  header{padding:0 10px}
+  footer{gap:12px;font-size:8px;letter-spacing:2px}
+  .footer-line{width:55px}
   .stats{grid-template-columns:1fr 1fr}
   .cal-day{min-height:48px;padding:5px}
   .status{display:none}
@@ -297,7 +302,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" style="padding-top:72px">
 <header>
   <a class="header-back" href="javascript:history.back()">← Back</a>
   <div class="header-brand">SOIKAT · 200D PLAN</div>
@@ -358,7 +363,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;margin-top:30px}
 
 
 
-<footer>Built with love by Soikat</footer>
+<footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by Soikat</div><span class="footer-line right"></span></footer>
 </div>
 
 <div class="modal" id="bulkModal">
