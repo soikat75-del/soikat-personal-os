@@ -501,14 +501,16 @@ footer{
   -webkit-backdrop-filter:blur(10px);
   z-index:20;
 }
-.admin-head-titlebar{display:flex;align-items:center;gap:14px;min-width:0}
+.admin-head-titlebar{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
 .admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
 .admin-content{padding:20px;padding-top:12px}
 .admin-toolbar{
   display:flex;
   align-items:center;
-  gap:8px;
+  justify-content:flex-end;
+  gap:5px;
+  margin-left:auto;
 }
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
@@ -550,12 +552,12 @@ footer{
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
-.admin-emoji{width:42px;height:42px;border:1px solid #31547e;border-radius:9px;background:#326fe7;color:#fff;font-size:19px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
+.admin-emoji{width:28px;height:28px;border:1px solid #31547e;border-radius:7px;background:#326fe7;color:#fff;font-size:14px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-category option:last-child{color:#78a8ff;font-weight:700}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
-.admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
+.admin-open-link{height:42px;width:40px;flex:0 0 40px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
 .admin-open-link:hover{background:#102845;border-color:#5e8fff}
 .admin-fields input:focus{border-color:#5e8fff}
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
@@ -635,12 +637,12 @@ footer{
   .category-manager,.confirm-box{width:100%}
 }
 @media(max-width:700px){
-  .admin-head-titlebar{gap:8px}
+  .admin-head-titlebar{gap:6px}
   .admin-head h2{font-size:14px}
-  .admin-emoji{width:36px;height:36px;font-size:17px}
+  .admin-emoji{width:28px;height:28px;font-size:13px}
   .admin-title{grid-template-columns:minmax(0,1fr) 130px 42px 30px}
   .admin-fields{grid-template-columns:1fr}
-  .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}
+  .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:flex-end;margin-left:auto}.admin-btn{flex:1}
 }
 </style>
 
@@ -1157,6 +1159,7 @@ function renderAdmin(){
         </div>
         <div class="admin-field-wrap">
           <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
+          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button>
         </div>
         <div class="admin-field-wrap">
           <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
@@ -1276,7 +1279,7 @@ async function checkAllStreams(){
   try{
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
     const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
-    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
+    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)}, 60000);
     if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
     (data.results||[]).forEach((r,i)=>{
       const el=document.getElementById("status-"+i);
@@ -1296,6 +1299,25 @@ function setAdminMessage(text,type){
   el.textContent=text;
   el.className="admin-message "+type;
 }
+
+// Show a clear message at the bottom for every field change.
+document.addEventListener("change", function(event){
+  const el=event.target;
+  if(!el || !el.closest("#adminRows")) return;
+  const key=el.dataset && el.dataset.key;
+  const labels={
+    name:"Channel name",
+    category:"Category",
+    status:"Status",
+    logo:"Logo URL",
+    url:"Stream URL",
+    source:"Source URL"
+  };
+  if(key && labels[key]){
+    const value=String(el.value || "").trim();
+    setAdminMessage(`${labels[key]} changed${value ? ". Click 💾 to save." : "."}`,"ok");
+  }
+});
 
 document.addEventListener("DOMContentLoaded", function(){
   const saveBtn = document.getElementById("saveChannels");
@@ -1377,7 +1399,7 @@ setInterval(updateClock,1000);
     </div>
     <div class="admin-content">
       <div id="adminRows"></div>
-      <div id="adminMessage" class="admin-message">Saved successfully.</div>
+      <div id="adminMessage" class="admin-message ok">Ready. Make a change.</div>
     </div>
   </div>
 </div>
