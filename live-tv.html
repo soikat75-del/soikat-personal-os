@@ -1303,7 +1303,7 @@ function addStream(){
   const rows = document.querySelectorAll("#adminRows .admin-row");
   const last = rows[rows.length-1];
   if(last){
-    last.scrollIntoView({behavior:"smooth",block:"nearest"});
+    last.scrollIntoView({behavior:"auto",block:"nearest"});
     const name = last.querySelector('[data-key="name"]');
     if(name){ name.focus(); name.select(); }
   }
@@ -1353,6 +1353,26 @@ function scheduleFailedSaveRetry(){
   },autoSaveRetryDelay);
 }
 
+async function saveCentralPost(payload){
+  if(!API_URL || API_URL.includes("PASTE_YOUR_")){
+    throw new Error("API URL not configured");
+  }
+
+  /*
+    Use POST instead of GET/JSONP for the full dataset.
+    The Apps Script doPost() accepts JSON in postData.contents.
+    text/plain avoids a browser CORS preflight while still sending
+    the complete JSON body.
+  */
+  await fetch(API_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=UTF-8"},
+    body:JSON.stringify(payload),
+    keepalive:true
+  });
+}
+
 async function autoSaveNow(){
   if(autoSaveBusy){
     return;
@@ -1364,18 +1384,16 @@ async function autoSaveNow(){
 
   try{
     const next=collectAdminChannels();
-    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
 
-    // One request saves the complete current state.
-    const data=await apiJsonp({
+    // Full state goes through POST, so 30/50/100+ streams are not
+    // limited by the URL length of a GET request.
+    await saveCentralPost({
       action:"save",
-      data:JSON.stringify({channels:next,categories:CATEGORIES})
-    },5000,1);
+      channels:next,
+      categories:CATEGORIES
+    });
 
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
-
-    CHANNELS=Array.isArray(data.channels)?data.channels:next;
-    CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
+    CHANNELS=next;
     saveLocalCentralData();
 
     try{
@@ -1385,8 +1403,6 @@ async function autoSaveNow(){
     renderChannels();
     renderPublicCategories();
 
-    // Do NOT re-render the admin form here. Re-rendering replaces the input
-    // elements and makes the field being edited look like it refreshed/cleared.
     autoSaveFailed=false;
     autoSaveRetryDelay=3000;
     clearTimeout(autoSaveRetryTimer);
@@ -1396,13 +1412,9 @@ async function autoSaveNow(){
   }catch(e){
     console.warn("Auto save failed. Will retry automatically:",e);
 
-    // Keep the exact text in the boxes and keep a local draft.
     saveDraftLocally();
-
     autoSaveFailed=true;
     setAdminSaveStatus("❌","error");
-
-    // IMPORTANT: automatically try again until the central save succeeds.
     scheduleFailedSaveRetry();
 
   }finally{
@@ -1420,7 +1432,7 @@ function scheduleAutoSave(){
   autoSaveRetryTimer=null;
   autoSaveFailed=false;
 
-  autoSaveTimer=setTimeout(autoSaveNow,180);
+  autoSaveTimer=setTimeout(autoSaveNow,500);
 }
 
 function setAdminSaveStatus(text,type="saved"){
