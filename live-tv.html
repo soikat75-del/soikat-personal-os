@@ -506,8 +506,6 @@ footer{
 .admin-move{height:42px;width:34px;min-width:34px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .admin-move:hover:not(:disabled){background:#102845;border-color:#5e8fff;color:#fff}
 .admin-move:disabled{opacity:.28;cursor:not-allowed}
-.admin-status-toggle{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0;display:inline-grid;place-items:center}
-.admin-status-toggle:hover{background:#4a1b22;border-color:#a33d48}
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
@@ -661,7 +659,6 @@ footer{
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
 .channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
-.channel-open.channel-dead{color:#ff5f67;opacity:1;font-weight:800}
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
 </style>
@@ -730,32 +727,36 @@ let selectedCategory = "ALL";
 let channelSearchTerm = "";
 let CENTRAL_DATA_READY = false;
 
-function apiJsonp(params, timeoutMs=12000){
+function apiJsonp(params, timeoutMs=18000, retries=3){
   return new Promise((resolve,reject)=>{
-    const callbackName = "soikatApi_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    let finished = false;
-    const timer = setTimeout(()=>finish(new Error("Request timed out")), timeoutMs);
-
-    function cleanup(){
-      clearTimeout(timer);
-      try{ delete window[callbackName]; }catch(e){}
-      script.remove();
+    let attempt=0;
+    function tryRequest(){
+      attempt++;
+      const callbackName="soikatApi_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+      const script=document.createElement("script"); let finished=false;
+      const timer=setTimeout(()=>finish(new Error("Request timed out")),timeoutMs);
+      function cleanup(){clearTimeout(timer);try{delete window[callbackName]}catch(e){}script.remove()}
+      function finish(err,data){if(finished)return;finished=true;cleanup();if(!err){resolve(data);return}if(attempt<retries)setTimeout(tryRequest,700*attempt);else reject(err)}
+      window[callbackName]=data=>finish(null,data);
+      script.onerror=()=>finish(new Error("Failed to reach Google Apps Script"));
+      const query=new URLSearchParams({...params,callback:callbackName,t:Date.now()});
+      script.src=API_URL+"?"+query.toString(); document.head.appendChild(script);
     }
-    function finish(err,data){
-      if(finished) return;
-      finished=true;
-      cleanup();
-      err ? reject(err) : resolve(data);
-    }
-
-    window[callbackName] = data => finish(null,data);
-    script.onerror = () => finish(new Error("Failed to reach Google Apps Script"));
-
-    const query = new URLSearchParams({...params, callback:callbackName, t:Date.now()});
-    script.src = API_URL + "?" + query.toString();
-    document.head.appendChild(script);
+    tryRequest();
   });
+}
+
+function saveLocalCentralData(){
+  try{localStorage.setItem("SOIKAT_LIVE_TV_DATA",JSON.stringify({channels:CHANNELS,categories:CATEGORIES,savedAt:Date.now()}))}catch(e){}
+}
+
+function loadLocalCentralData(){
+  try{
+    const raw=localStorage.getItem("SOIKAT_LIVE_TV_DATA"); if(!raw)return false;
+    const d=JSON.parse(raw); if(!d||!Array.isArray(d.channels)||!Array.isArray(d.categories))return false;
+    CHANNELS=d.channels; CATEGORIES=d.categories; CENTRAL_DATA_READY=true;
+    renderPublicCategories(); renderChannels(); return true;
+  }catch(e){return false}
 }
 
 function renderPublicCategories(){
@@ -787,23 +788,25 @@ async function loadCentralData(){
     return;
   }
 
+  const cached=loadLocalCentralData();
+
   try{
-    // One request only: categories + channels arrive together.
     const data = await apiJsonp({action:"get"});
-
-    if(!data || !data.ok) {
-      throw new Error((data && data.error) || "Central data unavailable");
-    }
-
-    CATEGORIES = Array.isArray(data.categories) ? data.categories : [];
-    CHANNELS = Array.isArray(data.channels) ? data.channels : [];
-    CENTRAL_DATA_READY = true;
-
-    renderPublicCategories();
-    renderChannels();
+    if(!data || !data.ok) throw new Error((data&&data.error)||"Central data unavailable");
+    CATEGORIES=Array.isArray(data.categories)?data.categories:[];
+    CHANNELS=Array.isArray(data.channels)?data.channels:[];
+    CENTRAL_DATA_READY=true;
+    saveLocalCentralData();
+    renderPublicCategories(); renderChannels();
   }catch(error){
     console.error("Central Live TV data unavailable:", error);
-    CENTRAL_DATA_READY = false;
+    CENTRAL_DATA_READY = cached;
+
+    if(cached){
+      renderPublicCategories();
+      renderChannels();
+      return;
+    }
 
     if(wrap){
       wrap.innerHTML = `<div class="category-loading">Unable to load categories</div>`;
@@ -835,9 +838,7 @@ function renderChannels(){
     return;
   }
 
-  channelsEl.innerHTML = list.map(channel => {
-    const isDead = String(channel.status || "LIVE").toUpperCase() === "DEAD";
-    return `
+  channelsEl.innerHTML = list.map(channel => `
     <a class="channel-card" href="${escapeAttr(channel.url)}" target="_blank" rel="noopener noreferrer">
       <div class="channel-logo">
         ${channel.logo
@@ -845,9 +846,9 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-open ${isDead ? "channel-dead" : ""}">${isDead ? "DEAD" : "OPEN"}</div>
+      <div class="channel-open">OPEN</div>
     </a>
-  `;}).join("");
+  `).join("");
 }
 
 function escapeHtml(value){
@@ -1034,22 +1035,9 @@ async function confirmYes(){
     if(btn){ btn.disabled=false; btn.textContent='DELETE'; }
   }
 }
-function toggleAdminStatus(index){
-  if(!CHANNELS[index]) return;
-  const current = String(CHANNELS[index].status || "LIVE").toUpperCase();
-  CHANNELS[index].status = current === "DEAD" ? "LIVE" : "DEAD";
-  renderAdmin();
-  setAdminMessage(
-    CHANNELS[index].status === "DEAD"
-      ? "Marked as DEAD. Click 💾 to save."
-      : "Marked as LIVE. Click 💾 to save.",
-    "ok"
-  );
-}
-
 function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
-    <div class="admin-row" data-row="${i}" data-status="${escapeAttr(String(c.status || "LIVE").toUpperCase()==="DEAD" ? "DEAD" : "LIVE")}">
+    <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <div class="admin-left">
           <span class="admin-serial">${i + 1}</span>
@@ -1059,10 +1047,10 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
-          <button type="button" class="admin-status-toggle" onclick="toggleAdminStatus(${i})" title="Toggle LIVE / DEAD" aria-label="Toggle LIVE / DEAD">🔴</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
+          <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
         </div>
       </div>
       <div class="admin-fields">
@@ -1116,13 +1104,12 @@ function collectAdminChannels(){
   return Array.from(document.querySelectorAll("#adminRows .admin-row")).map(row=>{
     const obj = {};
     row.querySelectorAll("[data-key]").forEach(el=>{ obj[el.dataset.key] = el.value.trim(); });
-    obj.status = String(row.dataset.status || "LIVE").toUpperCase() === "DEAD" ? "DEAD" : "LIVE";
     return obj;
   });
 }
 
 function addStream(){
-  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:"",status:"LIVE"});
+  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:""});
   renderAdmin();
   const rows = document.querySelectorAll("#adminRows .admin-row");
   const last = rows[rows.length-1];
@@ -1172,7 +1159,7 @@ async function saveChannels(){
     }
     for(let i=0;i<next.length;i++){
       const c=next[i];
-      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||"",status:c.status||"LIVE"});
+      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||""});
       if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
     }
     CHANNELS=next;
@@ -1182,6 +1169,29 @@ async function saveChannels(){
   }catch(e){ setAdminMessage("Save failed: "+e.message,"err"); }
   btn.disabled=false;
   btn.textContent="💾";
+}
+
+async function checkAllStreams(){
+  const btn=document.getElementById("checkAll");
+  btn.disabled=true;
+  btn.textContent="⏳";
+  document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
+  try{
+    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
+    const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
+    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
+    if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
+    (data.results||[]).forEach((r,i)=>{
+      const el=document.getElementById("status-"+i);
+      if(el){ el.textContent=r.ok?"🟢":"🔴"; el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE"); }
+    });
+    setAdminMessage("All streams checked.","ok");
+  }catch(e){
+    document.querySelectorAll(".admin-status").forEach(x=>x.textContent="⚪");
+    setAdminMessage("Check failed: "+e.message,"err");
+  }
+  btn.disabled=false;
+  btn.textContent="🔃";
 }
 
 function setAdminMessage(text,type){
