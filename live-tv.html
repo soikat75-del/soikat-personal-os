@@ -1053,29 +1053,33 @@ function closeCreateCategoryModal(){
   document.getElementById("categoryCreateModal").classList.remove("show");
 }
 
-async function createCategoryFromModal(){
+function createCategoryFromModal(){
   const input=document.getElementById("newCategoryInput");
-  const name=String(input.value||"").trim().replace(/\s+/g," ");
-  if(!name){ input.focus(); return; }
+  const name=String(input.value||"").trim().replace(/\\s+/g," ");
+  if(!name){
+    input.focus();
+    return;
+  }
+
   const category=name.toUpperCase();
+
   if(CATEGORIES.some(c=>String(c).toUpperCase()===category)){
     input.focus();
     input.select();
     setAdminMessage("Category already exists.","err");
     return;
   }
-  try{
-    const data=await apiJsonp({action:"createcategory",category});
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Category creation failed");
-    CATEGORIES=Array.isArray(data.categories)?data.categories:[...CATEGORIES,category];
-    renderCategoryManager();
-    renderAdmin();
-    renderPublicCategories();
-    closeCreateCategoryModal();
-    setAdminMessage("Category created: "+category,"ok");
-  }catch(e){
-    setAdminMessage("Category creation failed: "+e.message,"err");
-  }
+
+  // Create locally first. Do not depend on a separate Apps Script
+  // createCategory action; the normal save action persists categories.
+  CATEGORIES.push(category);
+
+  renderCategoryManager();
+  renderAdmin();
+  renderPublicCategories();
+  closeCreateCategoryModal();
+  setAdminMessage("Category created: "+category,"ok");
+  scheduleAutoSave();
 }
 
 function requestDeleteCategory(category){
