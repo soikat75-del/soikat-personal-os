@@ -403,6 +403,17 @@ footer{
   }
 }
 
+/* PUBLIC CHANNEL SEARCH */
+.channel-search{display:flex;align-items:center;gap:8px;margin:18px 24px 0;max-width:520px}
+.channel-search-wrap{position:relative;flex:1}
+.channel-search input{width:100%;height:40px;padding:0 42px 0 14px;border:1px solid #1c3555;border-radius:10px;background:#071321;color:#dfe9fa;outline:none;font-size:12px}
+.channel-search input::placeholder{color:#607895}
+.channel-search input:focus{border-color:#315f94;box-shadow:0 0 0 3px rgba(49,95,148,.12)}
+.channel-search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#6f88aa;font-size:14px;pointer-events:none}
+.channel-search-clear{height:40px;min-width:40px;border:1px solid #1c3555;border-radius:10px;background:#071321;color:#8ea6c7;cursor:pointer}
+.channel-search-clear:hover{border-color:#315f94;color:#fff}
+@media(max-width:700px){.channel-search{margin:14px 14px 0}}
+
 .categories{
   display:flex;
   align-items:center;
@@ -573,6 +584,40 @@ footer{
   padding:0 6px;
   white-space:nowrap;
 }
+.admin-serial{
+  width:26px;
+  min-width:26px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border:1px solid #223f64;
+  border-radius:8px;
+  background:#071525;
+  color:#8fa8d0;
+  font-size:11px;
+  font-weight:800;
+}
+.admin-move{
+  width:30px;
+  height:30px;
+  padding:0;
+  border:1px solid #294a70;
+  border-radius:8px;
+  background:#071525;
+  color:#9db8dc;
+  cursor:pointer;
+  font-size:11px;
+  font-weight:800;
+}
+.admin-move:hover:not(:disabled){
+  border-color:#3d96ff;
+  color:#fff;
+  background:#0a1c31;
+}
+.admin-move:disabled{
+  opacity:.3;
+  cursor:not-allowed;
+}
 </style>
 
 <style>
@@ -624,6 +669,14 @@ footer{
 
 <div class="categories" id="categories"></div>
 
+<div class="channel-search">
+  <div class="channel-search-wrap">
+    <input id="channelSearch" type="search" placeholder="Search channels..." autocomplete="off" aria-label="Search channels">
+    <span class="channel-search-icon">⌕</span>
+  </div>
+  <button type="button" class="channel-search-clear" id="clearChannelSearch" title="Clear search" aria-label="Clear search">✕</button>
+</div>
+
 <main>
   <section class="channels-section">
     <div class="section-title">CHANNELS</div>
@@ -665,6 +718,7 @@ const DEFAULT_CHANNELS = [{"name":"Ananda TV","category":"MOVIES","logo":"data:i
 let CHANNELS = [];
 const channelsEl = document.getElementById("channels");
 let selectedCategory = "ALL";
+let channelSearchTerm = "";
 let CENTRAL_DATA_READY = false;
 
 function apiJsonp(params, timeoutMs=12000){
@@ -754,16 +808,20 @@ async function loadCentralData(){
 }
 
 function renderChannels(){
-  const list = CHANNELS.filter(channel =>
-    selectedCategory === "ALL" ||
-    String(channel.category || "").toUpperCase() === selectedCategory
-  );
+  const term = channelSearchTerm.trim().toLowerCase();
+  const list = CHANNELS.filter(channel => {
+    const categoryMatch = selectedCategory === "ALL" ||
+      String(channel.category || "").toUpperCase() === selectedCategory;
+    const searchMatch = !term ||
+      String(channel.name || "").toLowerCase().includes(term);
+    return categoryMatch && searchMatch;
+  });
 
   if(!list.length){
     channelsEl.innerHTML = `
       <div class="empty-category">
         <div class="empty-category-title">NO CHANNELS</div>
-        <div class="empty-category-text">No channels are available in ${selectedCategory} yet.</div>
+        <div class="empty-category-text">${term ? `No channels found for “${escapeHtml(channelSearchTerm)}”.` : `No channels are available in ${selectedCategory} yet.`}</div>
       </div>`;
     return;
   }
@@ -787,6 +845,36 @@ function escapeHtml(value){
   }[ch]));
 }
 function escapeAttr(value){ return escapeHtml(value); }
+
+const channelSearchInput = document.getElementById("channelSearch");
+const clearChannelSearch = document.getElementById("clearChannelSearch");
+if(channelSearchInput){
+  channelSearchInput.addEventListener("input", () => {
+    channelSearchTerm = channelSearchInput.value;
+    renderChannels();
+  });
+}
+if(clearChannelSearch){
+  clearChannelSearch.addEventListener("click", () => {
+    channelSearchTerm = "";
+    if(channelSearchInput) channelSearchInput.value = "";
+    renderChannels();
+    channelSearchInput?.focus();
+  });
+}
+// Press / anywhere on the user page to focus channel search.
+document.addEventListener("keydown", e => {
+  if(e.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA" && document.activeElement?.tagName !== "SELECT"){
+    e.preventDefault();
+    channelSearchInput?.focus();
+  }
+  if(e.key === "Escape" && document.activeElement === channelSearchInput){
+    channelSearchInput.value = "";
+    channelSearchTerm = "";
+    renderChannels();
+    channelSearchInput.blur();
+  }
+});
 
 /* ================= ADMIN PANEL / CATEGORIES ================= */
 let CATEGORIES = ["SPORTS","NEWS","MUSIC","MOVIES","INFOTAINMENT"];
@@ -939,10 +1027,13 @@ function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
+        <span class="admin-serial">${i + 1}</span>
         <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
         <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="this.dataset.previous=this.value">
           ${categoryOptions(c.category)}
         </select>
+        <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
+        <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
         <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
         <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
       </div>
@@ -952,7 +1043,6 @@ function renderAdmin(){
         </div>
         <div class="admin-field-wrap">
           <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
-          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button>
         </div>
         <div class="admin-field-wrap">
           <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
@@ -962,6 +1052,17 @@ function renderAdmin(){
     </div>`).join("");
 
   document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels. Click ADD NEW STREAM.</div>`;
+}
+
+function moveChannel(index, direction){
+  const nextIndex = index + direction;
+  if(index < 0 || nextIndex < 0 || nextIndex >= CHANNELS.length) return;
+
+  const next = CHANNELS.slice();
+  [next[index], next[nextIndex]] = [next[nextIndex], next[index]];
+  CHANNELS = next;
+  renderAdmin();
+  setAdminMessage(`Channel moved to serial ${nextIndex + 1}. Click 💾 to save.`, "ok");
 }
 
 function openAdminLink(button,key){
