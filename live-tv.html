@@ -858,13 +858,19 @@ function renderPublicCategories(){
   const wrap = document.getElementById("categories");
   if(!wrap) return;
   const active = selectedCategory || "ALL";
-  wrap.innerHTML = `<button class="category ${active==="ALL"?"active":""}" data-category="ALL">ALL</button>` +
-    CATEGORIES.map(cat => `<button class="category ${active===String(cat).toUpperCase()?"active":""}" data-category="${escapeAttr(String(cat).toUpperCase())}">${escapeHtml(String(cat).toUpperCase())}</button>`).join("");
+  const allCount = CHANNELS.length;
+  wrap.innerHTML = `<button class="category ${active==="ALL"?"active":""}" data-category="ALL">ALL${active==="ALL" ? ` (${allCount})` : ""}</button>` +
+    CATEGORIES.map(cat => {
+      const name = String(cat).toUpperCase();
+      const count = CHANNELS.filter(ch => String(ch.category || "").toUpperCase() === name).length;
+      return `<button class="category ${active===name?"active":""}" data-category="${escapeAttr(name)}">${escapeHtml(name)}${active===name ? ` (${count})` : ""}</button>`;
+    }).join("");
   wrap.querySelectorAll(".category").forEach(button => {
     button.addEventListener("click", function(){
       wrap.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
       this.classList.add("active");
       selectedCategory = String(this.dataset.category || "ALL").toUpperCase();
+      renderPublicCategories();
       renderChannels();
     });
   });
