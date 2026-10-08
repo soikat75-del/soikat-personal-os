@@ -516,7 +516,6 @@ footer{
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}.admin-status-toggle{width:30px;height:30px;border:0;border-radius:8px;background:transparent;font-size:17px;cursor:pointer;padding:0;display:grid;place-items:center}.admin-status-toggle:hover{background:#102845}
 .admin-emoji{width:28px;height:28px;border:0;border-radius:0;background:transparent;color:#9db8dc;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji:hover{color:#fff}.admin-emoji.secondary{background:transparent}.admin-emoji:disabled{opacity:.55;cursor:wait}
-.admin-category option:last-child{color:#78a8ff;font-weight:700}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
@@ -1274,13 +1273,25 @@ function openAdminLink(button,key){
 }
 
 function collectAdminChannels(){
-  return Array.from(document.querySelectorAll("#adminRows .admin-row")).map(row=>{
-    const obj = {};
-    row.querySelectorAll("[data-key]").forEach(el=>{ obj[el.dataset.key] = el.value.trim(); });
-    const idx=Number(row.dataset.row);
-    obj.status=(CHANNELS[idx]?.status||"LIVE").toUpperCase()==="DEAD"?"DEAD":"LIVE";
-    return obj;
+  // Keep ALL existing channels. Only update the rows currently visible
+  // in the selected category filter.
+  const next = CHANNELS.map(channel => ({...channel}));
+
+  document.querySelectorAll("#adminRows .admin-row").forEach(row=>{
+    const idx = Number(row.dataset.row);
+    if(idx < 0 || idx >= next.length) return;
+
+    row.querySelectorAll("[data-key]").forEach(el=>{
+      next[idx][el.dataset.key] = el.value.trim();
+    });
+
+    next[idx].status =
+      (CHANNELS[idx]?.status || "LIVE").toUpperCase() === "DEAD"
+        ? "DEAD"
+        : "LIVE";
   });
+
+  return next;
 }
 
 function addStream(){
