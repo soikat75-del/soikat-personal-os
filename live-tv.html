@@ -509,7 +509,7 @@ footer{
 .admin-move:disabled{opacity:.28;cursor:not-allowed}
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
-.admin-delete:hover{background:#4a1b22;border-color:#a33d48}.admin-status-toggle{width:30px;height:30px;border:0;border-radius:8px;background:transparent;font-size:17px;cursor:pointer;padding:0;display:grid;place-items:center}.admin-status-toggle:hover{background:#102845}
+.admin-delete:hover{background:#4a1b22;border-color:#a33d48}
 .admin-emoji{width:28px;height:28px;border:0;border-radius:0;background:transparent;color:#9db8dc;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji:hover{color:#fff}.admin-emoji.secondary{background:transparent}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-category option:last-child{color:#78a8ff;font-weight:700}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
@@ -659,9 +659,43 @@ footer{
 .channel-logo img{width:100%;height:100%;object-fit:contain}
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
-.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}.channel-open.channel-dead{color:#ff5b67;opacity:1;font-weight:800}
+.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
+
+/* Fast initial data fetch + compact mobile admin layout */
+@media (max-width:700px){
+  .admin-content{padding:10px}
+  .admin-head{padding:12px}
+  .admin-row{padding:7px;border-radius:10px;margin-bottom:7px}
+  .admin-title{gap:5px;margin-bottom:6px;align-items:center}
+  .admin-left{gap:5px;min-width:0}
+  .admin-right{gap:4px}
+  .admin-serial{width:24px;min-width:24px;height:34px;border-radius:7px;font-size:10px}
+  .admin-name{height:34px;min-width:0;width:auto;padding:0 8px;font-size:12px}
+  .admin-category{height:34px;width:105px;min-width:105px;padding:0 7px;font-size:10px}
+  .admin-move{width:28px;min-width:28px;height:34px;border-radius:7px;font-size:10px}
+  .admin-delete{width:34px;min-width:34px;height:34px;border-radius:7px;font-size:15px}
+  .admin-status-toggle{width:30px!important;min-width:30px!important;height:34px!important;border-radius:7px!important;font-size:14px!important}
+  .admin-fields{grid-template-columns:1fr;gap:5px}
+  .admin-field-wrap{gap:5px}
+  .admin-field-wrap input{height:34px;padding:0 8px;font-size:10px}
+  .admin-open-link{width:34px;flex:0 0 34px;height:34px;border-radius:7px;font-size:14px}
+}
+@media (max-width:390px){
+  .admin-row{padding:6px}
+  .admin-title{gap:3px}
+  .admin-left{gap:3px}
+  .admin-right{gap:3px}
+  .admin-serial{width:22px;min-width:22px;height:32px;font-size:9px}
+  .admin-name{height:32px;font-size:11px;padding:0 6px}
+  .admin-category{height:32px;width:88px;min-width:88px;font-size:9px;padding:0 5px}
+  .admin-move{width:26px;min-width:26px;height:32px}
+  .admin-delete{width:31px;min-width:31px;height:32px;font-size:14px}
+  .admin-status-toggle{width:28px!important;min-width:28px!important;height:32px!important;font-size:13px!important}
+  .admin-field-wrap input{height:32px;font-size:9.5px}
+  .admin-open-link{width:32px;flex-basis:32px;height:32px}
+}
 </style>
 </head>
 
@@ -728,7 +762,7 @@ let selectedCategory = "ALL";
 let channelSearchTerm = "";
 let CENTRAL_DATA_READY = false;
 
-function apiJsonp(params, timeoutMs=5000, retries=1){
+function apiJsonp(params, timeoutMs=7000, retries=1){
   return new Promise((resolve,reject)=>{
     let attempt=0;
     function tryRequest(){
@@ -792,7 +826,7 @@ async function loadCentralData(){
   const cached=loadLocalCentralData();
 
   try{
-    const data = await apiJsonp({action:"get"});
+    const data = await apiJsonp({action:"get"},7000,1);
     if(!data || !data.ok) throw new Error((data&&data.error)||"Central data unavailable");
     CATEGORIES=Array.isArray(data.categories)?data.categories:[];
     CHANNELS=Array.isArray(data.channels)?data.channels:[];
@@ -847,7 +881,7 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-open ${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"channel-dead":""}">${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"DEAD":"OPEN"}</div>
+      <div class="channel-open">OPEN</div>
     </a>
   `).join("");
 }
@@ -986,33 +1020,30 @@ function requestDeleteCategory(category){
   );
 }
 
-function deleteCategory(category){
+async function deleteCategory(category){
   const target=String(category).trim().toUpperCase();
-  const previous=CATEGORIES.slice();
-
-  // Instant local delete — UI does not wait for Apps Script.
-  CATEGORIES=CATEGORIES.filter(c=>String(c).toUpperCase()!==target);
-  renderCategoryManager();
-  renderAdmin();
-  renderPublicCategories();
-  closeConfirm();
-  setAdminSaveStatus("🔄");
-
-  // Save in the background. Streams are NOT deleted or changed.
-  apiJsonp({action:"deleteCategory",category:target},5000,1).then(data=>{
+  try{
+    const data=await apiJsonp({
+      action:"deleteCategory",
+      category:target
+    });
     if(!data || !data.ok) throw new Error((data&&data.error)||"Category deletion failed");
-    CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
-    saveLocalCentralData();
-    renderCategoryManager();
-    renderPublicCategories();
-    setAdminSaveStatus("✅");
-  }).catch(e=>{
-    CATEGORIES=previous;
+
+    // IMPORTANT: deleting a category does NOT delete or modify any stream.
+    // The streams keep their category value, so they remain visible in ALL.
+    CATEGORIES=Array.isArray(data.categories)
+      ? data.categories
+      : CATEGORIES.filter(c=>String(c).toUpperCase()!==target);
+
     renderCategoryManager();
     renderAdmin();
     renderPublicCategories();
-    setAdminSaveStatus("❌","error");
-  });
+    closeConfirm();
+    setAdminMessage("Category deleted: "+category,"ok");
+  }catch(e){
+    setAdminMessage("Category deletion failed: "+e.message,"err");
+    closeConfirm();
+  }
 }
 
 let confirmAction=null;
@@ -1051,7 +1082,6 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
-          <button type="button" class="admin-status-toggle" onclick="toggleAdminStatus(${i})" title="${String(c.status || "LIVE").toUpperCase()==="DEAD"?"LIVE":"DEAD"}" aria-label="Toggle live/dead">${String(c.status || "LIVE").toUpperCase()==="DEAD"?"🔴":"🟢"}</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
@@ -1073,14 +1103,6 @@ function renderAdmin(){
     </div>`).join("");
 
   document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels. Click ADD NEW STREAM.</div>`;
-}
-
-function toggleAdminStatus(index){
-  if(index<0 || index>=CHANNELS.length) return;
-  CHANNELS[index].status = String(CHANNELS[index].status||"LIVE").toUpperCase()==="DEAD" ? "LIVE" : "DEAD";
-  renderAdmin();
-  renderChannels();
-  scheduleAutoSave();
 }
 
 function moveChannel(index, direction){
@@ -1117,14 +1139,12 @@ function collectAdminChannels(){
   return Array.from(document.querySelectorAll("#adminRows .admin-row")).map(row=>{
     const obj = {};
     row.querySelectorAll("[data-key]").forEach(el=>{ obj[el.dataset.key] = el.value.trim(); });
-    const idx=Number(row.dataset.row);
-    obj.status=(CHANNELS[idx]?.status||"LIVE").toUpperCase()==="DEAD"?"DEAD":"LIVE";
     return obj;
   });
 }
 
 function addStream(){
-  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:"",status:"LIVE"});
+  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:""});
   renderAdmin();
   const rows = document.querySelectorAll("#adminRows .admin-row");
   const last = rows[rows.length-1];
@@ -1157,40 +1177,93 @@ function deleteStream(index){
 let autoSaveTimer=null;
 let autoSaveBusy=false;
 
-async function autoSaveNow(){
-  if(autoSaveBusy) return;
-  autoSaveBusy=true;
-  setAdminSaveStatus("🔄");
+let autoSaveTimer=null;
+let autoSaveBusy=false;
+let autoSaveQueued=false;
+let autoSaveRetryTimer=null;
+let lastSavedSnapshot="";
+
+function getAdminSnapshot(){
   try{
     const next=collectAdminChannels();
+    return JSON.stringify({channels:next,categories:CATEGORIES});
+  }catch(e){ return ""; }
+}
+
+function saveDraftLocally(){
+  try{
+    const next=collectAdminChannels();
+    localStorage.setItem("SOIKAT_LIVE_TV_DRAFT",JSON.stringify({channels:next,categories:CATEGORIES,savedAt:Date.now()}));
+  }catch(e){}
+}
+
+async function autoSaveNow(){
+  if(autoSaveBusy){ autoSaveQueued=true; return; }
+  autoSaveBusy=true;
+  autoSaveQueued=false;
+  setAdminSaveStatus("🔄");
+  saveDraftLocally();
+
+  try{
+    const snapshot=getAdminSnapshot();
+    if(!snapshot) throw new Error("Nothing to save");
+    if(snapshot===lastSavedSnapshot){
+      setAdminSaveStatus("✅");
+      return;
+    }
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
 
-    // One request saves the complete current state.
-    const data=await apiJsonp({
-      action:"save",
-      data:JSON.stringify({channels:next,categories:CATEGORIES})
-    },5000,1);
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
+    // Save through POST so large logo/data URLs do not have to fit inside
+    // a JSONP/GET URL. The Apps Script endpoint already supports POST save.
+    const response=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=UTF-8"},
+      body:JSON.stringify({action:"save",data:snapshot}),
+      redirect:"follow"
+    });
 
-    CHANNELS=Array.isArray(data.channels)?data.channels:next;
-    CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
+    // no-cors/redirected Apps Script responses can be opaque; try to read JSON
+    // when available, otherwise verify by fetching the central data afterward.
+    let data=null;
+    try{ data=await response.json(); }catch(e){}
+    if(data && data.ok===false) throw new Error(data.error||"Save failed");
+
+    // Confirm the central copy. This also avoids showing ✅ for a failed POST.
+    const check=await apiJsonp({action:"get"},12000,2);
+    if(!check || !check.ok) throw new Error((check&&check.error)||"Save verification failed");
+
+    CHANNELS=Array.isArray(check.channels)?check.channels:collectAdminChannels();
+    CATEGORIES=Array.isArray(check.categories)?check.categories:CATEGORIES;
+    lastSavedSnapshot=JSON.stringify({channels:CHANNELS,categories:CATEGORIES});
     saveLocalCentralData();
     renderChannels();
     renderPublicCategories();
-    // Do NOT re-render the admin form here. Re-rendering replaces the input
-    // elements and makes the field being edited look like it refreshed/cleared.
     setAdminSaveStatus("✅");
   }catch(e){
+    console.warn("Auto save failed:",e);
     setAdminSaveStatus("❌","error");
+    // Keep the exact draft in localStorage. Never re-render/clear the boxes.
+    // Retry once after a short delay if another edit is not already queued.
+    clearTimeout(autoSaveRetryTimer);
+    autoSaveRetryTimer=setTimeout(()=>{
+      if(!autoSaveBusy) autoSaveNow();
+      else autoSaveQueued=true;
+    },1800);
   }finally{
     autoSaveBusy=false;
+    if(autoSaveQueued){
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer=setTimeout(autoSaveNow,350);
+    }
   }
 }
 
 function scheduleAutoSave(){
   clearTimeout(autoSaveTimer);
+  clearTimeout(autoSaveRetryTimer);
+  saveDraftLocally();
   setAdminSaveStatus("🔄");
-  autoSaveTimer=setTimeout(autoSaveNow,180);
+  autoSaveTimer=setTimeout(autoSaveNow,700);
 }
 
 function setAdminSaveStatus(text,type="saved"){
@@ -1201,25 +1274,13 @@ function setAdminSaveStatus(text,type="saved"){
 }
 
 function setAdminMessage(text,type){
-  if(/saving automatically|saved automatically|new stream added|stream deleted|channel moved/i.test(String(text))){
+  if(type === "ok" || /saving automatically|saved automatically/i.test(String(text))){
     setAdminSaveStatus("🔄");
     return;
   }
   const el=document.getElementById("adminMessage");
   if(el){el.textContent=text;el.className="admin-message "+type;}
 }
-
-document.addEventListener("input", function(e){
-  if(e.target.closest && e.target.closest("#adminRows")){
-    scheduleAutoSave();
-  }
-});
-
-document.addEventListener("change", function(e){
-  if(e.target.closest && e.target.closest("#adminRows")){
-    scheduleAutoSave();
-  }
-});
 
 function updateClock(){
   document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
