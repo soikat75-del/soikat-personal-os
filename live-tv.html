@@ -1333,6 +1333,8 @@ let autoSaveBusy=false;
 let autoSaveRetryTimer=null;
 let autoSaveRetryDelay=3000;
 let autoSaveFailed=false;
+let adminEditVersion=0;
+let draftSaveTimer=null;
 
 function saveDraftLocally(){
   try{
@@ -1343,6 +1345,14 @@ function saveDraftLocally(){
       savedAt:Date.now()
     }));
   }catch(e){}
+}
+
+function scheduleDraftSave(){
+  clearTimeout(draftSaveTimer);
+  draftSaveTimer=setTimeout(()=>{
+    draftSaveTimer=null;
+    saveDraftLocally();
+  },150);
 }
 
 function scheduleFailedSaveRetry(){
@@ -1358,12 +1368,6 @@ async function saveCentralPost(payload){
     throw new Error("API URL not configured");
   }
 
-  /*
-    Use POST instead of GET/JSONP for the full dataset.
-    The Apps Script doPost() accepts JSON in postData.contents.
-    text/plain avoids a browser CORS preflight while still sending
-    the complete JSON body.
-  */
   await fetch(API_URL,{
     method:"POST",
     mode:"no-cors",
@@ -1380,18 +1384,30 @@ async function autoSaveNow(){
 
   autoSaveBusy=true;
   setAdminSaveStatus("🔄");
-  saveDraftLocally();
+
+  // Take one exact snapshot of the form for this save attempt.
+  const versionAtStart=adminEditVersion;
+  const next=collectAdminChannels();
 
   try{
-    const next=collectAdminChannels();
-
-    // Full state goes through POST, so 30/50/100+ streams are not
-    // limited by the URL length of a GET request.
     await saveCentralPost({
       action:"save",
       channels:next,
       categories:CATEGORIES
     });
+
+    /*
+      If the user typed anything while the request was running, this save
+      is already stale. NEVER replace the current data with that old snapshot
+      and NEVER clear the local draft. The newest form values win.
+    */
+    if(versionAtStart!==adminEditVersion){
+      autoSaveBusy=false;
+      setAdminSaveStatus("🔄");
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer=setTimeout(autoSaveNow,100);
+      return;
+    }
 
     CHANNELS=next;
     saveLocalCentralData();
@@ -1412,27 +1428,32 @@ async function autoSaveNow(){
   }catch(e){
     console.warn("Auto save failed. Will retry automatically:",e);
 
+    // Keep the current form values in a local draft. Nothing in the form is
+    // re-rendered or cleared when the central save is slow/fails.
     saveDraftLocally();
     autoSaveFailed=true;
     setAdminSaveStatus("❌","error");
     scheduleFailedSaveRetry();
 
   }finally{
-    autoSaveBusy=false;
+    if(autoSaveBusy) autoSaveBusy=false;
   }
 }
 
 function scheduleAutoSave(){
+  adminEditVersion++;
   clearTimeout(autoSaveTimer);
   setAdminSaveStatus("🔄");
-  saveDraftLocally();
+  scheduleDraftSave();
 
-  // A fresh edit should retry soon instead of waiting for an old retry.
+  // Do not cancel a save that is already in progress. It will detect that
+  // the form changed and immediately save the newest version afterwards.
   clearTimeout(autoSaveRetryTimer);
   autoSaveRetryTimer=null;
   autoSaveFailed=false;
 
-  autoSaveTimer=setTimeout(autoSaveNow,500);
+  // Wait until typing pauses before starting the network request.
+  autoSaveTimer=setTimeout(autoSaveNow,1200);
 }
 
 function setAdminSaveStatus(text,type="saved"){
