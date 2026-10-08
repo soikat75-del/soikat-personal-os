@@ -905,11 +905,17 @@ async function loadCentralData(){
   try{
     const data = await apiJsonp({action:"get"});
     if(!data || !data.ok) throw new Error((data&&data.error)||"Central data unavailable");
-    CATEGORIES=Array.isArray(data.categories)?data.categories:[];
-    CHANNELS=Array.isArray(data.channels)?data.channels:[];
-    CENTRAL_DATA_READY=true;
-    saveLocalCentralData();
-    renderPublicCategories(); renderChannels();
+    // Do not replace active admin data if the user has already started editing.
+    // The admin form is the source of truth once editing has begun.
+    if(adminEditVersion===0){
+      CATEGORIES=Array.isArray(data.categories)?data.categories:[];
+      CHANNELS=Array.isArray(data.channels)?data.channels:[];
+      CENTRAL_DATA_READY=true;
+      saveLocalCentralData();
+      renderPublicCategories(); renderChannels();
+    }else{
+      CENTRAL_DATA_READY=true;
+    }
   }catch(error){
     console.error("Central Live TV data unavailable:", error);
     CENTRAL_DATA_READY = cached;
@@ -1385,9 +1391,10 @@ async function autoSaveNow(){
   autoSaveBusy=true;
   setAdminSaveStatus("🔄");
 
-  // Take one exact snapshot of the form for this save attempt.
+  // CHANNELS is kept in sync on every admin input, so the save snapshot
+  // never has to rebuild data from DOM elements that may be replaced.
   const versionAtStart=adminEditVersion;
-  const next=collectAdminChannels();
+  const next=CHANNELS.map(channel=>({...channel}));
 
   try{
     await saveCentralPost({
@@ -1473,15 +1480,30 @@ function setAdminMessage(text,type){
 }
 
 document.addEventListener("input", function(e){
-  if(e.target.closest && e.target.closest("#adminRows")){
-    scheduleAutoSave();
-  }
+  const row=e.target.closest && e.target.closest("#adminRows .admin-row");
+  if(!row) return;
+
+  const idx=Number(row.dataset.row);
+  const key=e.target.dataset && e.target.dataset.key;
+  if(!Number.isInteger(idx) || idx<0 || idx>=CHANNELS.length || !key) return;
+
+  // Update the in-memory record immediately. This is the important part:
+  // saving never needs to read/rebuild the form later, so typing cannot be
+  // lost when a save is slow.
+  CHANNELS[idx][key]=e.target.value;
+  scheduleAutoSave();
 });
 
 document.addEventListener("change", function(e){
-  if(e.target.closest && e.target.closest("#adminRows")){
-    scheduleAutoSave();
-  }
+  const row=e.target.closest && e.target.closest("#adminRows .admin-row");
+  if(!row) return;
+
+  const idx=Number(row.dataset.row);
+  const key=e.target.dataset && e.target.dataset.key;
+  if(!Number.isInteger(idx) || idx<0 || idx>=CHANNELS.length || !key) return;
+
+  CHANNELS[idx][key]=e.target.value;
+  scheduleAutoSave();
 });
 
 function updateClock(){
