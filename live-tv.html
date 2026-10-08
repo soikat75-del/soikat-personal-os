@@ -509,7 +509,6 @@ footer{
 .admin-move:disabled{opacity:.28;cursor:not-allowed}
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
-.admin-status-toggle{height:42px;width:42px;min-width:42px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;font-size:18px;cursor:pointer;padding:0;display:grid;place-items:center}.admin-status-toggle:hover{background:#102845;border-color:#5e8fff}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
 .admin-emoji{width:28px;height:28px;border:0;border-radius:0;background:transparent;color:#9db8dc;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji:hover{color:#fff}.admin-emoji.secondary{background:transparent}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-category option:last-child{color:#78a8ff;font-weight:700}
@@ -660,7 +659,7 @@ footer{
 .channel-logo img{width:100%;height:100%;object-fit:contain}
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
-.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}.channel-open.channel-dead{color:#ff5f6d;opacity:1;font-weight:800;text-shadow:0 0 10px rgba(255,95,109,.35)}
+.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
 </style>
@@ -848,7 +847,7 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-open ${String(channel.status || "LIVE").toUpperCase() === "DEAD" ? "channel-dead" : ""}">${String(channel.status || "LIVE").toUpperCase() === "DEAD" ? "DEAD" : "OPEN"}</div>
+      <div class="channel-open">OPEN</div>
     </a>
   `).join("");
 }
@@ -1049,7 +1048,6 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
-          <button type="button" class="admin-status-toggle" onclick="toggleChannelStatus(${i})" title="${String(c.status || "LIVE").toUpperCase()==="DEAD" ? "DEAD — click to make LIVE" : "LIVE — click to make DEAD"}" aria-label="Toggle channel status">${String(c.status || "LIVE").toUpperCase()==="DEAD" ? "🔴" : "🟢"}</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
@@ -1107,24 +1105,12 @@ function collectAdminChannels(){
   return Array.from(document.querySelectorAll("#adminRows .admin-row")).map(row=>{
     const obj = {};
     row.querySelectorAll("[data-key]").forEach(el=>{ obj[el.dataset.key] = el.value.trim(); });
-    const index = Number(row.dataset.row);
-    obj.status = String(CHANNELS[index]?.status || "LIVE").toUpperCase() === "DEAD" ? "DEAD" : "LIVE";
     return obj;
   });
 }
 
-function toggleChannelStatus(index){
-  if(index < 0 || index >= CHANNELS.length) return;
-  const current = String(CHANNELS[index].status || "LIVE").toUpperCase();
-  CHANNELS[index].status = current === "DEAD" ? "LIVE" : "DEAD";
-  renderAdmin();
-  renderChannels();
-  setAdminMessage(CHANNELS[index].status === "DEAD" ? "Channel marked DEAD. Saving automatically…" : "Channel marked LIVE. Saving automatically…", "ok");
-  scheduleAutoSave();
-}
-
 function addStream(){
-  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:"",status:"LIVE"});
+  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:""});
   renderAdmin();
   const rows = document.querySelectorAll("#adminRows .admin-row");
   const last = rows[rows.length-1];
@@ -1177,7 +1163,8 @@ async function autoSaveNow(){
     saveLocalCentralData();
     renderChannels();
     renderPublicCategories();
-    renderAdmin();
+    // Do NOT re-render the admin form here. Re-rendering replaces the input
+    // elements and makes the field being edited look like it refreshed/cleared.
     setAdminSaveStatus("✅");
   }catch(e){
     setAdminSaveStatus("❌","error");
