@@ -239,7 +239,7 @@ video{
 }
 
 .channel-name{
-  font-size:13px;
+  min-width:0;  font-size:13px;
   font-weight:700;
   white-space:nowrap;
   overflow:hidden;
@@ -493,14 +493,10 @@ footer{
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
 .admin-content{padding:20px;padding-top:12px}
 .admin-toolbar{
-  position:sticky;
-  top:0;
-  z-index:50;
   display:flex;
-  gap:8px;
   align-items:center;
-  padding:10px 0;
-  background:rgba(10,10,14,.94);
+  gap:8px;
+  background:rgba(7,19,33,.72);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
 }
@@ -698,6 +694,7 @@ footer{
 .section-title{font-size:13px;font-weight:800;letter-spacing:.18em;margin-bottom:14px}
 .channels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .channel-card{
+  position:relative;
   text-decoration:none;color:inherit;
   min-height:76px;padding:14px 16px;
   border:1px solid rgba(255,255,255,.08);
@@ -711,20 +708,28 @@ footer{
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
 .channel-status-note{
-  font-size:10px;
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:2;
+  font-size:9px;
   font-weight:900;
-  letter-spacing:.06em;
+  letter-spacing:.05em;
   white-space:nowrap;
-  padding:5px 8px;
-  border-radius:7px;
-  border:1px solid rgba(76,148,255,.55);
-  background:rgba(76,148,255,.12);
+  padding:2px 6px;
+  border-radius:999px;
+  background:rgba(4,12,22,.38);
+  border:1px solid rgba(105,168,255,.28);
   color:#69a8ff;
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  pointer-events:none;
   animation:livePulse 1.6s ease-in-out infinite;
 }
 .channel-status-note.dead{
-  border-color:rgba(255,75,75,.58);
-  background:rgba(255,75,75,.12);
+  border-color:rgba(255,107,107,.30);
+  background:rgba(30,4,8,.38);
   color:#ff6b6b;
   animation:deadPulse 1.25s ease-in-out infinite;
 }
@@ -1346,16 +1351,18 @@ setInterval(updateClock,1000);
 <div class="admin-modal" id="adminModal" onclick="if(event.target===this)closeAdmin()">
   <div class="admin-panel">
     <div class="admin-head">
-      <h2>SOIKAT · LIVE TV ADMIN</h2>
+      <div class="admin-head-left">
+        <h2>SOIKAT · LIVE TV ADMIN</h2>
+        <div class="admin-toolbar">
+          <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
+          <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
+          <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
+          <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
+        </div>
+      </div>
       <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
     </div>
     <div class="admin-content">
-      <div class="admin-toolbar">
-        <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
-        <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
-        <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
-        <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
-      </div>
       <div id="adminRows"></div>
       <div id="adminMessage" class="admin-message">Saved successfully.</div>
     </div>
