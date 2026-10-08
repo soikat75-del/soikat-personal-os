@@ -490,7 +490,7 @@ footer{
 .admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
 .admin-head{display:flex;align-items:center;justify-content:flex-start;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
 .admin-head h2{margin:0;font-size:17px;letter-spacing:.7px;flex:0 0 auto}
-.admin-save-status{margin-left:auto;margin-right:14px;font-size:12px;color:#7f94b2;min-width:58px;text-align:right;white-space:nowrap}.admin-save-status.saving{color:#f0c674}.admin-save-status.saved{color:#54d99a}.admin-save-status.error{color:#ff7474}
+.admin-save-status{margin-left:0;margin-right:0;font-size:16px;min-width:24px;text-align:center;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center}.admin-save-status.saving{color:#9db8dc;animation:saveSpin .9s linear infinite}.admin-save-status.saved{color:#54d99a}.admin-save-status.error{color:#ff7474}@keyframes saveSpin{to{transform:rotate(360deg)}}
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer;margin-left:0;flex:0 0 auto}
 .admin-content{padding:20px}
 .admin-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0 12px 0 auto;flex:0 0 auto;flex-wrap:nowrap}
@@ -1146,7 +1146,7 @@ let autoSaveBusy=false;
 async function autoSaveNow(){
   if(autoSaveBusy) return;
   autoSaveBusy=true;
-  setAdminSaveStatus("Saving...");
+  setAdminSaveStatus("🔄");
   try{
     const next=collectAdminChannels();
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
@@ -1164,9 +1164,9 @@ async function autoSaveNow(){
     renderChannels();
     renderPublicCategories();
     renderAdmin();
-    setAdminSaveStatus("Saved.");
+    setAdminSaveStatus("✅");
   }catch(e){
-    setAdminSaveStatus("Save failed.","error");
+    setAdminSaveStatus("❌","error");
   }finally{
     autoSaveBusy=false;
   }
@@ -1174,7 +1174,7 @@ async function autoSaveNow(){
 
 function scheduleAutoSave(){
   clearTimeout(autoSaveTimer);
-  setAdminSaveStatus("Saving...");
+  setAdminSaveStatus("🔄");
   autoSaveTimer=setTimeout(autoSaveNow,180);
 }
 
@@ -1270,8 +1270,8 @@ setInterval(updateClock,1000);
       <div class="admin-toolbar">
         <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
         <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
+        <span class="admin-save-status" id="adminSaveStatus" title="Auto save status"></span>
       </div>
-      <span class="admin-save-status" id="adminSaveStatus"></span>
       <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
     </div>
     <div class="admin-content">
