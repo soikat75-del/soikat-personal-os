@@ -503,11 +503,11 @@ footer{
 .admin-serial{width:36px;min-width:36px;height:42px;display:grid;place-items:center;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800}
 .admin-name{height:42px;flex:1 1 auto;min-width:150px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
 .admin-category{height:42px;width:155px;min-width:155px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
-.admin-status-toggle{height:42px;width:42px;min-width:42px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0;font-size:18px;text-align:center;outline:0;cursor:pointer}
-.admin-status-toggle.dead{border-color:#6b2a31;background:#241116}
 .admin-move{height:42px;width:34px;min-width:34px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .admin-move:hover:not(:disabled){background:#102845;border-color:#5e8fff;color:#fff}
 .admin-move:disabled{opacity:.28;cursor:not-allowed}
+.admin-status-toggle{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0;display:inline-grid;place-items:center}
+.admin-status-toggle:hover{background:#4a1b22;border-color:#a33d48}
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
@@ -835,7 +835,9 @@ function renderChannels(){
     return;
   }
 
-  channelsEl.innerHTML = list.map(channel => `
+  channelsEl.innerHTML = list.map(channel => {
+    const isDead = String(channel.status || "LIVE").toUpperCase() === "DEAD";
+    return `
     <a class="channel-card" href="${escapeAttr(channel.url)}" target="_blank" rel="noopener noreferrer">
       <div class="channel-logo">
         ${channel.logo
@@ -843,9 +845,9 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-open ${String(channel.status||"LIVE").toUpperCase()==="DEAD" ? "channel-dead" : ""}">${String(channel.status||"LIVE").toUpperCase()==="DEAD" ? "DEAD" : "OPEN"}</div>
+      <div class="channel-open ${isDead ? "channel-dead" : ""}">${isDead ? "DEAD" : "OPEN"}</div>
     </a>
-  `).join("");
+  `;}).join("");
 }
 
 function escapeHtml(value){
@@ -1033,16 +1035,21 @@ async function confirmYes(){
   }
 }
 function toggleAdminStatus(index){
-  const channel = CHANNELS[index];
-  if(!channel) return;
-  channel.status = String(channel.status||"LIVE").toUpperCase()==="DEAD" ? "LIVE" : "DEAD";
+  if(!CHANNELS[index]) return;
+  const current = String(CHANNELS[index].status || "LIVE").toUpperCase();
+  CHANNELS[index].status = current === "DEAD" ? "LIVE" : "DEAD";
   renderAdmin();
-  setAdminMessage(channel.status==="DEAD" ? "Marked as DEAD. Click 💾 to save." : "Marked as LIVE. Click 💾 to save.","ok");
+  setAdminMessage(
+    CHANNELS[index].status === "DEAD"
+      ? "Marked as DEAD. Click 💾 to save."
+      : "Marked as LIVE. Click 💾 to save.",
+    "ok"
+  );
 }
 
 function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
-    <div class="admin-row" data-row="${i}">
+    <div class="admin-row" data-row="${i}" data-status="${escapeAttr(String(c.status || "LIVE").toUpperCase()==="DEAD" ? "DEAD" : "LIVE")}">
       <div class="admin-title">
         <div class="admin-left">
           <span class="admin-serial">${i + 1}</span>
@@ -1052,7 +1059,7 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
-          <button type="button" class="admin-status-toggle ${String(c.status||"LIVE").toUpperCase()==="DEAD"?"dead":""}" onclick="toggleAdminStatus(${i})" title="Toggle LIVE / DEAD" aria-label="Toggle stream status">🔴</button>
+          <button type="button" class="admin-status-toggle" onclick="toggleAdminStatus(${i})" title="Toggle LIVE / DEAD" aria-label="Toggle LIVE / DEAD">🔴</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
@@ -1109,6 +1116,7 @@ function collectAdminChannels(){
   return Array.from(document.querySelectorAll("#adminRows .admin-row")).map(row=>{
     const obj = {};
     row.querySelectorAll("[data-key]").forEach(el=>{ obj[el.dataset.key] = el.value.trim(); });
+    obj.status = String(row.dataset.status || "LIVE").toUpperCase() === "DEAD" ? "DEAD" : "LIVE";
     return obj;
   });
 }
@@ -1164,7 +1172,7 @@ async function saveChannels(){
     }
     for(let i=0;i<next.length;i++){
       const c=next[i];
-      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||""});
+      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||"",status:c.status||"LIVE"});
       if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
     }
     CHANNELS=next;
@@ -1174,29 +1182,6 @@ async function saveChannels(){
   }catch(e){ setAdminMessage("Save failed: "+e.message,"err"); }
   btn.disabled=false;
   btn.textContent="💾";
-}
-
-async function checkAllStreams(){
-  const btn=document.getElementById("checkAll");
-  btn.disabled=true;
-  btn.textContent="⏳";
-  document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
-  try{
-    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
-    const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
-    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
-    (data.results||[]).forEach((r,i)=>{
-      const el=document.getElementById("status-"+i);
-      if(el){ el.textContent=r.ok?"🟢":"🔴"; el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE"); }
-    });
-    setAdminMessage("All streams checked.","ok");
-  }catch(e){
-    document.querySelectorAll(".admin-status").forEach(x=>x.textContent="⚪");
-    setAdminMessage("Check failed: "+e.message,"err");
-  }
-  btn.disabled=false;
-  btn.textContent="🔃";
 }
 
 function setAdminMessage(text,type){
