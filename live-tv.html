@@ -745,6 +745,17 @@ footer{
   .admin-field-wrap input{height:26px;font-size:9px}
   .admin-open-link{width:25px;min-width:25px;height:25px;font-size:11px}
 }
+
+/* Prevent mobile browser auto-zoom when focusing admin form fields */
+@media (max-width:600px){
+  .admin-name,
+  .admin-category,
+  .admin-field-wrap input,
+  .admin-field-wrap select,
+  .admin-field-wrap textarea{
+    font-size:16px !important;
+  }
+}
 </style>
 </head>
 
