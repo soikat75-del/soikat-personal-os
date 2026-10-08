@@ -1060,7 +1060,10 @@ function closeCategoryManager(){
 function moveCategory(index, direction){
   const nextIndex = index + direction;
   if(index < 0 || nextIndex < 0 || nextIndex >= CATEGORIES.length) return;
-  [CATEGORIES[index], CATEGORIES[nextIndex]] = [CATEGORIES[nextIndex], CATEGORIES[index]];
+
+  [CATEGORIES[index], CATEGORIES[nextIndex]] =
+    [CATEGORIES[nextIndex], CATEGORIES[index]];
+
   renderCategoryManager();
   renderAdmin();
   renderPublicCategories();
