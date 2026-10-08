@@ -239,7 +239,7 @@ video{
 }
 
 .channel-name{
-  min-width:0;  font-size:13px;
+  font-size:13px;
   font-weight:700;
   white-space:nowrap;
   overflow:hidden;
@@ -488,7 +488,20 @@ footer{
 .admin-modal{position:fixed;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
 .admin-modal.show{display:flex}
 .admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
-.admin-head{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:20}
+.admin-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:19px 22px;
+  border-bottom:1px solid #203b5d;
+  position:sticky;
+  top:0;
+  background:rgba(9,24,42,.72);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  z-index:20;
+}
+.admin-head-titlebar{display:flex;align-items:center;gap:14px;min-width:0}
 .admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
 .admin-content{padding:20px;padding-top:12px}
@@ -496,9 +509,6 @@ footer{
   display:flex;
   align-items:center;
   gap:8px;
-  background:rgba(7,19,33,.72);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
 }
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
@@ -559,10 +569,10 @@ footer{
   justify-content:center;
   margin-top:10px;
   padding:7px 10px;
-  background:rgba(10,10,14,.94);
+  background:rgba(9,24,42,.62);
   border-top:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
   text-align:center;
   font-size:12px;
   font-weight:600;
@@ -625,6 +635,9 @@ footer{
   .category-manager,.confirm-box{width:100%}
 }
 @media(max-width:700px){
+  .admin-head-titlebar{gap:8px}
+  .admin-head h2{font-size:14px}
+  .admin-emoji{width:36px;height:36px;font-size:17px}
   .admin-title{grid-template-columns:minmax(0,1fr) 130px 42px 30px}
   .admin-fields{grid-template-columns:1fr}
   .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}
@@ -712,7 +725,7 @@ footer{
   right:10px;
   top:50%;
   transform:translateY(-50%);
-  z-index:2;
+  z-index:3;
   font-size:9px;
   font-weight:900;
   letter-spacing:.05em;
@@ -1351,7 +1364,7 @@ setInterval(updateClock,1000);
 <div class="admin-modal" id="adminModal" onclick="if(event.target===this)closeAdmin()">
   <div class="admin-panel">
     <div class="admin-head">
-      <div class="admin-head-left">
+      <div class="admin-head-titlebar">
         <h2>SOIKAT · LIVE TV ADMIN</h2>
         <div class="admin-toolbar">
           <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
