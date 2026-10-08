@@ -488,11 +488,11 @@ footer{
 .admin-modal{position:fixed;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
 .admin-modal.show{display:flex}
 .admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
-.admin-head{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
-.admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
-.admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
+.admin-head{display:flex;align-items:center;justify-content:flex-start;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
+.admin-head h2{margin:0;font-size:17px;letter-spacing:.7px;flex:0 0 auto}
+.admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer;margin-left:0;flex:0 0 auto}
 .admin-content{padding:20px}
-.admin-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0;flex-wrap:nowrap}
+.admin-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0 12px 0 auto;flex:0 0 auto;flex-wrap:nowrap}
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
 .admin-btn:disabled{opacity:.55;cursor:wait}
@@ -1051,7 +1051,6 @@ function renderAdmin(){
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
-          <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
         </div>
       </div>
       <div class="admin-fields">
@@ -1173,29 +1172,6 @@ async function saveChannels(){
   btn.textContent="💾";
 }
 
-async function checkAllStreams(){
-  const btn=document.getElementById("checkAll");
-  btn.disabled=true;
-  btn.textContent="⏳";
-  document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
-  try{
-    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
-    const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
-    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
-    (data.results||[]).forEach((r,i)=>{
-      const el=document.getElementById("status-"+i);
-      if(el){ el.textContent=r.ok?"🟢":"🔴"; el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE"); }
-    });
-    setAdminMessage("All streams checked.","ok");
-  }catch(e){
-    document.querySelectorAll(".admin-status").forEach(x=>x.textContent="⚪");
-    setAdminMessage("Check failed: "+e.message,"err");
-  }
-  btn.disabled=false;
-  btn.textContent="🔃";
-}
-
 function setAdminMessage(text,type){
   const el=document.getElementById("adminMessage");
   el.textContent=text;
@@ -1204,9 +1180,7 @@ function setAdminMessage(text,type){
 
 document.addEventListener("DOMContentLoaded", function(){
   const saveBtn = document.getElementById("saveChannels");
-  const checkBtn = document.getElementById("checkAll");
   if(saveBtn) saveBtn.addEventListener("click", saveChannels);
-  if(checkBtn) checkBtn.addEventListener("click", checkAllStreams);
 });
 
 function updateClock(){
