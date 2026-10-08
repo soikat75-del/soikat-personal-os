@@ -488,30 +488,11 @@ footer{
 .admin-modal{position:fixed;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
 .admin-modal.show{display:flex}
 .admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
-.admin-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:19px 22px;
-  border-bottom:1px solid #203b5d;
-  position:sticky;
-  top:0;
-  background:rgba(9,24,42,.72);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
-  z-index:20;
-}
-.admin-head-titlebar{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
+.admin-head{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
 .admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
-.admin-content{padding:20px;padding-top:12px}
-.admin-toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:5px;
-  margin-left:auto;
-}
+.admin-content{padding:20px}
+.admin-toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
 .admin-btn:disabled{opacity:.55;cursor:wait}
@@ -522,63 +503,22 @@ footer{
 .admin-serial{width:36px;min-width:36px;height:42px;display:grid;place-items:center;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800}
 .admin-name{height:42px;flex:1 1 auto;min-width:150px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
 .admin-category{height:42px;width:155px;min-width:155px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
-.admin-channel-status{
-  height:42px;
-  width:52px;
-  min-width:52px;
-  border:1px solid #29476e;
-  border-radius:9px;
-  padding:0;
-  text-align:center;
-  font-size:16px;
-  font-weight:800;
-  outline:0;
-  background:#0b1b2e;
-  color:#dfeaff;
-}
-.admin-channel-status.is-live{
-  color:#b8d3ff;
-  border-color:#31547e;
-  background:#0b1b2e;
-}
-.admin-channel-status.is-dead{
-  color:#ffb1b1;
-  border-color:#6b3a43;
-  background:#1b1015;
-}
 .admin-move{height:42px;width:34px;min-width:34px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .admin-move:hover:not(:disabled){background:#102845;border-color:#5e8fff;color:#fff}
 .admin-move:disabled{opacity:.28;cursor:not-allowed}
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
-.admin-emoji{width:28px;height:28px;border:1px solid #31547e;border-radius:7px;background:#326fe7;color:#fff;font-size:14px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
+.admin-emoji{width:42px;height:42px;border:1px solid #31547e;border-radius:9px;background:#326fe7;color:#fff;font-size:19px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-category option:last-child{color:#78a8ff;font-weight:700}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
-.admin-open-link{height:42px;width:40px;flex:0 0 40px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
+.admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
 .admin-open-link:hover{background:#102845;border-color:#5e8fff}
 .admin-fields input:focus{border-color:#5e8fff}
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
-.admin-message{
-  position:sticky;
-  bottom:0;
-  z-index:50;
-  min-height:28px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin-top:10px;
-  padding:7px 10px;
-  background:rgba(9,24,42,.62);
-  border-top:1px solid rgba(255,255,255,.08);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  text-align:center;
-  font-size:12px;
-  font-weight:600;
-}
+.admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
  .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
@@ -637,12 +577,9 @@ footer{
   .category-manager,.confirm-box{width:100%}
 }
 @media(max-width:700px){
-  .admin-head-titlebar{gap:6px}
-  .admin-head h2{font-size:14px}
-  .admin-emoji{width:28px;height:28px;font-size:13px}
   .admin-title{grid-template-columns:minmax(0,1fr) 130px 42px 30px}
   .admin-fields{grid-template-columns:1fr}
-  .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:flex-end;margin-left:auto}.admin-btn{flex:1}
+  .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}
 }
 </style>
 
@@ -709,7 +646,6 @@ footer{
 .section-title{font-size:13px;font-weight:800;letter-spacing:.18em;margin-bottom:14px}
 .channels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .channel-card{
-  position:relative;
   text-decoration:none;color:inherit;
   min-height:76px;padding:14px 16px;
   border:1px solid rgba(255,255,255,.08);
@@ -722,42 +658,7 @@ footer{
 .channel-logo img{width:100%;height:100%;object-fit:contain}
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
-.channel-status-note{
-  position:absolute;
-  right:10px;
-  top:50%;
-  transform:translateY(-50%);
-  z-index:3;
-  font-size:9px;
-  font-weight:900;
-  letter-spacing:.05em;
-  white-space:nowrap;
-  padding:2px 6px;
-  border-radius:999px;
-  background:rgba(4,12,22,.38);
-  border:1px solid rgba(105,168,255,.28);
-  color:#69a8ff;
-  backdrop-filter:blur(3px);
-  -webkit-backdrop-filter:blur(3px);
-  pointer-events:none;
-  animation:livePulse 1.6s ease-in-out infinite;
-}
-.channel-status-note.dead{
-  border-color:rgba(255,107,107,.30);
-  background:rgba(30,4,8,.38);
-  color:#ff6b6b;
-  animation:deadPulse 1.25s ease-in-out infinite;
-}
-@keyframes livePulse{
-  0%,100%{box-shadow:0 0 0 rgba(76,148,255,0);opacity:.78}
-  50%{box-shadow:0 0 11px rgba(76,148,255,.72);opacity:1}
-}
-@keyframes deadPulse{
-  0%,100%{box-shadow:0 0 0 rgba(255,75,75,0);opacity:.78}
-  50%{box-shadow:0 0 12px rgba(255,75,75,.78);opacity:1}
-}
 .channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
-
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
 </style>
@@ -939,9 +840,6 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-status-note ${String(channel.status || "LIVE").toUpperCase()==="DEAD" ? "dead" : "live"}">
-        ${String(channel.status || "LIVE").toUpperCase()==="DEAD" ? "🔴 DEAD" : "🟢 LIVE"}
-      </div>
       <div class="channel-open">OPEN</div>
     </a>
   `).join("");
@@ -1143,10 +1041,6 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
-          <select class="admin-channel-status ${String(c.status || "LIVE").toUpperCase()==="DEAD" ? "is-dead" : "is-live"}" data-key="status" onchange="this.className='admin-channel-status '+(this.value==='DEAD'?'is-dead':'is-live')">
-            <option value="LIVE" ${String(c.status || "LIVE").toUpperCase()==="LIVE" ? "selected" : ""}>🟢</option>
-            <option value="DEAD" ${String(c.status || "LIVE").toUpperCase()==="DEAD" ? "selected" : ""}>🔴</option>
-          </select>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
@@ -1159,7 +1053,6 @@ function renderAdmin(){
         </div>
         <div class="admin-field-wrap">
           <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
-          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button>
         </div>
         <div class="admin-field-wrap">
           <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
@@ -1209,7 +1102,7 @@ function collectAdminChannels(){
 }
 
 function addStream(){
-  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:"",status:"LIVE"});
+  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:""});
   renderAdmin();
   const rows = document.querySelectorAll("#adminRows .admin-row");
   const last = rows[rows.length-1];
@@ -1259,7 +1152,7 @@ async function saveChannels(){
     }
     for(let i=0;i<next.length;i++){
       const c=next[i];
-      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||"",status:c.status||"LIVE"});
+      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||""});
       if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
     }
     CHANNELS=next;
@@ -1279,7 +1172,7 @@ async function checkAllStreams(){
   try{
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
     const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
-    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)}, 60000);
+    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
     if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
     (data.results||[]).forEach((r,i)=>{
       const el=document.getElementById("status-"+i);
@@ -1299,25 +1192,6 @@ function setAdminMessage(text,type){
   el.textContent=text;
   el.className="admin-message "+type;
 }
-
-// Show a clear message at the bottom for every field change.
-document.addEventListener("change", function(event){
-  const el=event.target;
-  if(!el || !el.closest("#adminRows")) return;
-  const key=el.dataset && el.dataset.key;
-  const labels={
-    name:"Channel name",
-    category:"Category",
-    status:"Status",
-    logo:"Logo URL",
-    url:"Stream URL",
-    source:"Source URL"
-  };
-  if(key && labels[key]){
-    const value=String(el.value || "").trim();
-    setAdminMessage(`${labels[key]} changed${value ? ". Click 💾 to save." : "."}`,"ok");
-  }
-});
 
 document.addEventListener("DOMContentLoaded", function(){
   const saveBtn = document.getElementById("saveChannels");
@@ -1386,20 +1260,18 @@ setInterval(updateClock,1000);
 <div class="admin-modal" id="adminModal" onclick="if(event.target===this)closeAdmin()">
   <div class="admin-panel">
     <div class="admin-head">
-      <div class="admin-head-titlebar">
-        <h2>SOIKAT · LIVE TV ADMIN</h2>
-        <div class="admin-toolbar">
-          <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
-          <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
-          <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
-          <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
-        </div>
-      </div>
+      <h2>SOIKAT · LIVE TV ADMIN</h2>
       <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
     </div>
     <div class="admin-content">
+      <div class="admin-toolbar">
+        <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
+        <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
+        <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
+        <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
+      </div>
       <div id="adminRows"></div>
-      <div id="adminMessage" class="admin-message ok">Ready. Make a change.</div>
+      <div id="adminMessage" class="admin-message"></div>
     </div>
   </div>
 </div>
