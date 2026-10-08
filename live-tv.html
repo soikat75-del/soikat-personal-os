@@ -1037,7 +1037,7 @@ function categoryOptions(selected){
 function renderCategoryManager(){
   const list=document.getElementById("categoryList");
   if(!list)return;
-  list.innerHTML=CATEGORIES.map(cat=>`
+  list.innerHTML=CATEGORIES.map((cat,index)=>`
     <div class="category-item">
       <span>${escapeHtml(cat)}</span>
       <div style="display:flex;align-items:center;gap:5px">
