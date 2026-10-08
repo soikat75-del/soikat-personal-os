@@ -493,18 +493,16 @@ footer{
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
 .admin-content{padding:20px;padding-top:12px}
 .admin-toolbar{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-  margin:0 -20px 14px;
-  padding:10px 20px;
-  flex-wrap:wrap;
   position:sticky;
   top:0;
-  z-index:15;
-  background:#09182a;
-  border-bottom:1px solid #203b5d;
-  box-shadow:0 8px 18px rgba(0,0,0,.18);
+  z-index:50;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  padding:10px 0;
+  background:rgba(10,10,14,.94);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 }
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
@@ -556,16 +554,22 @@ footer{
 .admin-fields input:focus{border-color:#5e8fff}
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
 .admin-message{
-  min-height:18px;
-  margin:10px -20px -20px;
-  padding:10px 20px;
-  font-size:12px;
   position:sticky;
   bottom:0;
-  z-index:14;
-  background:#09182a;
-  border-top:1px solid #203b5d;
-  box-shadow:0 -8px 18px rgba(0,0,0,.18);
+  z-index:50;
+  min-height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:10px;
+  padding:7px 10px;
+  background:rgba(10,10,14,.94);
+  border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  text-align:center;
+  font-size:12px;
+  font-weight:600;
 }
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
  .admin-empty{padding:30px;text-align:center;color:#7189ac}
@@ -1353,7 +1357,7 @@ setInterval(updateClock,1000);
         <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
       </div>
       <div id="adminRows"></div>
-      <div id="adminMessage" class="admin-message"></div>
+      <div id="adminMessage" class="admin-message">Saved successfully.</div>
     </div>
   </div>
 </div>
