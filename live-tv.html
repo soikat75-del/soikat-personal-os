@@ -1065,7 +1065,7 @@ async function createCategoryFromModal(){
     return;
   }
   try{
-    const data=await apiJsonp({action:"createCategory",category});
+    const data=await apiJsonp({action:"createcategory",category});
     if(!data || !data.ok) throw new Error((data&&data.error)||"Category creation failed");
     CATEGORIES=Array.isArray(data.categories)?data.categories:[...CATEGORIES,category];
     renderCategoryManager();
