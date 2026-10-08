@@ -533,6 +533,32 @@ footer{
  .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
 
+/* ================= CATEGORY SORT ================= */
+.category-sort-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.78);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  padding:18px;z-index:10002;
+}
+.category-sort-modal.show{display:flex}
+.category-sort-box{
+  width:min(500px,100%);background:#09182a;border:1px solid #29476e;
+  border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.72);overflow:hidden;
+}
+.category-sort-row{
+  min-height:46px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:0 10px 0 14px;border:1px solid #203b5d;
+  border-radius:10px;background:#0b1b2e;color:#dfeaff;font-size:13px;font-weight:700;
+}
+.category-sort-actions{display:flex;align-items:center;gap:5px}
+.category-sort-btn{
+  width:34px;height:34px;border:1px solid #31547e;border-radius:8px;
+  background:#0b1b2e;color:#9fc0ff;font-size:13px;font-weight:800;cursor:pointer;
+}
+.category-sort-btn:hover{background:#102845;border-color:#5e8fff;color:#fff}
+.category-sort-btn:disabled{opacity:.3;cursor:not-allowed}
+@media(max-width:700px){.category-sort-box{width:100%}}
+
 /* ================= CATEGORY MANAGER ================= */
 .category-manager-modal,.confirm-modal{
   position:fixed;inset:0;background:rgba(0,0,0,.78);
@@ -1053,6 +1079,36 @@ function closeCategoryManager(){
   document.getElementById("categoryManagerModal").classList.remove("show");
 }
 
+function openCategorySort(){
+  renderCategorySort();
+  document.getElementById("categorySortModal").classList.add("show");
+}
+function closeCategorySort(){
+  document.getElementById("categorySortModal").classList.remove("show");
+}
+function renderCategorySort(){
+  const list=document.getElementById("categorySortList");
+  if(!list)return;
+  list.innerHTML=CATEGORIES.map((cat,index)=>`
+    <div class="category-sort-row">
+      <span>${escapeHtml(cat)}</span>
+      <div class="category-sort-actions">
+        <button type="button" class="category-sort-btn" onclick="moveCategory(${index},-1)" ${index===0?"disabled":""} title="Move up">▲</button>
+        <button type="button" class="category-sort-btn" onclick="moveCategory(${index},1)" ${index===CATEGORIES.length-1?"disabled":""} title="Move down">▼</button>
+      </div>
+    </div>
+  `).join("") || `<div class="admin-empty">No categories.</div>`;
+}
+function moveCategory(index, direction){
+  const nextIndex=index+direction;
+  if(index<0 || nextIndex<0 || nextIndex>=CATEGORIES.length)return;
+  [CATEGORIES[index],CATEGORIES[nextIndex]]=[CATEGORIES[nextIndex],CATEGORIES[index]];
+  renderCategorySort();
+  renderAdmin();
+  renderPublicCategories();
+  scheduleAutoSave();
+}
+
 function openCreateCategoryModal(){
   document.getElementById("newCategoryInput").value="";
   document.getElementById("categoryCreateModal").classList.add("show");
@@ -1431,6 +1487,18 @@ setInterval(updateClock,1000);
 
 
 
+<div id="categorySortModal" class="category-sort-modal">
+  <div class="category-sort-box">
+    <div class="category-manager-head">
+      <h3>SORT CATEGORIES</h3>
+      <button type="button" class="admin-close" onclick="closeCategorySort()">×</button>
+    </div>
+    <div class="category-manager-body">
+      <div id="categorySortList" class="category-list"></div>
+    </div>
+  </div>
+</div>
+
 <div class="category-manager-modal" id="categoryManagerModal" onclick="if(event.target===this)closeCategoryManager()">
   <div class="category-manager">
     <div class="category-manager-head">
@@ -1481,7 +1549,7 @@ setInterval(updateClock,1000);
   <div class="admin-panel">
     <div class="admin-head">
       <h2>SOIKAT · LIVE TV ADMIN</h2>
-      <div class="admin-toolbar">
+      <div class="admin-toolbar"><button type="button" class="admin-btn secondary" onclick="openCategorySort()">SORT CATEGORIES</button>
         <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
         <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
         <span class="admin-save-status" id="adminSaveStatus" title="Auto save status"></span>
