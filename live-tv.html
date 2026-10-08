@@ -1058,9 +1058,9 @@ function closeCategoryManager(){
 }
 
 function moveCategory(index, direction){
-  const nextIndex=index+direction;
-  if(index<0 || nextIndex<0 || nextIndex>=CATEGORIES.length)return;
-  [CATEGORIES[index],CATEGORIES[nextIndex]]=[CATEGORIES[nextIndex],CATEGORIES[index]];
+  const nextIndex = index + direction;
+  if(index < 0 || nextIndex < 0 || nextIndex >= CATEGORIES.length) return;
+  [CATEGORIES[index], CATEGORIES[nextIndex]] = [CATEGORIES[nextIndex], CATEGORIES[index]];
   renderCategoryManager();
   renderAdmin();
   renderPublicCategories();
@@ -1444,8 +1444,6 @@ setInterval(updateClock,1000);
 </script>
 
 
-
-</div>
 
 <div class="category-manager-modal" id="categoryManagerModal" onclick="if(event.target===this)closeCategoryManager()">
   <div class="category-manager">
