@@ -1053,6 +1053,7 @@ function renderAdmin(){
         </div>
         <div class="admin-field-wrap">
           <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
+          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button>
         </div>
         <div class="admin-field-wrap">
           <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
@@ -1168,92 +1169,21 @@ async function checkAllStreams(){
   const btn=document.getElementById("checkAll");
   btn.disabled=true;
   btn.textContent="⏳";
-
-  const rows = Array.from(document.querySelectorAll("#adminRows .admin-row"));
-  rows.forEach((row,i)=>{
-    const el=document.getElementById("status-"+i);
-    if(el){
-      el.textContent="🟡";
-      el.title="Checking...";
-    }
-  });
-
+  document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
   try{
-    if(!API_URL || API_URL.includes("PASTE_YOUR_")){
-      throw new Error("API URL not configured");
-    }
-
-    const channelsForCheck = collectAdminChannels().map(c=>({
-      name:c.name||"",
-      url:c.url||""
-    }));
-
-    /*
-      IMPORTANT:
-      Check each stream separately and in parallel.
-      Previously all streams were sent in ONE Apps Script request.
-      If even one stream was slow, the whole request could time out.
-      Now a slow/dead stream cannot block the other streams.
-    */
-    const checks = channelsForCheck.map((channel,index)=>
-      apiJsonp(
-        {
-          action:"check",
-          channels:JSON.stringify([channel])
-        },
-        12000
-      )
-      .then(data=>{
-        const r = Array.isArray(data?.results) ? data.results[0] : null;
-        const el=document.getElementById("status-"+index);
-
-        if(!data || !data.ok || !r){
-          if(el){
-            el.textContent="🔴";
-            el.title=(data&&data.error)||"Check failed";
-          }
-          return {ok:false,error:(data&&data.error)||"Check failed"};
-        }
-
-        if(el){
-          el.textContent=r.ok ? "🟢" : "🔴";
-          el.title=r.ok
-            ? ("LIVE · HTTP "+(r.code||""))
-            : (r.error||("HTTP "+(r.code||"0")));
-        }
-
-        return r;
-      })
-      .catch(error=>{
-        const el=document.getElementById("status-"+index);
-        if(el){
-          el.textContent="🔴";
-          el.title=error?.message || "Request timed out";
-        }
-        return {ok:false,error:error?.message || "Request timed out"};
-      })
-    );
-
-    const results = await Promise.all(checks);
-    const failed = results.filter(r=>!r || !r.ok).length;
-
-    if(failed===0){
-      setAdminMessage("All streams checked successfully.","ok");
-    }else{
-      setAdminMessage(
-        `Check completed. ${results.length-failed} LIVE, ${failed} DEAD/FAILED.`,
-        "err"
-      );
-    }
-
-  }catch(e){
-    document.querySelectorAll(".admin-status").forEach(x=>{
-      x.textContent="⚪";
-      x.title="Not checked";
+    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
+    const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
+    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
+    if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
+    (data.results||[]).forEach((r,i)=>{
+      const el=document.getElementById("status-"+i);
+      if(el){ el.textContent=r.ok?"🟢":"🔴"; el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE"); }
     });
-    setAdminMessage("Check failed: "+(e?.message || "Unknown error"),"err");
+    setAdminMessage("All streams checked.","ok");
+  }catch(e){
+    document.querySelectorAll(".admin-status").forEach(x=>x.textContent="⚪");
+    setAdminMessage("Check failed: "+e.message,"err");
   }
-
   btn.disabled=false;
   btn.textContent="🔃";
 }
@@ -1338,7 +1268,6 @@ setInterval(updateClock,1000);
       <div class="admin-toolbar">
         <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
         <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
-        <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
         <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
       </div>
       <div id="adminRows"></div>
