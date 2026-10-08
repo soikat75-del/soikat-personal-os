@@ -490,6 +490,7 @@ footer{
 .admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
 .admin-head{display:flex;align-items:center;justify-content:flex-start;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
 .admin-head h2{margin:0;font-size:17px;letter-spacing:.7px;flex:0 0 auto}
+.admin-save-status{margin-left:auto;margin-right:14px;font-size:12px;color:#7f94b2;min-width:58px;text-align:right;white-space:nowrap}.admin-save-status.saving{color:#f0c674}.admin-save-status.saved{color:#54d99a}.admin-save-status.error{color:#ff7474}
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer;margin-left:0;flex:0 0 auto}
 .admin-content{padding:20px}
 .admin-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0 12px 0 auto;flex:0 0 auto;flex-wrap:nowrap}
@@ -1145,36 +1146,27 @@ let autoSaveBusy=false;
 async function autoSaveNow(){
   if(autoSaveBusy) return;
   autoSaveBusy=true;
+  setAdminSaveStatus("Saving...");
   try{
     const next=collectAdminChannels();
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
 
-    const current=await apiJsonp({action:"get"});
-    const oldChannels=Array.isArray(current?.channels)?current.channels:[];
+    // One request saves the complete current state.
+    const data=await apiJsonp({
+      action:"save",
+      data:JSON.stringify({channels:next,categories:CATEGORIES})
+    },12000,3);
+    if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
 
-    // Remove server-side streams that no longer exist locally.
-    for(let i=oldChannels.length-1;i>=next.length;i--){
-      const data=await apiJsonp({action:"delete",index:i});
-      if(!data || !data.ok) throw new Error((data&&data.error)||"Delete failed");
-    }
-
-    // Save every current stream. This also persists edits to name/category/logo/URLs.
-    for(let i=0;i<next.length;i++){
-      const c=next[i];
-      const data=await apiJsonp({
-        action:"saveOne",index:i,
-        name:c.name||"",category:c.category||"",logo:c.logo||"",
-        url:c.url||"",source:c.source||""
-      });
-      if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
-    }
-
-    CHANNELS=next;
+    CHANNELS=Array.isArray(data.channels)?data.channels:next;
+    CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
     saveLocalCentralData();
     renderChannels();
-    setAdminMessage("Saved automatically.","ok");
+    renderPublicCategories();
+    renderAdmin();
+    setAdminSaveStatus("Saved.");
   }catch(e){
-    setAdminMessage("Auto-save failed: "+e.message,"err");
+    setAdminSaveStatus("Save failed.","error");
   }finally{
     autoSaveBusy=false;
   }
@@ -1182,16 +1174,25 @@ async function autoSaveNow(){
 
 function scheduleAutoSave(){
   clearTimeout(autoSaveTimer);
-  setAdminMessage("Saving automatically…","ok");
-  autoSaveTimer=setTimeout(autoSaveNow,700);
+  setAdminSaveStatus("Saving...");
+  autoSaveTimer=setTimeout(autoSaveNow,180);
+}
+
+function setAdminSaveStatus(text,type="saved"){
+  const el=document.getElementById("adminSaveStatus");
+  if(!el) return;
+  el.textContent=text;
+  el.className="admin-save-status "+(type||"");
 }
 
 function setAdminMessage(text,type){
+  if(type === "ok" || /saving automatically|saved automatically/i.test(String(text))){
+    setAdminSaveStatus(/saving/i.test(String(text)) ? "Saving..." : "Saved.");
+    return;
+  }
   const el=document.getElementById("adminMessage");
-  el.textContent=text;
-  el.className="admin-message "+type;
+  if(el){el.textContent=text;el.className="admin-message "+type;}
 }
-
 
 document.addEventListener("input", function(e){
   if(e.target.closest && e.target.closest("#adminRows")){
@@ -1270,6 +1271,7 @@ setInterval(updateClock,1000);
         <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
         <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
       </div>
+      <span class="admin-save-status" id="adminSaveStatus"></span>
       <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
     </div>
     <div class="admin-content">
