@@ -487,14 +487,11 @@ footer{
 /* ================= ADMIN POPUP ================= */
 .admin-modal{position:fixed;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
 .admin-modal.show{display:flex}
-.admin-panel{width:min(1050px,100%);height:min(92vh,900px);display:flex;flex-direction:column;overflow:hidden;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
-.admin-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(105,140,180,.18);position:relative;flex:0 0 auto;background:transparent;z-index:3;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.admin-head h2{margin:0;font-size:17px;letter-spacing:.7px;white-space:nowrap}
-.admin-head-left{display:flex;align-items:center;min-width:0}
-.admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer;line-height:1}
-.admin-close:hover{color:#fff}
-.admin-head-actions{display:flex;align-items:center;gap:5px;margin-left:auto;margin-right:8px}
-.admin-content{padding:14px 20px 0;min-height:0;flex:1 1 auto;overflow:auto}
+.admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
+.admin-head{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
+.admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
+.admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
+.admin-content{padding:20px}
 .admin-toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
@@ -512,7 +509,7 @@ footer{
 .admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
 .admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
-.admin-emoji{width:30px;height:30px;border:0;border-radius:6px;background:transparent;color:#b8c8df;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center;opacity:.9}.admin-emoji:hover{color:#fff;background:rgba(255,255,255,.06)}.admin-emoji.secondary{background:transparent}.admin-emoji:disabled{opacity:.4;cursor:wait}
+.admin-emoji{width:42px;height:42px;border:1px solid #31547e;border-radius:9px;background:#326fe7;color:#fff;font-size:19px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-category option:last-child{color:#78a8ff;font-weight:700}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
@@ -521,7 +518,7 @@ footer{
 .admin-open-link:hover{background:#102845;border-color:#5e8fff}
 .admin-fields input:focus{border-color:#5e8fff}
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
-.admin-message{min-height:34px;margin:0;padding:9px 20px;border-top:1px solid rgba(105,140,180,.16);font-size:12px;line-height:16px;position:relative;flex:0 0 auto;background:transparent;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
  .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
@@ -578,11 +575,6 @@ footer{
 .category-create-modal .form-input:focus{border-color:#5e8fff}
 @media(max-width:700px){
   .category-manager,.confirm-box{width:100%}
-  .admin-head{padding:12px 14px}
-  .admin-head h2{font-size:14px}
-  .admin-content{padding:12px 14px 0}
-  .admin-head-actions{gap:2px;margin-right:5px}
-  .admin-emoji{width:28px;height:28px;font-size:16px}
 }
 @media(max-width:700px){
   .admin-title{grid-template-columns:minmax(0,1fr) 130px 42px 30px}
@@ -735,7 +727,7 @@ let selectedCategory = "ALL";
 let channelSearchTerm = "";
 let CENTRAL_DATA_READY = false;
 
-function apiJsonp(params, timeoutMs=30000){
+function apiJsonp(params, timeoutMs=12000){
   return new Promise((resolve,reject)=>{
     const callbackName = "soikatApi_" + Date.now() + "_" + Math.random().toString(36).slice(2);
     const script = document.createElement("script");
@@ -1176,21 +1168,92 @@ async function checkAllStreams(){
   const btn=document.getElementById("checkAll");
   btn.disabled=true;
   btn.textContent="⏳";
-  document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
+
+  const rows = Array.from(document.querySelectorAll("#adminRows .admin-row"));
+  rows.forEach((row,i)=>{
+    const el=document.getElementById("status-"+i);
+    if(el){
+      el.textContent="🟡";
+      el.title="Checking...";
+    }
+  });
+
   try{
-    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
-    const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
-    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)},30000);
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
-    (data.results||[]).forEach((r,i)=>{
-      const el=document.getElementById("status-"+i);
-      if(el){ el.textContent=r.ok?"🟢":"🔴"; el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE"); }
-    });
-    setAdminMessage("All streams checked.","ok");
+    if(!API_URL || API_URL.includes("PASTE_YOUR_")){
+      throw new Error("API URL not configured");
+    }
+
+    const channelsForCheck = collectAdminChannels().map(c=>({
+      name:c.name||"",
+      url:c.url||""
+    }));
+
+    /*
+      IMPORTANT:
+      Check each stream separately and in parallel.
+      Previously all streams were sent in ONE Apps Script request.
+      If even one stream was slow, the whole request could time out.
+      Now a slow/dead stream cannot block the other streams.
+    */
+    const checks = channelsForCheck.map((channel,index)=>
+      apiJsonp(
+        {
+          action:"check",
+          channels:JSON.stringify([channel])
+        },
+        12000
+      )
+      .then(data=>{
+        const r = Array.isArray(data?.results) ? data.results[0] : null;
+        const el=document.getElementById("status-"+index);
+
+        if(!data || !data.ok || !r){
+          if(el){
+            el.textContent="🔴";
+            el.title=(data&&data.error)||"Check failed";
+          }
+          return {ok:false,error:(data&&data.error)||"Check failed"};
+        }
+
+        if(el){
+          el.textContent=r.ok ? "🟢" : "🔴";
+          el.title=r.ok
+            ? ("LIVE · HTTP "+(r.code||""))
+            : (r.error||("HTTP "+(r.code||"0")));
+        }
+
+        return r;
+      })
+      .catch(error=>{
+        const el=document.getElementById("status-"+index);
+        if(el){
+          el.textContent="🔴";
+          el.title=error?.message || "Request timed out";
+        }
+        return {ok:false,error:error?.message || "Request timed out"};
+      })
+    );
+
+    const results = await Promise.all(checks);
+    const failed = results.filter(r=>!r || !r.ok).length;
+
+    if(failed===0){
+      setAdminMessage("All streams checked successfully.","ok");
+    }else{
+      setAdminMessage(
+        `Check completed. ${results.length-failed} LIVE, ${failed} DEAD/FAILED.`,
+        "err"
+      );
+    }
+
   }catch(e){
-    document.querySelectorAll(".admin-status").forEach(x=>x.textContent="⚪");
-    setAdminMessage("Check failed: "+e.message,"err");
+    document.querySelectorAll(".admin-status").forEach(x=>{
+      x.textContent="⚪";
+      x.title="Not checked";
+    });
+    setAdminMessage("Check failed: "+(e?.message || "Unknown error"),"err");
   }
+
   btn.disabled=false;
   btn.textContent="🔃";
 }
@@ -1268,21 +1331,19 @@ setInterval(updateClock,1000);
 <div class="admin-modal" id="adminModal" onclick="if(event.target===this)closeAdmin()">
   <div class="admin-panel">
     <div class="admin-head">
-      <div class="admin-head-left">
-        <h2>SOIKAT · LIVE TV ADMIN</h2>
-      </div>
-      <div class="admin-head-actions">
+      <h2>SOIKAT · LIVE TV ADMIN</h2>
+      <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
+    </div>
+    <div class="admin-content">
+      <div class="admin-toolbar">
         <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
         <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
         <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
         <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
       </div>
-      <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
-    </div>
-    <div class="admin-content">
       <div id="adminRows"></div>
+      <div id="adminMessage" class="admin-message"></div>
     </div>
-    <div id="adminMessage" class="admin-message">Ready.</div>
   </div>
 </div>
 </body>
