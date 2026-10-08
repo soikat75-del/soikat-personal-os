@@ -503,8 +503,62 @@ footer{
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
 .admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
-.admin-empty{padding:30px;text-align:center;color:#7189ac}
+ .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
+
+/* ================= CATEGORY MANAGER ================= */
+.category-manager-modal,.confirm-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.78);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  padding:18px;z-index:10001;
+}
+.category-manager-modal.show,.confirm-modal.show{display:flex}
+.category-manager,.confirm-box{
+  width:min(500px,100%);background:#09182a;border:1px solid #29476e;
+  border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.72);overflow:hidden;
+}
+.category-manager-head,.confirm-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px;border-bottom:1px solid #203b5d;
+}
+.category-manager-head h3,.confirm-head h3{margin:0;font-size:15px;letter-spacing:.5px}
+.category-manager-body,.confirm-body{padding:18px 20px}
+.category-list{display:flex;flex-direction:column;gap:8px;max-height:330px;overflow:auto}
+.category-item{
+  min-height:46px;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:0 10px 0 14px;border:1px solid #203b5d;
+  border-radius:10px;background:#0b1b2e;color:#dfeaff;font-size:13px;font-weight:700;
+}
+.category-delete{
+  width:36px;height:36px;border:1px solid #6b3038;border-radius:8px;
+  background:#35151a;color:#ff858d;font-size:16px;cursor:pointer;
+}
+.category-delete:hover{background:#4a1b22;border-color:#a33d48}
+.category-create{
+  width:100%;height:42px;margin-top:12px;border:1px dashed #31547e;
+  border-radius:10px;background:#0b1b2e;color:#9fc0ff;font-weight:700;cursor:pointer;
+}
+.category-create:hover{background:#102845;border-color:#5e8fff}
+.confirm-icon{
+  width:54px;height:54px;margin:0 auto 12px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(255,83,99,.10);
+  border:1px solid #6b3038;font-size:25px;
+}
+.confirm-text{text-align:center;color:#a9bde0;font-size:13px;line-height:1.6}
+.confirm-text strong{color:#fff}
+.confirm-actions{display:flex;gap:8px;justify-content:center;margin-top:18px}
+.confirm-actions button{height:40px;min-width:100px;border-radius:9px;cursor:pointer;font-weight:700}
+.confirm-cancel{border:1px solid #31547e;background:#0b1b2e;color:#dfeaff}
+.confirm-delete{border:1px solid #8d3540;background:#4a1b22;color:#fff}
+.category-create-modal .form-input{
+  width:100%;height:44px;border:1px solid #29476e;border-radius:9px;
+  background:#0b1b2e;color:#fff;padding:0 12px;outline:0;font-size:13px;
+}
+.category-create-modal .form-input:focus{border-color:#5e8fff}
+@media(max-width:700px){
+  .category-manager,.confirm-box{width:100%}
+}
 @media(max-width:700px){
   .admin-title{grid-template-columns:minmax(0,1fr) 130px 42px 30px}
   .admin-fields{grid-template-columns:1fr}
@@ -748,48 +802,113 @@ function categoryOptions(selected){
   const current = String(selected||"").toUpperCase();
   const cats = CATEGORIES.slice();
   if(current && !cats.includes(current)) cats.unshift(current);
-  return cats.map(cat => `<option value="${escapeAttr(cat)}" ${current===cat?"selected":""}>${escapeHtml(cat)}</option>`).join("") +
-    `<option value="__CREATE_NEW__">➕ CREATE NEW CATEGORY</option>`;
+  return cats.map(cat => `<option value="${escapeAttr(cat)}" ${current===cat?"selected":""}>${escapeHtml(cat)}</option>`).join("");
 }
 
-async function createNewCategory(select){
-  if(!select) return;
-  const previous = select.dataset.previous || select.value;
-  if(select.value !== "__CREATE_NEW__") { select.dataset.previous = select.value; return; }
-  const raw = prompt("Enter new category name:");
-  const name = String(raw || "").trim().replace(/\s+/g," ");
-  if(!name){
-    select.value = previous || CATEGORIES[0] || "";
-    return;
-  }
-  const category = name.toUpperCase();
-  if(CATEGORIES.some(c => c.toUpperCase() === category)){
-    select.value = category;
-    select.dataset.previous = category;
+function renderCategoryManager(){
+  const list=document.getElementById("categoryList");
+  if(!list)return;
+  list.innerHTML=CATEGORIES.map(cat=>`
+    <div class="category-item">
+      <span>${escapeHtml(cat)}</span>
+      <button type="button" class="category-delete" onclick="requestDeleteCategory('${escapeAttr(cat)}')" title="Delete category" aria-label="Delete category">🗑️</button>
+    </div>
+  `).join("") || `<div class="admin-empty">No custom categories.</div>`;
+}
+
+function openCategoryManager(){
+  renderCategoryManager();
+  document.getElementById("categoryManagerModal").classList.add("show");
+}
+function closeCategoryManager(){
+  document.getElementById("categoryManagerModal").classList.remove("show");
+}
+
+function openCreateCategoryModal(){
+  document.getElementById("newCategoryInput").value="";
+  document.getElementById("categoryCreateModal").classList.add("show");
+  setTimeout(()=>document.getElementById("newCategoryInput").focus(),50);
+}
+function closeCreateCategoryModal(){
+  document.getElementById("categoryCreateModal").classList.remove("show");
+}
+
+async function createCategoryFromModal(){
+  const input=document.getElementById("newCategoryInput");
+  const name=String(input.value||"").trim().replace(/\s+/g," ");
+  if(!name){ input.focus(); return; }
+  const category=name.toUpperCase();
+  if(CATEGORIES.some(c=>String(c).toUpperCase()===category)){
+    input.focus();
+    input.select();
     setAdminMessage("Category already exists.","err");
     return;
   }
   try{
-    const data = await apiJsonp({action:"createCategory",category});
+    const data=await apiJsonp({action:"createCategory",category});
     if(!data || !data.ok) throw new Error((data&&data.error)||"Category creation failed");
-    CATEGORIES = Array.isArray(data.categories) ? data.categories : [...CATEGORIES,category];
-    select.innerHTML = categoryOptions(category);
-    select.value = category;
-    select.dataset.previous = category;
+    CATEGORIES=Array.isArray(data.categories)?data.categories:[...CATEGORIES,category];
+    renderCategoryManager();
+    renderAdmin();
     renderPublicCategories();
+    closeCreateCategoryModal();
     setAdminMessage("Category created: "+category,"ok");
   }catch(e){
-    select.value = previous || CATEGORIES[0] || "";
     setAdminMessage("Category creation failed: "+e.message,"err");
   }
 }
 
+function requestDeleteCategory(category){
+  openConfirm(
+    "Delete Category",
+    `Delete "<strong>${escapeHtml(category)}</strong>" category?`,
+    ()=>deleteCategory(category)
+  );
+}
+
+async function deleteCategory(category){
+  const used=CHANNELS.filter(c=>String(c.category||"").toUpperCase()===String(category).toUpperCase()).length;
+  if(used>0){
+    closeConfirm();
+    setAdminMessage(`Cannot delete ${category}: ${used} stream${used===1?" is":"s are"} using this category.`,"err");
+    return;
+  }
+  try{
+    const data=await apiJsonp({action:"deleteCategory",category});
+    if(!data || !data.ok) throw new Error((data&&data.error)||"Category deletion failed");
+    CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES.filter(c=>c!==category);
+    renderCategoryManager();
+    renderAdmin();
+    renderPublicCategories();
+    closeConfirm();
+    setAdminMessage("Category deleted: "+category,"ok");
+  }catch(e){
+    setAdminMessage("Category deletion failed: "+e.message,"err");
+    closeConfirm();
+  }
+}
+
+let confirmAction=null;
+function openConfirm(title,message,action){
+  document.getElementById("confirmTitle").textContent=title;
+  document.getElementById("confirmText").innerHTML=message;
+  confirmAction=action;
+  document.getElementById("confirmModal").classList.add("show");
+}
+function closeConfirm(){
+  confirmAction=null;
+  document.getElementById("confirmModal").classList.remove("show");
+}
+function confirmYes(){
+  const action=confirmAction;
+  if(action) action();
+}
 function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
-        <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="createNewCategory(this)">
+        <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="this.dataset.previous=this.value">
           ${categoryOptions(c.category)}
         </select>
         <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
@@ -935,6 +1054,52 @@ setInterval(updateClock,1000);
 
 
 
+<div class="category-manager-modal" id="categoryManagerModal" onclick="if(event.target===this)closeCategoryManager()">
+  <div class="category-manager">
+    <div class="category-manager-head">
+      <h3>MANAGE CATEGORIES</h3>
+      <button class="admin-close" onclick="closeCategoryManager()" aria-label="Close">×</button>
+    </div>
+    <div class="category-manager-body">
+      <div class="category-list" id="categoryList"></div>
+      <button type="button" class="category-create" onclick="openCreateCategoryModal()">CREATE NEW CATEGORY</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-modal" id="confirmModal" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-box">
+    <div class="confirm-head">
+      <h3 id="confirmTitle">Delete Category</h3>
+      <button class="admin-close" onclick="closeConfirm()" aria-label="Close">×</button>
+    </div>
+    <div class="confirm-body">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-text" id="confirmText"></div>
+      <div class="confirm-actions">
+        <button type="button" class="confirm-cancel" onclick="closeConfirm()">CANCEL</button>
+        <button type="button" class="confirm-delete" onclick="confirmYes()">DELETE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="category-manager-modal category-create-modal" id="categoryCreateModal" onclick="if(event.target===this)closeCreateCategoryModal()">
+  <div class="confirm-box">
+    <div class="confirm-head">
+      <h3>CREATE NEW CATEGORY</h3>
+      <button class="admin-close" onclick="closeCreateCategoryModal()" aria-label="Close">×</button>
+    </div>
+    <div class="confirm-body">
+      <input id="newCategoryInput" class="form-input" placeholder="Category name" onkeydown="if(event.key==='Enter')createCategoryFromModal()">
+      <div class="confirm-actions">
+        <button type="button" class="confirm-cancel" onclick="closeCreateCategoryModal()">CANCEL</button>
+        <button type="button" class="confirm-delete" style="border-color:#31547e;background:#326fe7" onclick="createCategoryFromModal()">CREATE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="admin-modal" id="adminModal" onclick="if(event.target===this)closeAdmin()">
   <div class="admin-panel">
     <div class="admin-head">
@@ -944,6 +1109,7 @@ setInterval(updateClock,1000);
     <div class="admin-content">
       <div class="admin-toolbar">
         <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
+        <button class="admin-emoji secondary" id="manageCategories" onclick="openCategoryManager()" title="Manage categories" aria-label="Manage categories">🏷️</button>
         <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
         <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
       </div>
