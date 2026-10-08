@@ -727,36 +727,32 @@ let selectedCategory = "ALL";
 let channelSearchTerm = "";
 let CENTRAL_DATA_READY = false;
 
-function apiJsonp(params, timeoutMs=18000, retries=3){
+function apiJsonp(params, timeoutMs=12000){
   return new Promise((resolve,reject)=>{
-    let attempt=0;
-    function tryRequest(){
-      attempt++;
-      const callbackName="soikatApi_"+Date.now()+"_"+Math.random().toString(36).slice(2);
-      const script=document.createElement("script"); let finished=false;
-      const timer=setTimeout(()=>finish(new Error("Request timed out")),timeoutMs);
-      function cleanup(){clearTimeout(timer);try{delete window[callbackName]}catch(e){}script.remove()}
-      function finish(err,data){if(finished)return;finished=true;cleanup();if(!err){resolve(data);return}if(attempt<retries)setTimeout(tryRequest,700*attempt);else reject(err)}
-      window[callbackName]=data=>finish(null,data);
-      script.onerror=()=>finish(new Error("Failed to reach Google Apps Script"));
-      const query=new URLSearchParams({...params,callback:callbackName,t:Date.now()});
-      script.src=API_URL+"?"+query.toString(); document.head.appendChild(script);
+    const callbackName = "soikatApi_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+    let finished = false;
+    const timer = setTimeout(()=>finish(new Error("Request timed out")), timeoutMs);
+
+    function cleanup(){
+      clearTimeout(timer);
+      try{ delete window[callbackName]; }catch(e){}
+      script.remove();
     }
-    tryRequest();
+    function finish(err,data){
+      if(finished) return;
+      finished=true;
+      cleanup();
+      err ? reject(err) : resolve(data);
+    }
+
+    window[callbackName] = data => finish(null,data);
+    script.onerror = () => finish(new Error("Failed to reach Google Apps Script"));
+
+    const query = new URLSearchParams({...params, callback:callbackName, t:Date.now()});
+    script.src = API_URL + "?" + query.toString();
+    document.head.appendChild(script);
   });
-}
-
-function saveLocalCentralData(){
-  try{localStorage.setItem("SOIKAT_LIVE_TV_DATA",JSON.stringify({channels:CHANNELS,categories:CATEGORIES,savedAt:Date.now()}))}catch(e){}
-}
-
-function loadLocalCentralData(){
-  try{
-    const raw=localStorage.getItem("SOIKAT_LIVE_TV_DATA"); if(!raw)return false;
-    const d=JSON.parse(raw); if(!d||!Array.isArray(d.channels)||!Array.isArray(d.categories))return false;
-    CHANNELS=d.channels; CATEGORIES=d.categories; CENTRAL_DATA_READY=true;
-    renderPublicCategories(); renderChannels(); return true;
-  }catch(e){return false}
 }
 
 function renderPublicCategories(){
@@ -788,25 +784,23 @@ async function loadCentralData(){
     return;
   }
 
-  const cached=loadLocalCentralData();
-
   try{
+    // One request only: categories + channels arrive together.
     const data = await apiJsonp({action:"get"});
-    if(!data || !data.ok) throw new Error((data&&data.error)||"Central data unavailable");
-    CATEGORIES=Array.isArray(data.categories)?data.categories:[];
-    CHANNELS=Array.isArray(data.channels)?data.channels:[];
-    CENTRAL_DATA_READY=true;
-    saveLocalCentralData();
-    renderPublicCategories(); renderChannels();
+
+    if(!data || !data.ok) {
+      throw new Error((data && data.error) || "Central data unavailable");
+    }
+
+    CATEGORIES = Array.isArray(data.categories) ? data.categories : [];
+    CHANNELS = Array.isArray(data.channels) ? data.channels : [];
+    CENTRAL_DATA_READY = true;
+
+    renderPublicCategories();
+    renderChannels();
   }catch(error){
     console.error("Central Live TV data unavailable:", error);
-    CENTRAL_DATA_READY = cached;
-
-    if(cached){
-      renderPublicCategories();
-      renderChannels();
-      return;
-    }
+    CENTRAL_DATA_READY = false;
 
     if(wrap){
       wrap.innerHTML = `<div class="category-loading">Unable to load categories</div>`;
