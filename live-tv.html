@@ -412,13 +412,13 @@ footer{
 .channel-search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#6f88aa;font-size:14px;pointer-events:none}
 .channel-search-clear{height:40px;min-width:40px;border:1px solid #1c3555;border-radius:10px;background:#071321;color:#8ea6c7;cursor:pointer}
 .channel-search-clear:hover{border-color:#315f94;color:#fff}
-@media(max-width:700px){.channel-search{margin:14px 14px 0}.categories{padding-left:14px;padding-right:14px}}
+@media(max-width:700px){.channel-search{margin:14px 14px 0}}
 
 .categories{
   display:flex;
   align-items:center;
   gap:7px;
-  padding:14px 24px 12px;
+  padding:14px 0 12px;
   overflow-x:auto;
   scrollbar-width:none;
 }
@@ -521,6 +521,10 @@ footer{
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
 .admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
+.admin-filter-wrap{margin-bottom:12px}
+.admin-category-filter{width:180px;height:40px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;font-weight:700;outline:0}
+.admin-category-filter:focus{border-color:#5e8fff}
+@media(max-width:600px){.admin-filter-wrap{margin-bottom:8px}.admin-category-filter{width:150px;height:34px;font-size:16px !important}}
  .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
 
@@ -1078,7 +1082,6 @@ function createCategoryFromModal(){
   renderAdmin();
   renderPublicCategories();
   closeCreateCategoryModal();
-  setAdminMessage("Category created: "+category,"ok");
   scheduleAutoSave();
 }
 
@@ -1143,8 +1146,39 @@ async function confirmYes(){
     if(btn){ btn.disabled=false; btn.textContent='DELETE'; }
   }
 }
+let adminCategoryFilter = "ALL";
+
+function renderAdminCategoryFilter(){
+  const select = document.getElementById("adminCategoryFilter");
+  if(!select) return;
+  const current = adminCategoryFilter || "ALL";
+  select.innerHTML = '<option value="ALL">ALL</option>' +
+    CATEGORIES.map(cat => {
+      const name = String(cat).toUpperCase();
+      return `<option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`;
+    }).join("");
+  select.value = current;
+  if(select.value !== current){
+    adminCategoryFilter = "ALL";
+    select.value = "ALL";
+  }
+}
+
+function setAdminCategoryFilter(category){
+  adminCategoryFilter = String(category || "ALL").toUpperCase();
+  renderAdmin();
+}
+
 function renderAdmin(){
-  const list = CHANNELS.map((c,i)=>`
+  renderAdminCategoryFilter();
+
+  const filter = adminCategoryFilter || "ALL";
+  const indexedChannels = CHANNELS.map((c,i)=>({c,i}));
+  const filteredChannels = filter === "ALL"
+    ? indexedChannels
+    : indexedChannels.filter(({c}) => String(c.category || "").toUpperCase() === filter);
+
+  const list = filteredChannels.map(({c,i})=>`
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <div class="admin-left">
@@ -1176,7 +1210,7 @@ function renderAdmin(){
       </div>
     </div>`).join("");
 
-  document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels. Click ADD NEW STREAM.</div>`;
+  document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels in ${escapeHtml(filter)}.</div>`;
 }
 
 function toggleAdminStatus(index){
@@ -1450,6 +1484,11 @@ setInterval(updateClock,1000);
       <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
     </div>
     <div class="admin-content">
+      <div class="admin-filter-wrap">
+        <select id="adminCategoryFilter" class="admin-category-filter" onchange="setAdminCategoryFilter(this.value)">
+          <option value="ALL">ALL</option>
+        </select>
+      </div>
       <div id="adminRows"></div>
       <div id="adminMessage" class="admin-message"></div>
     </div>
