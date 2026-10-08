@@ -503,6 +503,8 @@ footer{
 .admin-serial{width:36px;min-width:36px;height:42px;display:grid;place-items:center;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800}
 .admin-name{height:42px;flex:1 1 auto;min-width:150px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
 .admin-category{height:42px;width:155px;min-width:155px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
+.admin-status-toggle{height:42px;width:42px;min-width:42px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0;font-size:18px;text-align:center;outline:0;cursor:pointer}
+.admin-status-toggle.dead{border-color:#6b2a31;background:#241116}
 .admin-move{height:42px;width:34px;min-width:34px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800;cursor:pointer;padding:0}
 .admin-move:hover:not(:disabled){background:#102845;border-color:#5e8fff;color:#fff}
 .admin-move:disabled{opacity:.28;cursor:not-allowed}
@@ -659,6 +661,7 @@ footer{
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
 .channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
+.channel-open.channel-dead{color:#ff5f67;opacity:1;font-weight:800}
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
 </style>
@@ -840,7 +843,7 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-open">OPEN</div>
+      <div class="channel-open ${String(channel.status||"LIVE").toUpperCase()==="DEAD" ? "channel-dead" : ""}">${String(channel.status||"LIVE").toUpperCase()==="DEAD" ? "DEAD" : "OPEN"}</div>
     </a>
   `).join("");
 }
@@ -1029,6 +1032,14 @@ async function confirmYes(){
     if(btn){ btn.disabled=false; btn.textContent='DELETE'; }
   }
 }
+function toggleAdminStatus(index){
+  const channel = CHANNELS[index];
+  if(!channel) return;
+  channel.status = String(channel.status||"LIVE").toUpperCase()==="DEAD" ? "LIVE" : "DEAD";
+  renderAdmin();
+  setAdminMessage(channel.status==="DEAD" ? "Marked as DEAD. Click 💾 to save." : "Marked as LIVE. Click 💾 to save.","ok");
+}
+
 function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
     <div class="admin-row" data-row="${i}">
@@ -1041,10 +1052,10 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
+          <button type="button" class="admin-status-toggle ${String(c.status||"LIVE").toUpperCase()==="DEAD"?"dead":""}" onclick="toggleAdminStatus(${i})" title="Toggle LIVE / DEAD" aria-label="Toggle stream status">🔴</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
           <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
-          <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
         </div>
       </div>
       <div class="admin-fields">
@@ -1103,7 +1114,7 @@ function collectAdminChannels(){
 }
 
 function addStream(){
-  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:""});
+  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:"",status:"LIVE"});
   renderAdmin();
   const rows = document.querySelectorAll("#adminRows .admin-row");
   const last = rows[rows.length-1];
