@@ -659,7 +659,7 @@ footer{
 .channel-logo img{width:100%;height:100%;object-fit:contain}
 .channel-logo span{font-weight:800;font-size:16px}
 .channel-name{font-size:14px;font-weight:700;flex:1}
-.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}
+.channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}.channel-open.channel-dead{color:#ff5f6d;opacity:1;font-weight:800;text-shadow:0 0 10px rgba(255,95,109,.35)}
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
 </style>
@@ -847,7 +847,7 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
-      <div class="channel-open">OPEN</div>
+      <div class="channel-open ${String(channel.status || "LIVE").toUpperCase() === "DEAD" ? "channel-dead" : ""}">${String(channel.status || "LIVE").toUpperCase() === "DEAD" ? "DEAD" : "OPEN"}</div>
     </a>
   `).join("");
 }
