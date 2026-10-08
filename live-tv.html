@@ -412,9 +412,14 @@ footer{
 .channel-search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#6f88aa;font-size:14px;pointer-events:none}
 .channel-search-clear{height:40px;min-width:40px;border:1px solid #1c3555;border-radius:10px;background:#071321;color:#8ea6c7;cursor:pointer}
 .channel-search-clear:hover{border-color:#315f94;color:#fff}
-@media(max-width:700px){.channel-search{margin:14px 14px 0}}
+@media(max-width:700px){
+  .categories{width:calc(100% - 20px)}
+  .channel-search{margin:14px 14px 0}
+}
 
 .categories{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
   display:flex;
   align-items:center;
   gap:7px;
