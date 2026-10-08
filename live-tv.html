@@ -472,6 +472,30 @@ footer{
   border-radius:inherit;
 }
 
+
+/* ================= ADMIN POPUP ================= */
+.admin-modal{position:fixed;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:18px;z-index:9999}
+.admin-modal.show{display:flex}
+.admin-panel{width:min(1050px,100%);max-height:92vh;overflow:auto;background:#09182a;border:1px solid #29476e;border-radius:18px;box-shadow:0 30px 100px rgba(0,0,0,.65)}
+.admin-head{display:flex;align-items:center;justify-content:space-between;padding:19px 22px;border-bottom:1px solid #203b5d;position:sticky;top:0;background:#09182a;z-index:2}
+.admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
+.admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
+.admin-content{padding:20px}
+.admin-toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px}
+.admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
+.admin-btn:disabled{opacity:.55;cursor:wait}
+.admin-row{border:1px solid #223f61;border-radius:13px;padding:13px;background:#071525;margin-bottom:10px}
+.admin-title{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.admin-name{height:42px;flex:1;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
+.admin-status{min-width:25px;text-align:center;font-size:16px}
+.admin-fields{display:grid;grid-template-columns:1fr 1fr 2fr 1.2fr;gap:8px}
+.admin-fields input{height:42px;width:100%;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
+.admin-fields input:focus,.admin-name:focus{border-color:#5e8fff}
+.admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
+.admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
+.admin-empty{padding:30px;text-align:center;color:#7189ac}
+.footer-soikat{cursor:pointer}
+@media(max-width:700px){.admin-fields{grid-template-columns:1fr 1fr}.admin-fields input:nth-child(3),.admin-fields input:nth-child(4){grid-column:1/-1}.admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}}
 </style>
 
 <style>
@@ -553,7 +577,7 @@ url  = Live .m3u8 stream URL
 -->
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
-<footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by <span class="footer-soikat">Soikat</span></div><span class="footer-line right"></span></footer>
+<footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by <span class="footer-soikat" onclick="openAdmin()">Soikat</span></div><span class="footer-line right"></span></footer>
 
 <script>
 // =========================================================
@@ -564,35 +588,33 @@ url  = Live .m3u8 stream URL
   // Ananda TV: https://famelack.com/tv/bd/7ynlCad0Y1lkdJ
 // Clicking a channel will open its link directly.
 // =========================================================
-const CHANNELS = [
-  {
-    // Source: https://famelack.com/tv/bd/7ynlCad0Y1lkdJ
-    name:"Ananda TV",
-    category:"MOVIES",
-    logo:"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23fff%22%2F%3E%0A%3Crect%20x%3D%227%22%20y%3D%227%22%20width%3D%2286%22%20height%3D%2286%22%20rx%3D%2212%22%20fill%3D%22%23f2b900%22%2F%3E%0A%3Ccircle%20cx%3D%2250%22%20cy%3D%2248%22%20r%3D%2229%22%20fill%3D%22%23fff%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2258%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2234%22%20font-weight%3D%22900%22%20fill%3D%22%23d71920%22%3EAT%3C%2Ftext%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2284%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%229%22%20font-weight%3D%22700%22%20fill%3D%22%23111%22%3EANANDA%20TV%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
-    url:"https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/anandatv.stream/live-orgin/anandatv.stream/chunks.m3u8?nimblesessionid=1242352079"
-  },
+const API_URL = "https://script.google.com/macros/s/AKfycbxqxGGuXgQK1wygN7hzfoE3LEcf980PcDR4eZ8hbfAaCeFHoszEd21vm8lXiHlxlk6Q/exec";
 
-  {
-    // Source: https://famelack.com/tv/in/pfMWY9QNez7wE8
-    name:"Sangeet Bangla",
-    category:"MUSIC",
-    logo:"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23e31b23%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2261%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2258%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20fill%3D%22%23fff%22%3ES%3C%2Ftext%3E%0A%3Crect%20y%3D%2272%22%20width%3D%22100%22%20height%3D%2228%22%20fill%3D%22%23080808%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2291%22%20text-anchor%3D%22middle%22%20font-family%3D%22Noto%20Sans%20Bengali%2CArial%2Csans-serif%22%20font-size%3D%2210%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%3E%E0%A6%B8%E0%A6%99%E0%A7%8D%E0%A6%97%E0%A7%80%E0%A6%A4%20%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
-    url:"https://mumt05.tangotv.in/87NeALx2SANGEETBANGLA/index.m3u8"
-  },
-  {
-    // Source: https://famelack.com/tv/in/7CIRMQUnuxC7MK
-    name:"9XM",
-    category:"MUSIC",
-    logo:"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23f4bd18%22%2F%3E%0A%3Ctext%20x%3D%228%22%20y%3D%2262%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2242%22%20font-weight%3D%22900%22%20fill%3D%22%23050505%22%3E9X%3C%2Ftext%3E%0A%3Ccircle%20cx%3D%2276%22%20cy%3D%2250%22%20r%3D%2227%22%20fill%3D%22%23ed1b2f%22%2F%3E%0A%3Ctext%20x%3D%2276%22%20y%3D%2264%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2239%22%20font-weight%3D%22900%22%20fill%3D%22%23fff%22%3EM%3C%2Ftext%3E%0A%3C%2Fsvg%3E",
-    url:"https://wiselp.wiseplayout.com/9XM/HD720/HD720.m3u8"
-  }
-];
+const DEFAULT_CHANNELS = [{"name":"Ananda TV","category":"MOVIES","logo":"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23fff%22%2F%3E%0A%3Crect%20x%3D%227%22%20y%3D%227%22%20width%3D%2286%22%20height%3D%2286%22%20rx%3D%2212%22%20fill%3D%22%23f2b900%22%2F%3E%0A%3Ccircle%20cx%3D%2250%22%20cy%3D%2248%22%20r%3D%2229%22%20fill%3D%22%23fff%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2258%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2234%22%20font-weight%3D%22900%22%20fill%3D%22%23d71920%22%3EAT%3C%2Ftext%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2284%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%229%22%20font-weight%3D%22700%22%20fill%3D%22%23111%22%3EANANDA%20TV%3C%2Ftext%3E%0A%3C%2Fsvg%3E","url":"https://app.ncare.live/c3VydmVyX8RpbEU9Mi8xNy8yMDE0GIDU6RgzQ6NTAgdEoaeFzbF92YWxIZTO0U0ezN1IzMyfvcGVMZEJCTEFWeVN3PTOmdFsaWRtaW51aiPhnPTI2/anandatv.stream/live-orgin/anandatv.stream/chunks.m3u8?nimblesessionid=1242352079","source":"https://famelack.com/tv/bd/7ynlCad0Y1lkdJ"},{"name":"Sangeet Bangla","category":"MUSIC","logo":"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23e31b23%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2261%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2258%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20fill%3D%22%23fff%22%3ES%3C%2Ftext%3E%0A%3Crect%20y%3D%2272%22%20width%3D%22100%22%20height%3D%2228%22%20fill%3D%22%23080808%22%2F%3E%0A%3Ctext%20x%3D%2250%22%20y%3D%2291%22%20text-anchor%3D%22middle%22%20font-family%3D%22Noto%20Sans%20Bengali%2CArial%2Csans-serif%22%20font-size%3D%2210%22%20font-weight%3D%22700%22%20fill%3D%22%23fff%22%3E%E0%A6%B8%E0%A6%99%E0%A7%8D%E0%A6%97%E0%A7%80%E0%A6%A4%20%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE%3C%2Ftext%3E%0A%3C%2Fsvg%3E","url":"https://mumt05.tangotv.in/87NeALx2SANGEETBANGLA/index.m3u8","source":"https://famelack.com/tv/in/pfMWY9QNez7wE8"},{"name":"9XM","category":"MUSIC","logo":"data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%3Crect%20width%3D%22100%22%20height%3D%22100%22%20rx%3D%2214%22%20fill%3D%22%23f4bd18%22%2F%3E%0A%3Ctext%20x%3D%228%22%20y%3D%2262%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2242%22%20font-weight%3D%22900%22%20fill%3D%22%23050505%22%3E9X%3C%2Ftext%3E%0A%3Ccircle%20cx%3D%2276%22%20cy%3D%2250%22%20r%3D%2227%22%20fill%3D%22%23ed1b2f%22%2F%3E%0A%3Ctext%20x%3D%2276%22%20y%3D%2264%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2239%22%20font-weight%3D%22900%22%20fill%3D%22%23fff%22%3EM%3C%2Ftext%3E%0A%3C%2Fsvg%3E","url":"https://wiselp.wiseplayout.com/9XM/HD720/HD720.m3u8","source":"https://famelack.com/tv/in/7CIRMQUnuxC7MK"}];
 
-
-
+let CHANNELS = DEFAULT_CHANNELS.slice();
 const channelsEl = document.getElementById("channels");
 let selectedCategory = "ALL";
+
+async function loadCentralChannels(){
+  if(!API_URL || API_URL.includes("PASTE_YOUR_")){
+    renderChannels();
+    return;
+  }
+  try{
+    const response = await fetch(API_URL + "?action=get&t=" + Date.now(), {cache:"no-store"});
+    const data = await response.json();
+    if(data && Array.isArray(data.channels)){
+      CHANNELS = data.channels;
+      renderChannels();
+    }else{
+      renderChannels();
+    }
+  }catch(error){
+    console.warn("Central channel data unavailable; using built-in data.", error);
+    renderChannels();
+  }
+}
 
 function renderChannels(){
   const list = CHANNELS.filter(channel =>
@@ -610,10 +632,10 @@ function renderChannels(){
   }
 
   channelsEl.innerHTML = list.map(channel => `
-    <a class="channel-card" href="${channel.url}" target="_blank" rel="noopener noreferrer">
+    <a class="channel-card" href="${escapeAttr(channel.url)}" target="_blank" rel="noopener noreferrer">
       <div class="channel-logo">
         ${channel.logo
-          ? `<img src="${channel.logo}" alt="" referrerpolicy="no-referrer">`
+          ? `<img src="${escapeAttr(channel.logo)}" alt="" referrerpolicy="no-referrer">`
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}</div>
@@ -631,18 +653,116 @@ document.querySelectorAll(".category").forEach(button => {
   });
 });
 
-renderChannels();
-
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, ch => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
   }[ch]));
 }
+function escapeAttr(value){ return escapeHtml(value); }
 
+loadCentralChannels();
+
+/* ================= ADMIN PANEL ================= */
+const adminModal = document.getElementById("adminModal");
+
+function openAdmin(){
+  adminModal.classList.add("show");
+  renderAdmin();
+}
+function closeAdmin(){
+  adminModal.classList.remove("show");
+}
+function renderAdmin(){
+  const list = CHANNELS.map((c,i)=>`
+    <div class="admin-row">
+      <div class="admin-title">
+        <input class="admin-name" data-i="${i}" value="${escapeAttr(c.name || "")}">
+        <span class="admin-status" id="status-${i}">⚪</span>
+      </div>
+      <div class="admin-fields">
+        <input data-i="${i}" data-key="category" value="${escapeAttr(c.category || "")}" placeholder="Category">
+        <input data-i="${i}" data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo">
+        <input data-i="${i}" data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL">
+        <input data-i="${i}" data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source">
+      </div>
+    </div>`).join("");
+
+  document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels.</div>`;
+}
+
+function collectAdminChannels(){
+  const next = CHANNELS.map((c,i)=>{
+    const rowInputs = document.querySelectorAll(`[data-i="${i}"]`);
+    const obj = {...c};
+    rowInputs.forEach(el=>{
+      if(el.classList.contains("admin-name")) obj.name=el.value.trim();
+      else if(el.dataset.key) obj[el.dataset.key]=el.value.trim();
+    });
+    return obj;
+  });
+  return next;
+}
+
+async function saveChannels(){
+  const next=collectAdminChannels();
+  const btn=document.getElementById("saveChannels");
+  btn.disabled=true;
+  btn.textContent="SAVING...";
+  try{
+    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
+    const response=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"save",channels:next})
+    });
+    const data=await response.json();
+    if(!data.ok) throw new Error(data.error||"Save failed");
+    CHANNELS=data.channels||next;
+    renderChannels();
+    setAdminMessage("Saved successfully.","ok");
+  }catch(e){
+    setAdminMessage("Save failed: "+e.message,"err");
+  }
+  btn.disabled=false;
+  btn.textContent="SAVE CHANGES";
+}
+
+async function checkAllStreams(){
+  const btn=document.getElementById("checkAll");
+  btn.disabled=true;
+  btn.textContent="CHECKING...";
+  document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
+  try{
+    if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
+    const response=await fetch(API_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"check",channels:collectAdminChannels()})
+    });
+    const data=await response.json();
+    if(!data.ok) throw new Error(data.error||"Check failed");
+    (data.results||[]).forEach((r,i)=>{
+      const el=document.getElementById("status-"+i);
+      if(el) el.textContent=r.ok?"🟢":"🔴";
+      if(r.ok) el.title="LIVE";
+      else el.title=r.error||"OFFLINE";
+    });
+    setAdminMessage("All streams checked.","ok");
+  }catch(e){
+    setAdminMessage("Check failed: "+e.message,"err");
+  }
+  btn.disabled=false;
+  btn.textContent="CHECK ALL STREAMS";
+}
+
+function setAdminMessage(text,type){
+  const el=document.getElementById("adminMessage");
+  el.textContent=text;
+  el.className="admin-message "+type;
+}
+
+document.getElementById("saveChannels").addEventListener("click",saveChannels);
+document.getElementById("checkAll").addEventListener("click",checkAllStreams);
 
 function updateClock(){
   document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
@@ -654,5 +774,22 @@ setInterval(updateClock,1000);
 </script>
 
 
+
+<div class="admin-modal" id="adminModal" onclick="if(event.target===this)closeAdmin()">
+  <div class="admin-panel">
+    <div class="admin-head">
+      <h2>SOIKAT · LIVE TV ADMIN</h2>
+      <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
+    </div>
+    <div class="admin-content">
+      <div class="admin-toolbar">
+        <button class="admin-btn" id="checkAll">CHECK ALL STREAMS</button>
+        <button class="admin-btn" id="saveChannels">SAVE CHANGES</button>
+      </div>
+      <div id="adminRows"></div>
+      <div id="adminMessage" class="admin-message"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
