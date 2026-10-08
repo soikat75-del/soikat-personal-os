@@ -496,16 +496,22 @@ footer{
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
 .admin-btn.secondary{background:#0b1b2e}
 .admin-btn:disabled{opacity:.55;cursor:wait}
-.admin-row{border:1px solid #223f61;border-radius:13px;padding:12px;background:#071525;margin-bottom:10px}
-.admin-title{display:grid;grid-template-columns:minmax(0,1fr) 155px 42px 34px;align-items:center;gap:8px;margin-bottom:9px}
-.admin-name{height:42px;width:100%;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
-.admin-category{height:42px;width:100%;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
-.admin-status{min-width:25px;text-align:center;font-size:17px;line-height:42px}
-.admin-delete{height:42px;width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
+.admin-row{border:1px solid #223f61;border-radius:13px;padding:10px;background:#071525;margin-bottom:10px;overflow:hidden}
+.admin-title{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-bottom:8px}
+.admin-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+.admin-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.admin-serial{width:36px;min-width:36px;height:42px;display:grid;place-items:center;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800}
+.admin-name{height:42px;flex:1 1 auto;min-width:150px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
+.admin-category{height:42px;width:155px;min-width:155px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
+.admin-move{height:42px;width:34px;min-width:34px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:12px;font-weight:800;cursor:pointer;padding:0}
+.admin-move:hover:not(:disabled){background:#102845;border-color:#5e8fff;color:#fff}
+.admin-move:disabled{opacity:.28;cursor:not-allowed}
+.admin-status{width:25px;min-width:25px;text-align:center;font-size:17px;line-height:42px}
+.admin-delete{height:42px;width:42px;min-width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
 .admin-emoji{width:42px;height:42px;border:1px solid #31547e;border-radius:9px;background:#326fe7;color:#fff;font-size:19px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-category option:last-child{color:#78a8ff;font-weight:700}
-.admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px}
+.admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
 .admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
@@ -1027,15 +1033,19 @@ function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
-        <span class="admin-serial">${i + 1}</span>
-        <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
-        <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="this.dataset.previous=this.value">
-          ${categoryOptions(c.category)}
-        </select>
-        <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
-        <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
-        <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
-        <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
+        <div class="admin-left">
+          <span class="admin-serial">${i + 1}</span>
+          <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
+          <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="this.dataset.previous=this.value">
+            ${categoryOptions(c.category)}
+          </select>
+        </div>
+        <div class="admin-right">
+          <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
+          <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
+          <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
+          <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
+        </div>
       </div>
       <div class="admin-fields">
         <div class="admin-field-wrap">
