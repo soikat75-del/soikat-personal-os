@@ -486,21 +486,27 @@ footer{
 .admin-btn.secondary{background:#0b1b2e}
 .admin-btn:disabled{opacity:.55;cursor:wait}
 .admin-row{border:1px solid #223f61;border-radius:13px;padding:12px;background:#071525;margin-bottom:10px}
-.admin-title{display:grid;grid-template-columns:minmax(0,1fr) 155px 78px 34px;align-items:center;gap:8px;margin-bottom:9px}
+.admin-title{display:grid;grid-template-columns:minmax(0,1fr) 155px 42px 34px;align-items:center;gap:8px;margin-bottom:9px}
 .admin-name{height:42px;width:100%;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
 .admin-category{height:42px;width:100%;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
 .admin-status{min-width:25px;text-align:center;font-size:17px;line-height:42px}
-.admin-delete{height:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:11px;font-weight:800;cursor:pointer}
+.admin-delete{height:42px;width:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:18px;font-weight:800;cursor:pointer;padding:0}
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}
+.admin-emoji{width:42px;height:42px;border:1px solid #31547e;border-radius:9px;background:#326fe7;color:#fff;font-size:19px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji.secondary{background:#0b1b2e}.admin-emoji:disabled{opacity:.55;cursor:wait}
+.admin-category option:last-child{color:#78a8ff;font-weight:700}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px}
-.admin-fields input{height:42px;width:100%;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
+.admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
+.admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
+.admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
+.admin-open-link:hover{background:#102845;border-color:#5e8fff}
+.admin-fields input:focus{border-color:#5e8fff}
 .admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
 .admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
 .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
 @media(max-width:700px){
-  .admin-title{grid-template-columns:minmax(0,1fr) 130px 68px 30px}
+  .admin-title{grid-template-columns:minmax(0,1fr) 130px 42px 30px}
   .admin-fields{grid-template-columns:1fr}
   .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}
 }
@@ -632,6 +638,38 @@ function apiJsonp(params, timeoutMs=20000){
   });
 }
 
+function renderPublicCategories(){
+  const wrap = document.getElementById("categories");
+  if(!wrap) return;
+  const active = selectedCategory || "ALL";
+  wrap.innerHTML = `<button class="category ${active==="ALL"?"active":""}" data-category="ALL">ALL</button>` +
+    CATEGORIES.map(cat => `<button class="category ${active===String(cat).toUpperCase()?"active":""}" data-category="${escapeAttr(String(cat).toUpperCase())}">${escapeHtml(String(cat).toUpperCase())}</button>`).join("");
+  wrap.querySelectorAll(".category").forEach(button => {
+    button.addEventListener("click", function(){
+      wrap.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
+      this.classList.add("active");
+      selectedCategory = String(this.dataset.category || "ALL").toUpperCase();
+      renderChannels();
+    });
+  });
+}
+
+async function loadCentralCategories(){
+  if(!API_URL || API_URL.includes("PASTE_YOUR_")){
+    renderPublicCategories();
+    return;
+  }
+  try{
+    const data = await apiJsonp({action:"getCategories"});
+    if(data && Array.isArray(data.categories) && data.categories.length){
+      CATEGORIES = data.categories;
+    }
+  }catch(error){
+    console.warn("Central categories unavailable; using built-in categories.", error);
+  }
+  renderPublicCategories();
+}
+
 async function loadCentralChannels(){
   if(!API_URL || API_URL.includes("PASTE_YOUR_")){
     renderChannels();
@@ -677,15 +715,6 @@ function renderChannels(){
   `).join("");
 }
 
-document.querySelectorAll(".category").forEach(button => {
-  button.addEventListener("click", function(){
-    document.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
-    this.classList.add("active");
-    selectedCategory = String(this.dataset.category || "ALL").toUpperCase();
-    renderChannels();
-  });
-});
-
 function escapeHtml(value){
   return String(value).replace(/[&<>"']/g, ch => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
@@ -693,13 +722,21 @@ function escapeHtml(value){
 }
 function escapeAttr(value){ return escapeHtml(value); }
 
+/* ================= ADMIN PANEL / CATEGORIES ================= */
+let CATEGORIES = ["SPORTS","NEWS","MUSIC","MOVIES","INFOTAINMENT"];
+
+loadCentralCategories();
 loadCentralChannels();
 
 /* ================= ADMIN PANEL ================= */
-function openAdmin(){
+async function openAdmin(){
   const adminModal = document.getElementById("adminModal");
   if(!adminModal) return;
   adminModal.classList.add("show");
+  try{
+    const data = await apiJsonp({action:"getCategories"});
+    if(data && Array.isArray(data.categories) && data.categories.length) CATEGORIES = data.categories;
+  }catch(e){}
   renderAdmin();
 }
 function closeAdmin(){
@@ -708,8 +745,43 @@ function closeAdmin(){
   adminModal.classList.remove("show");
 }
 function categoryOptions(selected){
-  const cats = ["SPORTS","NEWS","MUSIC","MOVIES","INFOTAINMENT"];
-  return cats.map(cat => `<option value="${cat}" ${String(selected||"").toUpperCase()===cat?"selected":""}>${cat}</option>`).join("");
+  const current = String(selected||"").toUpperCase();
+  const cats = CATEGORIES.slice();
+  if(current && !cats.includes(current)) cats.unshift(current);
+  return cats.map(cat => `<option value="${escapeAttr(cat)}" ${current===cat?"selected":""}>${escapeHtml(cat)}</option>`).join("") +
+    `<option value="__CREATE_NEW__">➕ CREATE NEW CATEGORY</option>`;
+}
+
+async function createNewCategory(select){
+  if(!select) return;
+  const previous = select.dataset.previous || select.value;
+  if(select.value !== "__CREATE_NEW__") { select.dataset.previous = select.value; return; }
+  const raw = prompt("Enter new category name:");
+  const name = String(raw || "").trim().replace(/\s+/g," ");
+  if(!name){
+    select.value = previous || CATEGORIES[0] || "";
+    return;
+  }
+  const category = name.toUpperCase();
+  if(CATEGORIES.some(c => c.toUpperCase() === category)){
+    select.value = category;
+    select.dataset.previous = category;
+    setAdminMessage("Category already exists.","err");
+    return;
+  }
+  try{
+    const data = await apiJsonp({action:"createCategory",category});
+    if(!data || !data.ok) throw new Error((data&&data.error)||"Category creation failed");
+    CATEGORIES = Array.isArray(data.categories) ? data.categories : [...CATEGORIES,category];
+    select.innerHTML = categoryOptions(category);
+    select.value = category;
+    select.dataset.previous = category;
+    renderPublicCategories();
+    setAdminMessage("Category created: "+category,"ok");
+  }catch(e){
+    select.value = previous || CATEGORIES[0] || "";
+    setAdminMessage("Category creation failed: "+e.message,"err");
+  }
 }
 
 function renderAdmin(){
@@ -717,20 +789,46 @@ function renderAdmin(){
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
-        <select class="admin-category" data-key="category">
+        <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="createNewCategory(this)">
           ${categoryOptions(c.category)}
         </select>
-        <button type="button" class="admin-delete" onclick="deleteStream(${i})">DELETE</button>
+        <button type="button" class="admin-delete" onclick="deleteStream(${i})" title="Delete stream" aria-label="Delete stream">🗑️</button>
         <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
       </div>
       <div class="admin-fields">
-        <input data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo URL / data image">
-        <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
-        <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
+        <div class="admin-field-wrap">
+          <input data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo URL / data image">
+        </div>
+        <div class="admin-field-wrap">
+          <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
+          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button>
+        </div>
+        <div class="admin-field-wrap">
+          <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
+          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'source')" title="Open source URL" aria-label="Open source URL">🔗</button>
+        </div>
       </div>
     </div>`).join("");
 
   document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels. Click ADD NEW STREAM.</div>`;
+}
+
+function openAdminLink(button,key){
+  const wrap=button?.closest('.admin-field-wrap');
+  const input=wrap?.querySelector(`[data-key="${key}"]`);
+  const raw=String(input?.value || '').trim();
+  if(!raw){
+    setAdminMessage(key === 'url' ? 'Stream URL is empty.' : 'Source URL is empty.','err');
+    input?.focus();
+    return;
+  }
+  let url=raw;
+  if(!/^https?:\/\//i.test(url) && !/^data:/i.test(url)) url='https://'+url;
+  if(/^data:/i.test(url)){
+    setAdminMessage('This is a data image, not a web link.','err');
+    return;
+  }
+  window.open(url,'_blank','noopener,noreferrer');
 }
 
 function collectAdminChannels(){
@@ -767,7 +865,7 @@ async function saveChannels(){
   const next=collectAdminChannels();
   const btn=document.getElementById("saveChannels");
   btn.disabled=true;
-  btn.textContent="SAVING...";
+  btn.textContent="⏳";
   try{
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
     const current = await apiJsonp({action:"get"});
@@ -787,13 +885,13 @@ async function saveChannels(){
     setAdminMessage("Saved successfully.","ok");
   }catch(e){ setAdminMessage("Save failed: "+e.message,"err"); }
   btn.disabled=false;
-  btn.textContent="SAVE CHANGES";
+  btn.textContent="💾";
 }
 
 async function checkAllStreams(){
   const btn=document.getElementById("checkAll");
   btn.disabled=true;
-  btn.textContent="CHECKING...";
+  btn.textContent="⏳";
   document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
   try{
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
@@ -810,7 +908,7 @@ async function checkAllStreams(){
     setAdminMessage("Check failed: "+e.message,"err");
   }
   btn.disabled=false;
-  btn.textContent="CHECK ALL STREAMS";
+  btn.textContent="🔃";
 }
 
 function setAdminMessage(text,type){
@@ -845,9 +943,9 @@ setInterval(updateClock,1000);
     </div>
     <div class="admin-content">
       <div class="admin-toolbar">
-        <button class="admin-btn secondary" id="addStream" onclick="addStream()">+ ADD NEW STREAM</button>
-        <button class="admin-btn" id="checkAll">CHECK ALL STREAMS</button>
-        <button class="admin-btn" id="saveChannels">SAVE CHANGES</button>
+        <button class="admin-emoji secondary" id="addStream" onclick="addStream()" title="Add new stream" aria-label="Add new stream">➕</button>
+        <button class="admin-emoji" id="checkAll" title="Check all streams" aria-label="Check all streams">🔃</button>
+        <button class="admin-emoji" id="saveChannels" title="Save changes" aria-label="Save changes">💾</button>
       </div>
       <div id="adminRows"></div>
       <div id="adminMessage" class="admin-message"></div>
