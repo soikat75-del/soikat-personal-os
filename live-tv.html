@@ -481,21 +481,29 @@ footer{
 .admin-head h2{margin:0;font-size:17px;letter-spacing:.7px}
 .admin-close{border:0;background:none;color:#9db3d1;font-size:26px;cursor:pointer}
 .admin-content{padding:20px}
-.admin-toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px}
+.admin-toolbar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .admin-btn{height:42px;border:1px solid #31547e;border-radius:9px;padding:0 14px;background:#326fe7;color:#fff;font-weight:700;cursor:pointer}
+.admin-btn.secondary{background:#0b1b2e}
 .admin-btn:disabled{opacity:.55;cursor:wait}
-.admin-row{border:1px solid #223f61;border-radius:13px;padding:13px;background:#071525;margin-bottom:10px}
-.admin-title{display:flex;align-items:center;gap:9px;margin-bottom:10px}
-.admin-name{height:42px;flex:1;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
-.admin-status{min-width:25px;text-align:center;font-size:16px}
-.admin-fields{display:grid;grid-template-columns:1fr 1fr 2fr 1.2fr;gap:8px}
+.admin-row{border:1px solid #223f61;border-radius:13px;padding:12px;background:#071525;margin-bottom:10px}
+.admin-title{display:grid;grid-template-columns:minmax(0,1fr) 155px 78px 34px;align-items:center;gap:8px;margin-bottom:9px}
+.admin-name{height:42px;width:100%;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#fff;padding:0 11px;font-size:14px;font-weight:700;outline:0}
+.admin-category{height:42px;width:100%;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
+.admin-status{min-width:25px;text-align:center;font-size:17px;line-height:42px}
+.admin-delete{height:42px;border:1px solid #6b3038;border-radius:9px;background:#35151a;color:#ff858d;font-size:11px;font-weight:800;cursor:pointer}
+.admin-delete:hover{background:#4a1b22;border-color:#a33d48}
+.admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px}
 .admin-fields input{height:42px;width:100%;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
-.admin-fields input:focus,.admin-name:focus{border-color:#5e8fff}
+.admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
 .admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
 .admin-empty{padding:30px;text-align:center;color:#7189ac}
 .footer-soikat{cursor:pointer}
-@media(max-width:700px){.admin-fields{grid-template-columns:1fr 1fr}.admin-fields input:nth-child(3),.admin-fields input:nth-child(4){grid-column:1/-1}.admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}}
+@media(max-width:700px){
+  .admin-title{grid-template-columns:minmax(0,1fr) 130px 68px 30px}
+  .admin-fields{grid-template-columns:1fr}
+  .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:stretch}.admin-btn{flex:1}
+}
 </style>
 
 <style>
@@ -699,35 +707,60 @@ function closeAdmin(){
   if(!adminModal) return;
   adminModal.classList.remove("show");
 }
+function categoryOptions(selected){
+  const cats = ["SPORTS","NEWS","MUSIC","MOVIES","INFOTAINMENT"];
+  return cats.map(cat => `<option value="${cat}" ${String(selected||"").toUpperCase()===cat?"selected":""}>${cat}</option>`).join("");
+}
+
 function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
-    <div class="admin-row">
+    <div class="admin-row" data-row="${i}">
       <div class="admin-title">
-        <input class="admin-name" data-i="${i}" value="${escapeAttr(c.name || "")}">
-        <span class="admin-status" id="status-${i}">⚪</span>
+        <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
+        <select class="admin-category" data-key="category">
+          ${categoryOptions(c.category)}
+        </select>
+        <button type="button" class="admin-delete" onclick="deleteStream(${i})">DELETE</button>
+        <span class="admin-status" id="status-${i}" title="Not checked">⚪</span>
       </div>
       <div class="admin-fields">
-        <input data-i="${i}" data-key="category" value="${escapeAttr(c.category || "")}" placeholder="Category">
-        <input data-i="${i}" data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo">
-        <input data-i="${i}" data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL">
-        <input data-i="${i}" data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source">
+        <input data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo URL / data image">
+        <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
+        <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
       </div>
     </div>`).join("");
 
-  document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels.</div>`;
+  document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels. Click ADD NEW STREAM.</div>`;
 }
 
 function collectAdminChannels(){
-  const next = CHANNELS.map((c,i)=>{
-    const rowInputs = document.querySelectorAll(`[data-i="${i}"]`);
-    const obj = {...c};
-    rowInputs.forEach(el=>{
-      if(el.classList.contains("admin-name")) obj.name=el.value.trim();
-      else if(el.dataset.key) obj[el.dataset.key]=el.value.trim();
-    });
+  return Array.from(document.querySelectorAll("#adminRows .admin-row")).map(row=>{
+    const obj = {};
+    row.querySelectorAll("[data-key]").forEach(el=>{ obj[el.dataset.key] = el.value.trim(); });
     return obj;
   });
-  return next;
+}
+
+function addStream(){
+  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:""});
+  renderAdmin();
+  const rows = document.querySelectorAll("#adminRows .admin-row");
+  const last = rows[rows.length-1];
+  if(last){
+    last.scrollIntoView({behavior:"smooth",block:"nearest"});
+    const name = last.querySelector('[data-key="name"]');
+    if(name){ name.focus(); name.select(); }
+  }
+  setAdminMessage("New stream added. Fill the fields and press SAVE CHANGES.","ok");
+}
+
+function deleteStream(index){
+  if(index < 0 || index >= CHANNELS.length) return;
+  const name = CHANNELS[index]?.name || "this stream";
+  if(!confirm(`Delete ${name}?`)) return;
+  CHANNELS.splice(index,1);
+  renderAdmin();
+  setAdminMessage("Stream removed from the list. Press SAVE CHANGES to permanently save it.","ok");
 }
 
 async function saveChannels(){
@@ -737,29 +770,22 @@ async function saveChannels(){
   btn.textContent="SAVING...";
   try{
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
-
-    // Google Apps Script Web Apps do not reliably expose CORS for browser fetch().
-    // Save each channel through JSONP so this also works from GitHub Pages.
+    const current = await apiJsonp({action:"get"});
+    const oldChannels = Array.isArray(current?.channels) ? current.channels : [];
+    for(let i=oldChannels.length-1;i>=next.length;i--){
+      const data=await apiJsonp({action:"delete",index:i});
+      if(!data || !data.ok) throw new Error((data&&data.error)||"Delete failed");
+    }
     for(let i=0;i<next.length;i++){
       const c=next[i];
-      const data=await apiJsonp({
-        action:"saveOne",
-        index:i,
-        name:c.name||"",
-        category:c.category||"",
-        logo:c.logo||"",
-        url:c.url||"",
-        source:c.source||""
-      });
+      const data=await apiJsonp({action:"saveOne",index:i,name:c.name||"",category:c.category||"",logo:c.logo||"",url:c.url||"",source:c.source||""});
       if(!data || !data.ok) throw new Error((data&&data.error)||"Save failed");
     }
-
     CHANNELS=next;
     renderChannels();
+    renderAdmin();
     setAdminMessage("Saved successfully.","ok");
-  }catch(e){
-    setAdminMessage("Save failed: "+e.message,"err");
-  }
+  }catch(e){ setAdminMessage("Save failed: "+e.message,"err"); }
   btn.disabled=false;
   btn.textContent="SAVE CHANGES";
 }
@@ -771,20 +797,12 @@ async function checkAllStreams(){
   document.querySelectorAll(".admin-status").forEach(x=>x.textContent="🟡");
   try{
     if(!API_URL || API_URL.includes("PASTE_YOUR_")) throw new Error("API URL not configured");
-
     const channelsForCheck = collectAdminChannels().map(c=>({name:c.name||"",url:c.url||""}));
-    const data = await apiJsonp({
-      action:"check",
-      channels:JSON.stringify(channelsForCheck)
-    });
+    const data = await apiJsonp({action:"check",channels:JSON.stringify(channelsForCheck)});
     if(!data || !data.ok) throw new Error((data&&data.error)||"Check failed");
-
     (data.results||[]).forEach((r,i)=>{
       const el=document.getElementById("status-"+i);
-      if(el){
-        el.textContent=r.ok?"🟢":"🔴";
-        el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE");
-      }
+      if(el){ el.textContent=r.ok?"🟢":"🔴"; el.title=r.ok ? ("LIVE · HTTP "+(r.code||"")) : (r.error||"OFFLINE"); }
     });
     setAdminMessage("All streams checked.","ok");
   }catch(e){
@@ -827,6 +845,7 @@ setInterval(updateClock,1000);
     </div>
     <div class="admin-content">
       <div class="admin-toolbar">
+        <button class="admin-btn secondary" id="addStream" onclick="addStream()">+ ADD NEW STREAM</button>
         <button class="admin-btn" id="checkAll">CHECK ALL STREAMS</button>
         <button class="admin-btn" id="saveChannels">SAVE CHANGES</button>
       </div>
