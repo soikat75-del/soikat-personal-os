@@ -421,9 +421,13 @@ footer{
   padding:14px 0 12px;
   overflow-x:auto;
   scrollbar-width:none;
+  justify-content:flex-start;
+  margin-left:25px;
+  margin-right:25px;
+  width:calc(100% - 50px);
 }
 @media(max-width:700px){
-  .categories{width:calc(100% - 20px);margin-left:auto;margin-right:auto}
+  .categories{width:calc(100% - 50px);margin-left:25px;margin-right:25px;justify-content:flex-start}
   .channel-search{margin:14px 14px 0}
 }
 .categories::-webkit-scrollbar{display:none}
