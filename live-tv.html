@@ -874,9 +874,13 @@ async function deleteCategory(category){
     return;
   }
   try{
-    const data=await apiJsonp({action:"deleteCategory",category});
+    const nextCategories=CATEGORIES.filter(c=>String(c).toUpperCase()!==String(category).toUpperCase());
+    const data=await apiJsonp({
+      action:"save",
+      data:JSON.stringify({channels:CHANNELS,categories:nextCategories})
+    });
     if(!data || !data.ok) throw new Error((data&&data.error)||"Category deletion failed");
-    CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES.filter(c=>c!==category);
+    CATEGORIES=Array.isArray(data.categories)?data.categories:nextCategories;
     renderCategoryManager();
     renderAdmin();
     renderPublicCategories();
@@ -899,9 +903,18 @@ function closeConfirm(){
   confirmAction=null;
   document.getElementById("confirmModal").classList.remove("show");
 }
-function confirmYes(){
+async function confirmYes(){
   const action=confirmAction;
-  if(action) action();
+  const btn=document.querySelector('#confirmModal .confirm-delete');
+  if(!action) return;
+  if(btn){ btn.disabled=true; btn.textContent='⏳'; }
+  try{
+    await action();
+  }catch(e){
+    setAdminMessage(e?.message || 'Action failed.','err');
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent='DELETE'; }
+  }
 }
 function renderAdmin(){
   const list = CHANNELS.map((c,i)=>`
@@ -974,10 +987,24 @@ function addStream(){
 function deleteStream(index){
   if(index < 0 || index >= CHANNELS.length) return;
   const name = CHANNELS[index]?.name || "this stream";
-  if(!confirm(`Delete ${name}?`)) return;
-  CHANNELS.splice(index,1);
-  renderAdmin();
-  setAdminMessage("Stream removed from the list. Press SAVE CHANGES to permanently save it.","ok");
+  openConfirm(
+    "Delete Stream",
+    `Delete <strong>${escapeHtml(name)}</strong> stream?`,
+    async ()=>{
+      const nextChannels=CHANNELS.filter((_,i)=>i!==index);
+      const data=await apiJsonp({
+        action:"save",
+        data:JSON.stringify({channels:nextChannels,categories:CATEGORIES})
+      });
+      if(!data || !data.ok) throw new Error((data&&data.error)||"Stream deletion failed");
+      CHANNELS=Array.isArray(data.channels)?data.channels:nextChannels;
+      CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
+      renderAdmin();
+      renderChannels();
+      closeConfirm();
+      setAdminMessage("Stream deleted successfully.","ok");
+    }
+  );
 }
 
 async function saveChannels(){
