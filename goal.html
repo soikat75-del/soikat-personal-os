@@ -1302,6 +1302,14 @@ footer{
  }
 }
 .footer-soikat{color:#7c8cff;}
+
+@media(max-width:600px){
+ .day-tooltip{display:block!important;left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom, 0px))!important;top:auto!important;width:auto;min-width:0;max-width:none;padding:13px 14px;border-radius:12px;opacity:0;visibility:hidden;transform:translateY(12px);pointer-events:none;transition:opacity .16s ease,transform .16s ease,visibility .16s;}
+ .day-tooltip.show.touch-mode{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto;}
+ .day-tooltip .tt-close{display:block;width:30px;height:30px;margin:8px 0 0 auto;padding:0;border:1px solid #35506e;border-radius:8px;background:#132338;color:#fff;font-size:20px;line-height:1;}
+ input,select,textarea{font-size:16px!important;}
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -2810,9 +2818,11 @@ function showDayTooltip(
   tooltip.innerHTML+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #26384e;color:#9db0c6">${safeNote} · ${money(cumulative)} cumulative</div>`;
  }
  if(touchMode){
+  tooltip.classList.add("touch-mode");
   tooltip.innerHTML+='<button type="button" class="tt-close" aria-label="Close tooltip">×</button>';
   tooltip.querySelector(".tt-close").addEventListener("click",e=>{e.stopPropagation();hideDayTooltip();});
-  tooltip.style.left=""; tooltip.style.top="";
+  tooltip.style.left="10px"; tooltip.style.top="auto";
+  tooltip.style.bottom="calc(10px + env(safe-area-inset-bottom, 0px))";
  }
  tooltip.classList.add("show");
  if(!touchMode) moveDayTooltip(event);
@@ -2905,8 +2915,11 @@ function hideDayTooltip(){
    "dayTooltip"
   )
   .classList.remove(
-   "show"
+   "show", "touch-mode"
   );
+ tooltip.style.left="";
+ tooltip.style.top="";
+ tooltip.style.bottom="";
 
 }
 
