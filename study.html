@@ -858,7 +858,8 @@ function renderRoutine(d){
   // Show earlier studies for subjects planned on the selected routine date.
   const subjects=new Set(list.map(x=>normalizeSubject(x.subject)));
   const prior=[];
-  for(let day=cloneDate(START);day<cloneDate(d);day.setDate(day.getDate()+1)){
+  // Subject recap repeats only within the selected calendar month.
+  for(let day=new Date(d.getFullYear(),d.getMonth(),1);day<cloneDate(d);day.setDate(day.getDate()+1)){
     const dk=iso(day);
     entries(day).forEach((item,index)=>{
       if(subjects.has(normalizeSubject(item.subject))){
