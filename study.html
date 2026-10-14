@@ -3,1333 +3,1973 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SOIKAT · 200D PLAN</title>
+<title>SOIKAT — PERSONAL OS</title>
+
 <style>
-:root{
-  --bg:#070b14;--panel:#0d1422;--panel2:#111a2b;--line:#1d2940;
-  --text:#edf3ff;--muted:#8190a8;--green:#35e39a;--blue:#5aa7ff;
-  --purple:#a77bff;--orange:#ffb454;--red:#ff6b78;--yellow:#f4d35e;
-}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 20% 0%,#101a30 0,#070b14 38%,#050810 100%);
-font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);min-height:100vh}
-.wrap{max-width:1200px;margin:auto;padding:14px 16px 24px}
-header{position:fixed;top:0;left:0;right:0;z-index:1000;height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid rgba(105,140,180,.18);padding:0 16px;background:rgba(7,11,20,.58);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.header-back{justify-self:start;color:var(--muted);text-decoration:none;font-size:10px;white-space:nowrap;transition:.15s}
-.header-back:hover{color:var(--text)}
-.header-brand{justify-self:center;font-weight:800;letter-spacing:.13em;font-size:12px;white-space:nowrap;background:linear-gradient(110deg,#ffffff 10%,#9ebcff 45%,#ffffff 60%,#758fff 80%,#ffffff 100%);background-size:250% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:logoShine 6s linear infinite}
-@keyframes logoShine{to{background-position:250% center}}
-.header-range{justify-self:end;color:var(--muted);font-size:9px;white-space:nowrap}
-.brand{font-weight:800;letter-spacing:.16em;font-size:15px}.brand span{color:var(--blue)}
-.sub{font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:5px}
-.top-actions{display:flex;gap:8px;flex-wrap:wrap}
-button,.btn{border:1px solid var(--line);background:#0c1422;color:var(--text);border-radius:9px;padding:9px 12px;cursor:pointer;font-weight:700}
-button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
-.hero{display:grid;grid-template-columns:1fr;gap:10px}
-.card{background:linear-gradient(180deg,#0e1727,#0a111e);border:1px solid var(--line);border-radius:11px;padding:12px;box-shadow:0 8px 24px #0003}
-.kicker{font-size:10px;letter-spacing:.18em;color:var(--muted);font-weight:800}
-.big{font-size:27px;font-weight:900;margin:5px 0}
-.big span{color:var(--blue)}
-.progress{height:7px;background:#182237;border-radius:20px;overflow:hidden;margin:9px 0 7px}
-.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple),var(--green));border-radius:20px}
-.meta{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:9px}
-.stat{background:#0b1321;border:1px solid var(--line);border-radius:8px;padding:8px}
-.stat b{display:block;font-size:16px;margin-top:3px}.stat small{color:var(--muted);font-size:9px}
 
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;margin-top:10px}
-.section-title{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:8px}
-.section-title h2{margin:0;font-size:14px}.tag{font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:4px 6px;border-radius:6px}
-.daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:9px 10px;border-radius:8px;margin-bottom:6px}
-.daybar strong{font-size:12px}.daybar span{font-size:10px;color:var(--muted)}
-.routine-head{gap:10px}.routine-head h2{flex:none}.routine-head{margin-bottom:8px}.routine-head>button{padding:6px 8px;font-size:9px}.routine-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:6px}.routine-nav button{padding:7px 8px;font-size:9px;white-space:nowrap;min-width:0}.recap-nav{margin-bottom:8px}.recap-nav button{font-size:8px;padding:7px 3px}
-.study-row{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #162238}
-.study-row:last-child{border-bottom:0}
-.check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
-.subject{font-size:11px;color:var(--blue);font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.topic{font-size:14px;margin-top:3px}.carry{font-size:10px;color:var(--orange);margin-top:4px}
-.status{font-size:10px;color:var(--muted);white-space:nowrap}
-.status.done{color:var(--green)}
-.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
-.month-nav{display:flex;gap:8px;align-items:center}.month-nav button{padding:7px 10px}
-.month-name{min-width:135px;text-align:center;font-weight:800}
-.month-item{border:1px solid var(--line);border-radius:9px;padding:11px;background:#0a1220;cursor:pointer}
-.month-item.active{border-color:var(--blue);box-shadow:0 0 0 1px #5aa7ff33 inset}
-.month-item b{display:block;font-size:12px}.month-item span{font-size:10px;color:var(--muted)}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-input,select,textarea{width:100%;background:#080f1c;border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--blue)}
-.full{grid-column:1/-1}
-.add{width:100%;margin-top:9px;background:#14253d;border-color:#31547e}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:7px}
-.cal-head{font-size:8px;text-align:center;color:var(--muted);padding:3px}
-.cal-day{min-height:50px;border:1px solid var(--line);border-radius:6px;padding:5px;background:#0a1220;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center}
-.cal-day:hover{border-color:#3d5a80}
-.cal-day.today{box-shadow:0 0 0 2px var(--blue) inset}
-.cal-day.selected-date{box-shadow:0 0 0 2px var(--purple) inset,0 0 0 1px #a77bff55}
-.cal-day.selected-date .selected-marker{display:block}
-.selected-marker{display:none;position:absolute;top:6px;right:7px;width:5px;height:5px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 2px #a77bff22}
-.cal-day{position:relative}
-.cal-day.done{background:#0d2a21;border-color:#1d7358}
-.cal-day.partial{background:#282310;border-color:#75651c}
-.cal-day.missed{background:#2a1118;border-color:#71313d}
-.cal-day.pending{background:#0a1220;border-color:#33425a}
-.cal-day.empty{background:#0a1220;border-color:#1b2638;opacity:.75}
-.cal-day .n{font-size:10px;font-weight:800;display:block;text-align:center}.cal-day .mini{font-size:8px;color:var(--muted);margin-top:3px}
-.cal-day.done .mini{color:var(--green)}
-.cal-day.partial .mini{color:var(--orange)}
-.cal-day.missed .mini{color:var(--red)}
-.cal-day.pending .mini{color:var(--muted)}
-.cal-status-wrap{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:4px}.cal-status{font-size:7px;letter-spacing:.08em;font-weight:800;color:var(--muted)}.cal-today{font-size:7px;letter-spacing:.08em;font-weight:800;color:var(--blue)}
-.cal-day.done .cal-status{color:var(--green)}
-.cal-day.partial .cal-status{color:var(--orange)}
-.cal-day.missed .cal-status{color:var(--red)}
-.cal-day.pending .cal-status{color:var(--muted)}
-
-.cal-day.outside{opacity:.28;cursor:default;background:#070b14}
-.delete-routine{border:1px solid #71313d;color:var(--red);background:#160c10;padding:5px 8px;font-size:8px;border-radius:6px;cursor:pointer}
-.delete-routine:hover{border-color:var(--red)}
-.routine-card{
-  scroll-margin-top:70px;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-.routine-item{
-  display:grid;
-  grid-template-columns:22px minmax(0,1fr) 30px;
-  gap:6px;
-  align-items:center;
-  padding:9px 0;
-  border-bottom:1px solid #162238;
-}
-.routine-item:last-child{border-bottom:0}
-.routine-content{
-  min-width:0;
-  width:100%;
-  justify-self:stretch;
-  text-align:left;
-}
-.routine-content .subject{
-  display:block;
-  text-align:left;
-}
-.routine-content .topic{
-  display:block;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-  word-break:break-word;
-  text-align:left;
-  line-height:1.4;
-  margin-top:2px;
-}
-.routine-action{
-  width:22px;
-  height:22px;
-  padding:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:8px;
-  flex:none;
-}
-.routine-action svg{
-  width:11px;
-  height:11px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-.routine-action.check-action{
-  width:16px;
-  height:16px;
-  margin:0;
-  padding:0;
-  accent-color:var(--green);
-  cursor:pointer;
-  border:0;
-  background:transparent;
-  appearance:auto;
-  -webkit-appearance:checkbox;
-  justify-self:start;
-}
-.routine-action.delete-action{
-  color:var(--red);
-  border-color:#71313d;
-  background:#160c10;
-}
-.routine-action.delete-action:hover{
-  border-color:var(--red);
-  background:#211017;
+body{
+    min-height:100vh;
+    background:#030914;
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
 }
 
+/* ================= BACKGROUND ================= */
 
-.rev{margin-top:10px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#0a1220}
-.rev-head{display:flex;justify-content:space-between;font-size:12px;font-weight:800}.rev small{display:block;color:var(--muted);margin-top:5px}
-.rev-head-single{justify-content:flex-start}.rev-head-single span{font-weight:800}
-.rev-title-stack{display:flex;flex-direction:row;align-items:center;gap:10px;width:100%;margin-bottom:8px}.rev-title-stack h2{margin:0;white-space:nowrap}.rev-date-label{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.03em;white-space:nowrap}.rev-count-label{font-size:11px;font-weight:800;color:var(--text);margin-left:auto;white-space:nowrap}
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-3;
 
-.revision-list{margin-top:5px;display:grid;gap:5px;max-height:360px;overflow:auto}
-.revision-item{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;
-  padding:7px 0;border-top:1px solid #162238;cursor:pointer}
-.revision-item input{width:16px;height:16px;accent-color:var(--green);cursor:pointer}
-.revision-item .topic{font-size:12px}
-.revision-date{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap}
-.revision-group-title{font-size:9px;letter-spacing:.12em;color:var(--orange);font-weight:800;margin-top:12px;padding-bottom:6px;border-bottom:1px solid #162238}
-.pending-item{cursor:default}
+    background:
+        radial-gradient(
+            circle at 5% 0%,
+            rgba(20,75,210,.28),
+            transparent 32%
+        ),
+        radial-gradient(
+            circle at 100% 100%,
+            rgba(120,35,220,.22),
+            transparent 32%
+        ),
+        linear-gradient(
+            135deg,
+            #020812,
+            #050c18 55%,
+            #080412
+        );
+}
 
+body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-2;
 
-.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
-.modal.open{display:flex}.modal-box{width:min(560px,100%);max-height:90vh;overflow:auto;background:#0d1524;border:1px solid var(--line);border-radius:14px;padding:18px}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.bulk{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;min-height:240px;resize:vertical}
-.note{color:var(--muted);font-size:11px;line-height:1.5;margin-top:8px}
-footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-top:38px;padding:0 0 20px;color:#8292a2;font-size:11px;letter-spacing:4px}.footer-line{width:150px;height:1px;background:linear-gradient(90deg,transparent,#526b82)}.footer-line.right{background:linear-gradient(90deg,#526b82,transparent)}.heart{color:#ff416c;font-size:14px;display:inline-block;animation:heartbeat 1.8s infinite}@keyframes heartbeat{0%,100%{transform:scale(1)}10%{transform:scale(1.22)}20%{transform:scale(1)}30%{transform:scale(1.12)}}
-/* ===== FIXED DESKTOP LAYOUT =====
-   The four main work areas keep their positions.
-   Their internal content scrolls instead of pushing the
-   other sections up/down when routine or revision lists grow.
-*/
-@media(min-width:851px){
-  .grid{
-    align-items:start;
-  }
+    background-image:
+        linear-gradient(
+            rgba(70,120,255,.065) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(70,120,255,.065) 1px,
+            transparent 1px
+        );
 
-  .grid>div{
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-  }
+    background-size:72px 72px;
 
-  .routine-card,
-  .calendar-card,
-  .weekly-card,
-  .monthly-card{
-    display:flex;
-    flex-direction:column;
-    min-height:0;
+    transform:
+        perspective(700px)
+        rotateX(58deg)
+        scale(1.5)
+        translateY(12%);
+
+    transform-origin:center bottom;
+}
+
+/* ================= CONTAINER ================= */
+
+.container{
+    width:min(1440px,92%);
+    min-height:100vh;
+    margin:auto;
+
+    padding:
+        clamp(45px,6vw,80px)
+        0
+        30px;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    text-align:center;
+    margin-bottom:clamp(40px,5vw,60px);
+}
+
+.logo{
+    font-size:clamp(48px,7vw,90px);
+    font-weight:900;
+    line-height:1;
+
+    letter-spacing:
+        clamp(9px,1.6vw,20px);
+
+    margin-left:
+        clamp(9px,1.6vw,20px);
+
+    background:
+        linear-gradient(
+            110deg,
+            #72a9ff,
+            #ffffff 30%,
+            #a9baff 52%,
+            #ffffff 70%,
+            #927cff
+        );
+
+    background-size:250% auto;
+
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+
+    text-shadow:
+        0 0 35px rgba(80,120,255,.2);
+
+    animation:logoShine 7s linear infinite;
+}
+
+@keyframes logoShine{
+    to{
+        background-position:250% center;
+    }
+}
+
+.subtitle{
+    margin-top:18px;
+
+    color:#6c7fa6;
+
+    font-size:
+        clamp(9px,1vw,13px);
+
+    font-weight:600;
+
+    letter-spacing:
+        clamp(5px,1vw,10px);
+}
+
+.header-line{
+    width:175px;
+    max-width:35vw;
+    height:1px;
+
+    margin:24px auto 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #367fff,
+            #9b60ff,
+            transparent
+        );
+
+    box-shadow:
+        0 0 15px rgba(70,120,255,.6);
+}
+
+/* ================= GRID ================= */
+
+.cards{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:
+        clamp(16px,1.6vw,24px);
+}
+
+/* ================= CARD ================= */
+
+.card{
+    position:relative;
+
+    height:
+        clamp(220px,22vw,285px);
+
     overflow:hidden;
-    flex:none;
-  }
 
-  /* Keep the four sections in fixed positions,
-     but let their CONTENT scroll internally. */
-  .routine-card,
-  .weekly-card{
-    height:430px;
-  }
+    border-radius:
+        clamp(16px,1.5vw,22px);
 
-  .calendar-card,
-  .monthly-card{
-    height:430px;
-  }
+    background:#07101c;
 
-  .routine-card #routineList{
-    min-height:0;
-    flex:1;
-    overflow-y:auto;
-    overflow-x:hidden;
-    padding-right:4px;
-  }
+    border:1px solid rgba(90,145,255,.55);
 
-  .calendar-card .calendar{
-    flex:1;
-    min-height:0;
-    overflow-y:auto;
-    overflow-x:hidden;
-    align-content:start;
-  }
+    text-decoration:none;
+    color:white;
 
-  .weekly-card #weeklyList,
-  .monthly-card #monthlyList{
-    min-height:0;
-    flex:1;
-    overflow-y:auto;
-    overflow-x:hidden;
-    padding-right:4px;
-  }
+    isolation:isolate;
 
-  .weekly-card .revision-list,
-  .monthly-card .revision-list{
-    max-height:none;
-    overflow:visible;
-  }
+    transition:
+        transform .4s ease,
+        box-shadow .4s ease,
+        border-color .4s ease;
 }
 
-@media(max-width:850px){
-  body{padding-top:58px}
-  .hero,.grid{grid-template-columns:1fr}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .routine-card,.calendar-card,.weekly-card,.monthly-card{height:auto}
-  .routine-card #routineList,
-  .weekly-card #weeklyList,
-  .monthly-card #monthlyList{overflow:visible}
-  .calendar-card .calendar{overflow:visible}
-  header{grid-template-columns:auto 1fr auto;gap:10px}
-  .header-brand{font-size:12px;letter-spacing:.12em}
-}
-@media(max-width:560px){
-  .wrap{padding:76px 12px 18px}
-  .routine-nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
-  .routine-nav button{font-size:8px;padding:7px 5px}
+.card:hover{
+    transform:translateY(-7px);
 
-  header{padding:0 10px}
-  footer{gap:12px;font-size:8px;letter-spacing:2px}
-  .footer-line{width:55px}
-  .stats{grid-template-columns:1fr 1fr}
-  .cal-day{min-height:48px;padding:5px}
-  .status{display:none}
-  .big{font-size:28px}
-  .header-back{font-size:10px}
-  .header-brand{font-size:10px}
-  .header-range{font-size:8px}
+    border-color:
+        rgba(120,180,255,.95);
+
+    box-shadow:
+        0 25px 70px rgba(0,0,0,.5),
+        0 0 35px rgba(60,120,255,.16);
 }
 
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:28px;
-  transform:translateX(-50%);
-  z-index:9999;
-  padding:9px 14px;
-  border-radius:8px;
-  background:#f5f7fa;
-  color:#111827;
-  font-size:12px;
-  font-weight:600;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .18s ease, transform .18s ease;
+
+/* =========================================================
+   CINEMATIC ART
+========================================================= */
+
+.art{
+    position:absolute;
+    inset:0;
+
+    z-index:-3;
+
+    overflow:hidden;
 }
-.toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(-2px);
+
+.art::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(2,8,17,.97) 0%,
+            rgba(2,8,17,.86) 30%,
+            rgba(2,8,17,.52) 55%,
+            rgba(2,8,17,.16) 80%,
+            rgba(2,8,17,.08)
+        ),
+        linear-gradient(
+            to top,
+            rgba(1,5,12,.8),
+            transparent 65%
+        );
+
+    z-index:20;
+}
+
+
+/* =========================================================
+   100K GOAL ART
+========================================================= */
+
+.goal-art{
+    background:
+        radial-gradient(
+            circle at 72% 50%,
+            rgba(255,172,45,.28),
+            transparent 28%
+        ),
+        linear-gradient(
+            135deg,
+            #06101e,
+            #0a1a2c 50%,
+            #291505
+        );
+}
+
+.goal-table{
+    position:absolute;
+
+    left:42%;
+    right:-5%;
+    bottom:0;
+
+    height:18%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #5b3518,
+            #1b1009
+        );
+
+    transform:
+        perspective(300px)
+        rotateX(55deg);
+}
+
+.coin{
+    position:absolute;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #fff1a0,
+            #f3ae32 45%,
+            #7a3f08
+        );
+
+    box-shadow:
+        0 0 15px rgba(255,178,48,.45);
+
+    animation:
+        coinFloat 3s ease-in-out infinite alternate;
+}
+
+.coin.one{
+    width:42px;
+    height:13px;
+
+    right:28%;
+    bottom:12%;
+}
+
+.coin.two{
+    width:35px;
+    height:11px;
+
+    right:20%;
+    bottom:18%;
+
+    animation-delay:.5s;
+}
+
+.coin.three{
+    width:30px;
+    height:10px;
+
+    right:34%;
+    bottom:8%;
+
+    animation-delay:1s;
+}
+
+@keyframes coinFloat{
+    to{
+        transform:translateY(-5px);
+    }
+}
+
+.chart{
+    position:absolute;
+
+    right:8%;
+    bottom:17%;
+
+    width:52%;
+    height:62%;
+}
+
+.bar{
+    position:absolute;
+
+    bottom:0;
+
+    width:11%;
+
+    border-radius:4px 4px 0 0;
+
+    background:
+        linear-gradient(
+            to top,
+            #9a530b,
+            #ffc653
+        );
+
+    box-shadow:
+        0 0 17px rgba(255,179,53,.32);
+}
+
+.bar:nth-child(1){
+    left:2%;
+    height:20%;
+}
+
+.bar:nth-child(2){
+    left:18%;
+    height:34%;
+}
+
+.bar:nth-child(3){
+    left:34%;
+    height:48%;
+}
+
+.bar:nth-child(4){
+    left:50%;
+    height:66%;
+}
+
+.bar:nth-child(5){
+    left:66%;
+    height:84%;
+}
+
+.growth-arrow{
+    position:absolute;
+
+    left:5%;
+    top:10%;
+
+    width:70%;
+    height:65%;
+
+    border-top:
+        4px solid #ffc04c;
+
+    transform:
+        rotate(-29deg);
+
+    transform-origin:left center;
+
+    filter:
+        drop-shadow(
+            0 0 9px rgba(255,190,60,.8)
+        );
+}
+
+.growth-arrow::after{
+    content:"";
+
+    position:absolute;
+
+    right:-3px;
+    top:-11px;
+
+    width:0;
+    height:0;
+
+    border-left:18px solid #ffc04c;
+    border-top:10px solid transparent;
+    border-bottom:10px solid transparent;
+
+    transform:rotate(18deg);
+}
+
+.target{
+    position:absolute;
+
+    right:2%;
+    bottom:8%;
+
+    width:100px;
+    height:100px;
+
+    border:
+        4px solid #f2b43c;
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 25px rgba(255,179,47,.45);
+}
+
+.target::before{
+    content:"";
+
+    position:absolute;
+
+    inset:18px;
+
+    border:
+        4px solid #f2b43c;
+
+    border-radius:50%;
+}
+
+.target::after{
+    content:"";
+
+    position:absolute;
+
+    inset:37px;
+
+    border:
+        4px solid #f2b43c;
+
+    border-radius:50%;
+
+    background:#ffb93e;
+}
+
+
+/* =========================================================
+   200D PLAN ART
+========================================================= */
+
+.plan-art{
+    background:
+        radial-gradient(
+            circle at 75% 45%,
+            rgba(50,130,255,.3),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #06101e,
+            #0a1d36 65%,
+            #101727
+        );
+}
+
+.lamp{
+    position:absolute;
+
+    right:7%;
+    top:-4%;
+
+    width:105px;
+    height:82px;
+
+    border-radius:
+        55% 55% 15% 15%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #23364e,
+            #a0b4cc
+        );
+
+    transform:rotate(-8deg);
+
+    box-shadow:
+        0 18px 30px rgba(0,0,0,.4);
+}
+
+.lamp::after{
+    content:"";
+
+    position:absolute;
+
+    left:10px;
+    top:50px;
+
+    width:85px;
+    height:130px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(105,168,255,.3),
+            transparent
+        );
+
+    filter:blur(10px);
+}
+
+.books{
+    position:absolute;
+
+    right:20%;
+    bottom:13%;
+
+    width:42%;
+}
+
+.book{
+    height:28px;
+
+    margin-top:5px;
+
+    border-radius:3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0d1c34,
+            #39577f
+        );
+
+    box-shadow:
+        0 5px 12px rgba(0,0,0,.4);
+}
+
+.book span{
+    display:block;
+
+    padding:7px 0 0 18px;
+
+    color:#b2c9f5;
+
+    font-size:8px;
+
+    letter-spacing:2px;
+}
+
+.calendar{
+    position:absolute;
+
+    right:5%;
+    bottom:8%;
+
+    width:30%;
+    height:58%;
+
+    border-radius:7px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #dfe8f2,
+            #7e93b0
+        );
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.45);
+}
+
+.calendar-top{
+    height:20%;
+
+    background:#315987;
+}
+
+.calendar-grid{
+    padding:15px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:9px;
+}
+
+.calendar-grid i{
+    width:13px;
+    height:13px;
+
+    border:
+        2px solid #315987;
+
+    position:relative;
+}
+
+.calendar-grid i::after{
+    content:"";
+
+    position:absolute;
+
+    width:7px;
+    height:4px;
+
+    left:2px;
+    top:1px;
+
+    border-left:2px solid #3868e8;
+    border-bottom:2px solid #3868e8;
+
+    transform:rotate(-45deg);
+}
+
+
+/* =========================================================
+   NOTEPAD ART
+========================================================= */
+
+.note-art{
+    background:
+        radial-gradient(
+            circle at 75% 38%,
+            rgba(42,225,180,.18),
+            transparent 28%
+        ),
+        linear-gradient(
+            135deg,
+            #031414,
+            #082724 58%,
+            #07171e
+        );
+}
+
+.note-desk{
+    position:absolute;
+
+    left:32%;
+    right:-5%;
+    bottom:0;
+
+    height:16%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #31574c,
+            #101c1a
+        );
+}
+
+.notebook{
+    position:absolute;
+
+    right:8%;
+    bottom:-3%;
+
+    width:52%;
+    height:75%;
+
+    border-radius:
+        8px 18px 13px 7px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e0e4d9,
+            #a2aa9d
+        );
+
+    transform:rotate(-7deg);
+
+    box-shadow:
+        -15px 20px 40px rgba(0,0,0,.5);
+}
+
+.notebook::before{
+    content:"";
+
+    position:absolute;
+
+    inset:9%;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0 22px,
+            rgba(52,103,89,.25) 23px
+        );
+
+    border-left:
+        2px solid rgba(50,100,85,.18);
+}
+
+.note-lines{
+    position:absolute;
+
+    left:18%;
+    top:20%;
+
+    color:#33463e;
+
+    font-size:12px;
+
+    line-height:26px;
+
+    font-style:italic;
+}
+
+.pen{
+    position:absolute;
+
+    right:16%;
+    bottom:10%;
+
+    width:9px;
+    height:57%;
+
+    border-radius:8px;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #111,
+            #bdc8c5
+        );
+
+    transform:rotate(31deg);
+
+    box-shadow:
+        0 0 12px rgba(50,255,215,.16);
+}
+
+.bulb{
+    position:absolute;
+
+    right:19%;
+    top:8%;
+
+    width:75px;
+    height:75px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #fffbd0 0 8%,
+            #ffe46b 24%,
+            rgba(255,220,70,.22) 57%,
+            transparent 72%
+        );
+
+    filter:
+        drop-shadow(
+            0 0 24px rgba(255,220,80,.8)
+        );
+
+    animation:
+        bulbGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes bulbGlow{
+    to{
+        transform:scale(1.12);
+        opacity:.82;
+    }
+}
+
+
+/* =========================================================
+   LIVE TV — MODERN SMART TV
+========================================================= */
+
+.tv-art{
+    background:
+        radial-gradient(
+            circle at 72% 45%,
+            rgba(75,105,255,.22),
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 35% 75%,
+            rgba(160,55,255,.12),
+            transparent 30%
+        ),
+        linear-gradient(
+            135deg,
+            #050811,
+            #0a1020 55%,
+            #120b1c
+        );
+}
+
+
+/* TV BODY */
+
+.television{
+    position:absolute;
+
+    right:8%;
+    top:12%;
+
+    width:59%;
+    height:64%;
+
+    border-radius:12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #171c27,
+            #070a10
+        );
+
+    border:3px solid #252c38;
+
+    box-shadow:
+        0 25px 45px rgba(0,0,0,.65),
+        0 0 35px rgba(70,105,255,.16);
+
+    z-index:5;
+}
+
+
+/* TV SCREEN */
+
+.television::before{
+    content:"";
+
+    position:absolute;
+
+    left:3%;
+    top:4%;
+
+    width:94%;
+    height:83%;
+
+    border-radius:7px;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            rgba(255,255,255,.18),
+            transparent 18%
+        ),
+        linear-gradient(
+            135deg,
+            #172d57,
+            #101d3c 38%,
+            #37206b 72%,
+            #151b3d
+        );
+
+    box-shadow:
+        inset 0 0 28px rgba(0,0,0,.65),
+        0 0 20px rgba(70,110,255,.14);
+
+    animation:
+        screenGlow 5s ease-in-out infinite alternate;
+}
+
+@keyframes screenGlow{
+
+    0%{
+        filter:brightness(.9);
+    }
+
+    100%{
+        filter:brightness(1.12);
+    }
+
+}
+
+
+/* TV REFLECTION */
+
+.television::after{
+    content:"";
+
+    position:absolute;
+
+    left:5%;
+    top:7%;
+
+    width:38%;
+    height:20%;
+
+    background:
+        linear-gradient(
+            125deg,
+            rgba(255,255,255,.16),
+            transparent
+        );
+
+    transform:skewX(-20deg);
+
+    opacity:.45;
+
+    z-index:7;
+}
+
+
+/* TV POWER LIGHT */
+
+.tv-power{
+    position:absolute;
+
+    right:4%;
+    bottom:5%;
+
+    width:5px;
+    height:5px;
+
+    border-radius:50%;
+
+    background:#65a2ff;
+
+    box-shadow:
+        0 0 10px #65a2ff;
+
+    z-index:10;
+}
+
+
+/* TV STAND */
+
+.tv-stand{
+    position:absolute;
+
+    left:30%;
+    bottom:8%;
+
+    width:40%;
+    height:7px;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0c1017,
+            #394352,
+            #0c1017
+        );
+
+    box-shadow:
+        0 7px 15px rgba(0,0,0,.5);
+
+    z-index:4;
+}
+
+
+/* TV LEG */
+
+.tv-base{
+    position:absolute;
+
+    left:44%;
+    bottom:1%;
+
+    width:12%;
+    height:9%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0b0f16,
+            #252d39,
+            #0b0f16
+        );
+
+    clip-path:
+        polygon(
+            35% 0,
+            65% 0,
+            100% 100%,
+            0 100%
+        );
+
+    z-index:3;
+}
+
+
+/* REMOTE */
+
+.remote{
+    position:absolute;
+
+    right:8%;
+    bottom:8%;
+
+    width:22px;
+    height:68px;
+
+    border-radius:7px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #0b0e14,
+            #2b303a,
+            #0b0e14
+        );
+
+    transform:rotate(18deg);
+
+    box-shadow:
+        0 12px 20px rgba(0,0,0,.55);
+
+    z-index:8;
+}
+
+.remote::before{
+    content:"";
+
+    position:absolute;
+
+    top:9px;
+    left:7px;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#6b82ff;
+
+    box-shadow:
+        0 15px 0 #555d6b,
+        0 27px 0 #555d6b,
+        0 39px 0 #555d6b;
+}
+
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.card-icon{
+    position:absolute;
+
+    top:
+        clamp(22px,2.2vw,32px);
+
+    left:
+        clamp(25px,3vw,42px);
+
+    width:
+        clamp(44px,4.4vw,58px);
+
+    height:
+        clamp(44px,4.4vw,58px);
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border:1px solid rgba(80,155,255,.75);
+
+    border-radius:13px;
+
+    background:rgba(2,12,25,.55);
+
+    backdrop-filter:blur(8px);
+
+    z-index:30;
+
+    transition:.4s ease;
+}
+
+.card:hover .card-icon{
+    transform:
+        translateY(-3px)
+        scale(1.08);
+}
+
+.card-icon svg{
+    width:55%;
+    height:55%;
+
+    fill:none;
+
+    stroke:#70a9ff;
+
+    stroke-width:1.7;
+
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+.card-content{
+    position:absolute;
+
+    left:
+        clamp(28px,3vw,44px);
+
+    bottom:
+        clamp(28px,3vw,40px);
+
+    z-index:30;
+
+    max-width:58%;
+}
+
+.card-title{
+    font-size:
+        clamp(23px,2.4vw,39px);
+
+    font-weight:800;
+
+    line-height:1.05;
+
+    letter-spacing:-1px;
+
+    text-shadow:
+        0 2px 18px rgba(0,0,0,.8);
+}
+
+.card-description{
+    margin-top:11px;
+
+    color:#84a1d2;
+
+    font-size:
+        clamp(11px,1.1vw,16px);
+
+    line-height:1.4;
+
+    text-shadow:
+        0 2px 12px rgba(0,0,0,.8);
+}
+
+
+/* ================= COLORS ================= */
+
+.goal-card{
+    border-color:rgba(255,185,60,.65);
+}
+
+.goal-card .card-icon{
+    border-color:rgba(255,190,70,.75);
+}
+
+.goal-card .card-icon svg{
+    stroke:#ffc04c;
+}
+
+.note-card{
+    border-color:rgba(35,225,190,.65);
+}
+
+.note-card .card-icon{
+    border-color:rgba(35,225,190,.75);
+}
+
+.note-card .card-icon svg{
+    stroke:#35e6bd;
+}
+
+.tv-card{
+    border-color:rgba(170,70,255,.7);
+}
+
+.tv-card .card-icon{
+    border-color:rgba(175,80,255,.75);
+}
+
+.tv-card .card-icon svg{
+    stroke:#b77cff;
+}
+
+
+/* ================= FOOTER ================= */
+
+.footer{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:35px;
+    margin-top:38px;
+    padding:0 0 20px;
+    color:#8292a2;
+    font-size:11px;
+    letter-spacing:4px;
+    animation:fadeUp 1s .55s both;
+}
+
+.footer-line{
+    width:150px;
+    height:1px;
+    background:linear-gradient(90deg,transparent,#526b82);
+}
+
+.footer-line.right{
+    background:linear-gradient(90deg,#526b82,transparent);
+}
+
+.heart{
+    color:#ff416c;
+    font-size:14px;
+    display:inline-block;
+    animation:heartbeat 1.8s infinite;
+}
+
+@keyframes heartbeat{
+    0%,100%{transform:scale(1)}
+    10%{transform:scale(1.22)}
+    20%{transform:scale(1)}
+    30%{transform:scale(1.12)}
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:600px){
+
+    .container{
+        width:88%;
+
+        padding:
+            42px 0
+            28px;
+    }
+
+    .header{
+        margin-bottom:34px;
+    }
+
+    .logo{
+        font-size:
+            clamp(40px,13vw,55px);
+
+        letter-spacing:
+            clamp(6px,2.5vw,10px);
+
+        margin-left:
+            clamp(6px,2.5vw,10px);
+    }
+
+    .subtitle{
+        margin-top:14px;
+        font-size:9px;
+        letter-spacing:5px;
+    }
+
+    .header-line{
+        width:115px;
+        margin-top:19px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+        gap:13px;
+    }
+
+    .card{
+        height:190px;
+        border-radius:16px;
+    }
+
+    .card-content{
+        left:23px;
+        bottom:23px;
+        max-width:68%;
+    }
+
+    .card-title{
+        font-size:22px;
+    }
+
+    .card-description{
+        margin-top:8px;
+        font-size:10px;
+    }
+
+    .card-icon{
+        top:20px;
+        left:22px;
+
+        width:40px;
+        height:40px;
+
+        border-radius:10px;
+    }
+
+    .chart{
+        right:-3%;
+        width:58%;
+    }
+
+    .target{
+        right:-5%;
+        width:75px;
+        height:75px;
+    }
+
+    .books{
+        right:12%;
+        width:44%;
+    }
+
+    .calendar{
+        right:0;
+        width:32%;
+    }
+
+    .notebook{
+        right:-5%;
+        width:58%;
+    }
+
+    .television{
+        right:-3%;
+        width:62%;
+    }
+
+    .remote{
+        right:4%;
+        bottom:7%;
+    }
+
+    /* FOOTER */
+
+    .footer{
+        gap:8px;
+
+        margin-top:28px;
+
+        font-size:7px;
+
+        letter-spacing:1px;
+
+        white-space:nowrap;
+    }
+
+    .footer::before,
+    .footer::after{
+        width:25px;
+        flex-shrink:0;
+    }
+
+    .heart{
+        font-size:12px;
+    }
+
+}
+
+
+/* ================= SMALL PHONE ================= */
+
+@media(max-width:380px){
+
+    .container{
+        width:90%;
+        padding-top:34px;
+    }
+
+    .card{
+        height:175px;
+    }
+
+    .card-content{
+        left:20px;
+        bottom:20px;
+    }
+
+    .card-title{
+        font-size:19px;
+    }
+
+    .card-description{
+        font-size:9px;
+    }
+
+    .television{
+        width:64%;
+        right:-5%;
+    }
+
+    .footer{
+        gap:5px;
+        font-size:6.5px;
+        letter-spacing:.7px;
+    }
+
+    .footer::before,
+    .footer::after{
+        width:18px;
+    }
+
 }
 
 .footer-soikat{color:#7c8cff;}
 
-/* ===== STUDY SEGMENT CARDS: ROUTINE + RECAP ===== */
-.routine-card #routineList,
-.weekly-card #weeklyList,
-.monthly-card #monthlyList{
-  min-width:0;
+/* ================= COMPACT HEADER BACKUP BUTTONS ================= */
+.subtitle-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-top:18px}
+.subtitle-row .subtitle{margin-top:0}
+.backup-quick-actions{display:flex;align-items:center;justify-content:center;gap:7px}
+.backup-btn{min-height:27px;padding:5px 10px;border:1px solid rgba(80,145,255,.38);border-radius:7px;background:rgba(10,24,43,.72);color:#a9c9ff;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.backup-btn.secondary{background:rgba(15,13,35,.72);border-color:rgba(157,115,255,.38);color:#c6b5ff}
+.backup-btn:hover{filter:brightness(1.15);border-color:#729fff;transform:translateY(-1px)}
+.backup-file{display:none}
+
+.backup-status{
+  position:fixed;left:50%;bottom:22px;z-index:10001;
+  display:block;max-width:calc(100vw - 28px);width:max-content;
+  padding:10px 16px;border:1px solid #fff;
+  border-radius:8px;background:#fff;color:#000;
+  font-size:12px;font-weight:600;line-height:1.45;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;visibility:hidden;transform:translate(-50%,10px);
+  transition:opacity .22s ease,transform .22s ease,visibility .22s;
+  pointer-events:none;
 }
-.routine-item{
-  position:relative;
-  border:1px solid #1d2c44;
-  border-radius:10px;
-  background:linear-gradient(135deg,rgba(17,29,49,.94),rgba(9,17,30,.96));
-  padding:11px 9px;
-  margin:0 0 8px;
-  transition:border-color .2s ease,background .2s ease,transform .2s ease,box-shadow .2s ease;
-  animation:segmentEnter .28s ease both;
+.backup-status.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.backup-status.error{border-color:#fff;background:#fff;color:#000}
+@media(max-width:600px){.backup-status{bottom:16px;padding:10px 14px;font-size:11px}}
+
+.backup-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(1,5,14,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.backup-modal.open{display:flex}
+.backup-dialog{width:min(360px,100%);padding:24px 22px 20px;text-align:center;border:1px solid rgba(91,139,255,.38);border-radius:18px;background:linear-gradient(145deg,#0b1729,#080d1b);box-shadow:0 24px 80px rgba(0,0,0,.55),0 0 35px rgba(61,104,255,.12);animation:backupPop .2s ease-out}
+.backup-dialog-icon{width:48px;height:48px;margin:0 auto 14px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(82,130,255,.12);border:1px solid rgba(112,151,255,.28);color:#a9c9ff;font-size:22px}
+.backup-dialog h2{font-size:17px;letter-spacing:.02em;margin-bottom:8px}
+.backup-dialog p{font-size:12px;line-height:1.6;color:#91a2bd;margin-bottom:20px}
+.backup-dialog-actions{display:flex;gap:8px}
+.backup-dialog-actions button{flex:1;min-height:38px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer}
+.backup-cancel{background:#101a2a;border:1px solid #293b56;color:#aabbd2}
+.backup-confirm{background:linear-gradient(100deg,#347fff,#7864ff);border:1px solid transparent;color:#fff}
+@keyframes backupPop{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:600px){
+ .subtitle-row{gap:9px;margin-top:13px}
+ .subtitle-row .subtitle{font-size:9px;letter-spacing:clamp(3px,1.2vw,5px)}
+ .backup-quick-actions{gap:7px}
+ .backup-btn{min-height:27px;padding:5px 10px;font-size:9px}
+ .backup-dialog{padding:22px 18px 18px;border-radius:16px}
 }
-.routine-item:last-child{margin-bottom:0}
-.routine-item:hover{
-  border-color:#35547b;
-  background:linear-gradient(135deg,rgba(20,37,61,.98),rgba(10,19,34,.98));
-  box-shadow:0 5px 16px rgba(0,0,0,.16);
-  transform:translateY(-1px);
-}
-.routine-item:has(.check-action:checked){
-  border-color:rgba(53,227,154,.38);
-  background:linear-gradient(135deg,rgba(13,42,33,.72),rgba(9,20,29,.96));
-}
-.revision-list{
-  gap:7px;
-}
-.revision-item{
-  position:relative;
-  border:1px solid #1d2c44;
-  border-top:1px solid #1d2c44;
-  border-radius:10px;
-  background:linear-gradient(135deg,rgba(17,29,49,.92),rgba(9,17,30,.96));
-  padding:10px 9px;
-  margin:0;
-  transition:border-color .2s ease,background .2s ease,transform .2s ease,box-shadow .2s ease;
-  animation:segmentEnter .28s ease both;
-}
-.revision-item:hover{
-  border-color:#35547b;
-  background:linear-gradient(135deg,rgba(20,37,61,.98),rgba(10,19,34,.98));
-  box-shadow:0 5px 16px rgba(0,0,0,.16);
-  transform:translateY(-1px);
-}
-.revision-item:has(input:checked){
-  border-color:rgba(53,227,154,.38);
-  background:linear-gradient(135deg,rgba(13,42,33,.72),rgba(9,20,29,.96));
-}
-.revision-group-title{
-  margin-top:13px;
-  margin-bottom:7px;
-  padding:0 2px 6px;
-}
-@keyframes segmentEnter{
-  from{opacity:0;transform:translateY(5px)}
-  to{opacity:1;transform:translateY(0)}
-}
-@media(hover:none){
-  .routine-item:hover,.revision-item:hover{transform:none;box-shadow:none}
-}
-@media(prefers-reduced-motion:reduce){
-  .routine-item,.revision-item{animation:none;transition:none}
-}
+@media(prefers-reduced-motion:reduce){.backup-dialog{animation:none}.backup-btn,.backup-status{transition:none}}
 
 </style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#030914">
 </head>
+
+
 <body>
-<div class="wrap" style="padding-top:72px">
-<header>
-  <a class="header-back" href="javascript:history.back()">← Back</a>
-  <div class="header-brand">SOIKAT · 200D PLAN</div>
-  <div class="header-range">01 Oct 2026 → 18 Apr 2027</div>
+
+<div class="container">
+
+
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+    <h1 class="logo">
+        SOIKAT
+    </h1>
+
+    <div class="subtitle-row">
+        <div class="subtitle">PERSONAL OS</div>
+        <div class="backup-quick-actions" aria-label="Data backup">
+            <button class="backup-btn" id="exportBackupBtn" type="button">↓ EXPORT</button>
+            <button class="backup-btn secondary" id="importBackupBtn" type="button">↑ IMPORT</button>
+        </div>
+    </div>
+
+    <div class="header-line"></div>
+
 </header>
 
 
+<!-- ================= CARDS ================= -->
 
-<section class="hero">
-  <div class="card">
-    <div class="kicker">200 DAY PROGRESS</div>
-    <div class="big">DAY <span id="dayNo">1</span> <small style="font-size:15px;color:var(--muted)">/ 200</small></div>
-    <div class="progress"><i id="bar"></i></div>
-    <div class="meta"><span id="startText"></span><span id="endText"></span></div>
-    <div class="stats">
-      <div class="stat"><small>DAYS LEFT</small><b id="daysLeft">200</b></div>
-      <div class="stat"><small>STUDY DONE</small><b id="studyDone">0 <span class="metric-sub">(0%)</span></b></div>
-      <div class="stat"><small>STUDY LEFT</small><b id="studyLeft">200 <span class="metric-sub">(100%)</span></b></div>
-      <div class="stat"><small>CARRY FORWARD</small><b id="carryCount">0</b><small class="metric-sub">pending studies</small></div>
-    </div>
-  </div>
-</section>
+<section class="cards">
 
-<section class="grid">
-  <div>
-    <div class="card routine-card">
-      <div class="section-title routine-head">
-        <h2>ROUTINE</h2>
-        <button type="button" onclick="openBulk()">SET ROUTINE</button>
-      </div>
-      <div class="daybar"><strong id="routineDate">—</strong><span id="routineDay">—</span></div>
-      <div class="routine-nav">
-        <button type="button" onclick="changeRoutineDay(-1)">PREVIOUS DAY</button>
-        <button type="button" onclick="goToday()">TODAY</button>
-        <button type="button" onclick="changeRoutineDay(1)">NEXT DAY</button>
-      </div>
-      <div id="routineList"></div>
-    </div>
 
-    
+<!-- =====================================================
+     100K GOAL
+===================================================== -->
 
-    <div class="card calendar-card" style="margin-top:12px">
-      <div class="section-title">
-        <h2>200D CALENDAR</h2>
-        <div class="month-nav"><button onclick="changeMonth(-1)">‹</button><div class="month-name" id="calMonth"></div><button onclick="changeMonth(1)">›</button></div>
-      </div>
-      <div class="calendar" id="calendar"></div>
+<a href="goal.html" class="card goal-card">
+
+    <div class="art goal-art">
+
+        <div class="goal-table"></div>
+
+        <div class="chart">
+
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+
+            <div class="growth-arrow"></div>
 
         </div>
-  </div>
 
-  <div>
-    <div class="card weekly-card">
-      <div class="section-title rev-title-stack"><h2>WEEKLY RECAP</h2><div class="rev-date-label" id="weekLabel">THIS WEEK</div><div class="rev-count-label" id="weekCount">0/0</div></div>
-      <div class="routine-nav recap-nav">
-        <button type="button" onclick="changeRecapWeek(-1)">PREVIOUS WEEK</button>
-        <button type="button" onclick="goRecapWeekToday()">THIS WEEK</button>
-        <button type="button" onclick="changeRecapWeek(1)">NEXT WEEK</button>
-      </div>
-      <div id="weeklyList"></div>
+        <div class="target"></div>
+
+        <div class="coin one"></div>
+        <div class="coin two"></div>
+        <div class="coin three"></div>
+
     </div>
-    <div class="card monthly-card" style="margin-top:16px">
-      <div class="section-title rev-title-stack"><h2>MONTHLY RECAP</h2><div class="rev-date-label" id="monthLabel">THIS MONTH</div><div class="rev-count-label" id="monthCount">0/0</div></div>
-      <div class="routine-nav recap-nav">
-        <button type="button" onclick="changeRecapMonth(-1)">PREVIOUS MONTH</button>
-        <button type="button" onclick="goRecapMonthToday()">THIS MONTH</button>
-        <button type="button" onclick="changeRecapMonth(1)">NEXT MONTH</button>
-      </div>
-      <div id="monthlyList"></div>
+
+
+    <div class="card-icon">
+
+        <svg viewBox="0 0 24 24">
+
+            <path d="M12 3v18"/>
+
+            <path d="
+                M17 7
+                C17 5 15 4 12 4
+                C9 4 7 5 7 7
+                C7 9 9 10 12 10
+                C15 10 17 11 17 13
+                C17 15 15 16 12 16
+                C9 16 7 15 7 13
+            "/>
+
+        </svg>
+
     </div>
-  </div>
+
+
+    <div class="card-content">
+
+        <div class="card-title">
+            100K GOAL
+        </div>
+
+        <div class="card-description">
+            Track your financial target
+        </div>
+
+    </div>
+
+</a>
+
+
+
+<!-- =====================================================
+     200D PLAN
+===================================================== -->
+
+<a href="study.html" class="card">
+
+    <div class="art plan-art">
+
+        <div class="lamp"></div>
+
+        <div class="books">
+
+            <div class="book">
+                <span>GROWTH</span>
+            </div>
+
+            <div class="book">
+                <span>DISCIPLINE</span>
+            </div>
+
+            <div class="book">
+                <span>STUDY</span>
+            </div>
+
+            <div class="book">
+                <span>PLAN</span>
+            </div>
+
+        </div>
+
+
+        <div class="calendar">
+
+            <div class="calendar-top"></div>
+
+            <div class="calendar-grid">
+
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+
+                <i></i>
+                <i></i>
+                <i></i>
+                <i></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card-icon">
+
+        <svg viewBox="0 0 24 24">
+
+            <rect
+                x="5"
+                y="3"
+                width="14"
+                height="18"
+                rx="2"
+            />
+
+            <path d="M8 7h8"/>
+            <path d="M8 11h8"/>
+            <path d="M8 15h5"/>
+
+        </svg>
+
+    </div>
+
+
+    <div class="card-content">
+
+        <div class="card-title">
+            200D PLAN
+        </div>
+
+        <div class="card-description">
+            Study plan &amp; progress
+        </div>
+
+    </div>
+
+</a>
+
+
+
+<!-- =====================================================
+     NOTEPAD
+===================================================== -->
+
+<a href="notepad.html" class="card note-card">
+
+    <div class="art note-art">
+
+        <div class="note-desk"></div>
+
+        <div class="bulb"></div>
+
+        <div class="notebook">
+
+            <div class="note-lines">
+                □ Ideas<br>
+                □ To-Do<br>
+                □ Notes<br>
+                □ Thoughts
+            </div>
+
+        </div>
+
+        <div class="pen"></div>
+
+    </div>
+
+
+    <div class="card-icon">
+
+        <svg viewBox="0 0 24 24">
+
+            <path d="M5 4h14v16H5z"/>
+
+            <path d="M8 8h8"/>
+            <path d="M8 12h8"/>
+            <path d="M8 16h5"/>
+
+        </svg>
+
+    </div>
+
+
+    <div class="card-content">
+
+        <div class="card-title">
+            NOTEPAD
+        </div>
+
+        <div class="card-description">
+            Notes, ideas &amp; quick thoughts
+        </div>
+
+    </div>
+
+</a>
+
+
+
+<!-- =====================================================
+     LIVE TV
+===================================================== -->
+
+<a href="live-tv.html" class="card tv-card">
+
+    <div class="art tv-art">
+
+        <div class="television">
+
+            <div class="tv-power"></div>
+
+            <div class="tv-stand"></div>
+
+            <div class="tv-base"></div>
+
+        </div>
+
+        <div class="remote"></div>
+
+    </div>
+
+
+    <div class="card-icon">
+
+        <svg viewBox="0 0 24 24">
+
+            <rect
+                x="3"
+                y="6"
+                width="18"
+                height="13"
+                rx="2"
+            />
+
+            <path d="M8 3l4 3 4-3"/>
+
+            <path d="M9 11l6 3-6 3z"/>
+
+        </svg>
+
+    </div>
+
+
+    <div class="card-content">
+
+        <div class="card-title">
+            LIVE TV
+        </div>
+
+        <div class="card-description">
+            Watch live channels
+        </div>
+
+    </div>
+
+</a>
+
+
 </section>
 
 
 
-<footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by <span class="footer-soikat">Soikat</span></div><span class="footer-line right"></span></footer>
-</div>
-
-<div class="modal" id="bulkModal">
-  <div class="modal-box">
-    <div class="modal-head"><h2 style="margin:0;font-size:17px">SET ROUTINE IN BULK</h2><button onclick="closeBulk()">×</button></div>
-    <div class="note">একই Date + Subject-এর নিচে যতক্ষণ নতুন Date | Subject | Topic line না আসে, সব line একই Topic-এর অংশ হবে।</div><textarea id="bulkInput" class="bulk" placeholder="01 Oct 2026 | বাংলা | সন্ধি
-02 Oct 2026 | বাংলা | সমাস
-03 Oct 2026 | English | Tense
-04 Oct 2026 | গণিত | শতকরা"></textarea>
-    <div class="note">Format: <b>DD Mon YYYY | Subject | Topic</b><br>একটি Date | Subject | Topic line = একটি Study। পরের Date line আসা পর্যন্ত নিচের line-গুলো একই Topic-এর অংশ। Existing routine মুছে যাবে না; নতুনগুলো যোগ হবে।</div>
-    <button class="add" onclick="importBulk()">IMPORT ROUTINE</button>
+<!-- Backup controls and custom import confirmation -->
+<input class="backup-file" id="backupFileInput" type="file" accept=".json,application/json">
+<div class="backup-status" id="backupStatus" role="status" aria-live="polite" hidden></div>
+<div class="backup-modal" id="backupImportModal" role="dialog" aria-modal="true" aria-labelledby="backupModalTitle" aria-describedby="backupModalMessage">
+  <div class="backup-dialog">
+    <div class="backup-dialog-icon" aria-hidden="true">↑</div>
+    <h2 id="backupModalTitle">IMPORT BACKUP</h2>
+    <p id="backupModalMessage">এই ব্যাকআপ ইমপোর্ট করলে বর্তমান ডিভাইসের LocalStorage ডাটা সম্পূর্ণ রিপ্লেস হবে। আগে প্রয়োজনীয় ব্যাকআপ রেখে নাও।</p>
+    <div class="backup-dialog-actions">
+      <button class="backup-cancel" id="cancelBackupImport" type="button">CANCEL</button>
+      <button class="backup-confirm" id="confirmBackupImport" type="button">IMPORT</button>
+    </div>
   </div>
 </div>
 
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+    <span class="footer-line"></span>
+    <div>Built with <span class="heart">♥</span> by <span class="footer-soikat">Soikat</span></div>
+    <span class="footer-line right"></span>
+</footer>
+
+
+</div>
+
+
 <script>
-const START = new Date(2026,9,1);
-const END = new Date(2027,3,18);
-const DAYS = 200;
 
-// IMPORTANT: keep the existing storage key unchanged.
-const KEY = 'soikat_200d_plan_v2';
+/* ================= CARD MOUSE MOVEMENT ================= */
 
-const DEFAULT_DATA = {
-  routine:{},
-  done:{},
-  weekly:{},
-  monthly:{},
-  weeklyRevision:{},
-  monthlyRevision:{}
-};
+document.querySelectorAll(".card").forEach(card => {
 
-function loadDataSafely(){
-  let raw = null;
-  try{ raw = localStorage.getItem(KEY); }catch(e){}
-  let parsed = null;
-  if(raw){
-    try{ parsed = JSON.parse(raw); }catch(e){}
+    const art = card.querySelector(".art");
+
+    card.addEventListener("mousemove", e => {
+
+        const rect = card.getBoundingClientRect();
+
+        const x =
+            (e.clientX - rect.left) / rect.width - .5;
+
+        const y =
+            (e.clientY - rect.top) / rect.height - .5;
+
+        art.style.transform =
+            `scale(1.025)
+             translate(${x * 7}px,${y * 5}px)`;
+
+    });
+
+    card.addEventListener("mouseleave", () => {
+
+        art.style.transform =
+            "scale(1)";
+
+    });
+
+});
+
+
+/* ================= CENTRAL DATA BACKUP ================= */
+(function(){
+  const exportBtn=document.getElementById("exportBackupBtn");
+  const importBtn=document.getElementById("importBackupBtn");
+  const fileInput=document.getElementById("backupFileInput");
+  const status=document.getElementById("backupStatus");
+  const modal=document.getElementById("backupImportModal");
+  const cancelBtn=document.getElementById("cancelBackupImport");
+  const confirmBtn=document.getElementById("confirmBackupImport");
+  if(!exportBtn||!importBtn||!fileInput||!status||!modal||!cancelBtn||!confirmBtn)return;
+  let pendingBackup=null;
+  let statusTimer=null;
+  function setStatus(message,type="success",duration=2600){
+    status.textContent=message;
+    status.hidden=false;
+    status.classList.toggle("error",type==="error");
+    status.classList.add("show");
+    if(statusTimer)clearTimeout(statusTimer);
+    statusTimer=setTimeout(()=>{status.classList.remove("show");},duration);
   }
-  const base = parsed && typeof parsed === 'object' ? parsed : {};
-  Object.keys(DEFAULT_DATA).forEach(k=>{
-    if(!base[k] || typeof base[k] !== 'object' || Array.isArray(base[k])) base[k] = {};
-  });
-  return base;
-}
+  function closeModal(){modal.classList.remove("open");pendingBackup=null;}
+  function openModal(){modal.classList.add("open");confirmBtn.focus();}
 
-let data = loadDataSafely();
-
-let trustedOffsetMs = Number(localStorage.getItem(KEY+'_trusted_offset_ms') || 0);
-let trustedAtMs = Number(localStorage.getItem(KEY+'_trusted_at_ms') || 0);
-let trustedSource = localStorage.getItem(KEY+'_trusted_source') || 'none';
-
-let selected = new Date();
-let calCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
-let recapWeekCursor = cloneDate(selected);
-let recapMonthCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
-
-function pad(n){return String(n).padStart(2,'0')}
-
-function iso(d){
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-}
-
-function cloneDate(d){
-  return new Date(d.getFullYear(),d.getMonth(),d.getDate());
-}
-
-function save(){
-  localStorage.setItem(KEY,JSON.stringify(data));
-}
-
-function inPlan(d){
-  return d>=START && d<=END;
-}
-
-function fmt(d){
-  return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
-}
-
-function displayDate(isoDate){
-  const d=new Date(isoDate+'T00:00:00');
-  return `${pad(d.getDate())}-${pad(d.getMonth()+1)}-${d.getFullYear()}`;
-}
-
-function dayIndex(d){
-  return Math.floor((cloneDate(d)-START)/86400000)+1;
-}
-
-function allDates(){
-  const a=[];
-  for(let d=cloneDate(START);d<=END;d.setDate(d.getDate()+1)) a.push(cloneDate(d));
-  return a;
-}
-
-function entries(date){
-  return Array.isArray(data.routine[iso(date)]) ? data.routine[iso(date)] : [];
-}
-
-function dhakaDateFromInstant(ms){
-  const parts=new Intl.DateTimeFormat('en-CA',{
-    timeZone:'Asia/Dhaka',
-    year:'numeric',
-    month:'2-digit',
-    day:'2-digit'
-  }).formatToParts(new Date(ms));
-  const get=t=>parts.find(p=>p.type===t)?.value;
-  return new Date(Number(get('year')),Number(get('month'))-1,Number(get('day')));
-}
-
-function trustedNowMs(){
-  // Fresh trusted offset -> previously trusted offset -> device clock.
-  return Date.now() + (Number.isFinite(trustedOffsetMs) ? trustedOffsetMs : 0);
-}
-
-function todayDhaka(){
-  return dhakaDateFromInstant(trustedNowMs());
-}
-
-function saveTrustedClock(serverMs, source){
-  const now=Date.now();
-  trustedOffsetMs=serverMs-now;
-  trustedAtMs=now;
-  trustedSource=source;
-  localStorage.setItem(KEY+'_trusted_offset_ms',String(trustedOffsetMs));
-  localStorage.setItem(KEY+'_trusted_at_ms',String(trustedAtMs));
-  localStorage.setItem(KEY+'_trusted_source',source);
-}
-
-async function syncTrustedDate(manual=false){
-  const endpoints=[
-    ['WorldTimeAPI','https://worldtimeapi.org/api/timezone/Asia/Dhaka',
-      async r=>(await r.json()).unixtime*1000],
-    ['timeapi.io','https://timeapi.io/api/Time/current/zone?timeZone=Asia%2FDhaka',
-      async r=>{
-        const j=await r.json();
-        const raw=String(j.dateTime||j.currentDateTime||'');
-        if(!raw) return NaN;
-        // Asia/Dhaka is UTC+06:00. If the API omits an offset, interpret
-        // the returned Dhaka wall-clock value explicitly as UTC+06:00.
-        if(/[zZ]|[+-]\d{2}:?\d{2}$/.test(raw)) return Date.parse(raw);
-        const m=raw.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?$/);
-        if(!m) return NaN;
-        return Date.UTC(+m[1],+m[2]-1,+m[3],+m[4]-6,+m[5],+(m[6]||0),0);
-      }]
-  ];
-
-  for(const [name,url,parse] of endpoints){
+  exportBtn.addEventListener("click",()=>{
     try{
-      const controller=new AbortController();
-      const timer=setTimeout(()=>controller.abort(),5000);
-      const r=await fetch(url,{cache:'no-store',signal:controller.signal});
-      clearTimeout(timer);
-      if(!r.ok) continue;
-      const ms=await parse(r);
-      if(Number.isFinite(ms)){
-        saveTrustedClock(ms,name);
-        updateDateSyncStatus();
-        if(manual) render();
-        return true;
+      const data={};
+      for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key!==null)data[key]=localStorage.getItem(key);
       }
-    }catch(e){}
-  }
-
-  if(manual) render();
-  return false;
-}
-
-
-/*
-  DATA MIGRATION / ID SAFETY
-  --------------------------
-  Old versions used date#index IDs such as 2026-10-01#0.
-  We preserve those records and map them to a permanent uid on each study.
-  After migration, completion/revision state follows the study itself,
-  not its array position. No localStorage key is changed and no data is cleared.
-*/
-function makeUid(){
-  if(window.crypto && crypto.randomUUID) return crypto.randomUUID();
-  return 'study_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2);
-}
-
-function legacyId(dateKey,index){
-  return dateKey+'#'+index;
-}
-
-function ensureStudyUids(){
-  let changed=false;
-
-  Object.keys(data.routine).forEach(dateKey=>{
-    const list=Array.isArray(data.routine[dateKey]) ? data.routine[dateKey] : [];
-    data.routine[dateKey]=list;
-
-    list.forEach((item,index)=>{
-      if(!item || typeof item!=='object'){
-        list[index]={subject:'Study',topic:String(item??'')};
-        item=list[index];
-        changed=true;
-      }
-
-      const oldId=legacyId(dateKey,index);
-      if(!item.uid){
-        item.uid=makeUid();
-        changed=true;
-      }
-
-      const uid=item.uid;
-
-      // Preserve old completion state by copying it to the permanent uid.
-      if(data.done[oldId]===true && data.done[uid]!==true){
-        data.done[uid]=true;
-        changed=true;
-      }
-
-      // Preserve old revision state in both revision stores.
-      if(data.weeklyRevision[oldId]===true && data.weeklyRevision[uid]!==true){
-        data.weeklyRevision[uid]=true;
-        changed=true;
-      }
-
-      if(data.monthlyRevision[oldId]===true && data.monthlyRevision[uid]!==true){
-        data.monthlyRevision[uid]=true;
-        changed=true;
-      }
-    });
+      const backup={format:"SOIKAT_PERSONAL_OS_BACKUP",version:1,exportedAt:new Date().toISOString(),origin:location.origin,storage:data};
+      const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const link=document.createElement("a");
+      link.href=url;
+      link.download=`soikat-personal-os-backup-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      setStatus("Export complete.");
+    }catch(error){setStatus("Export failed. Check browser storage permissions.","error");}
   });
 
-  if(changed) save();
-}
+  importBtn.addEventListener("click",()=>fileInput.click());
+  cancelBtn.addEventListener("click",()=>{closeModal();fileInput.value="";});
+  modal.addEventListener("click",e=>{if(e.target===modal){closeModal();fileInput.value="";}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open")){closeModal();fileInput.value="";}});
 
-ensureStudyUids();
+  fileInput.addEventListener("change",async()=>{
+    const file=fileInput.files&&fileInput.files[0];
+    if(!file)return;
+    try{
+      const parsed=JSON.parse(await file.text());
+      if(!parsed||parsed.format!=="SOIKAT_PERSONAL_OS_BACKUP"||!parsed.storage||typeof parsed.storage!=="object"||Array.isArray(parsed.storage))throw new Error("invalid backup");
+      const entries=Object.entries(parsed.storage);
+      for(const [key,value] of entries){if(typeof key!=="string"||typeof value!=="string")throw new Error("invalid storage entry");}
+      pendingBackup=entries;
+      openModal();
+    }catch(error){setStatus("Import failed: the selected file is not a valid backup.","error");fileInput.value="";}
+  });
 
-function studyId(item,dateKey,index){
-  return item && item.uid ? item.uid : legacyId(dateKey,index);
-}
+  confirmBtn.addEventListener("click",()=>{
+    if(!pendingBackup)return;
+    const entries=pendingBackup;
+    // Keep an in-memory rollback copy so a failed restore does not leave a partial import.
+    const previous={};
+    for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key!==null)previous[key]=localStorage.getItem(key);}
+    try{
+      localStorage.clear();
+      for(const [key,value] of entries)localStorage.setItem(key,value);
+      closeModal();fileInput.value="";
+      setStatus("Import successful.","success",1800);
+      // Give the success toast time to be seen before refreshing the dashboard.
+      setTimeout(()=>location.reload(),1800);
+    }catch(error){
+      try{localStorage.clear();for(const [key,value] of Object.entries(previous))localStorage.setItem(key,value);}catch(rollbackError){}
+      closeModal();fileInput.value="";setStatus("Import failed. Existing data was restored where possible.","error");
+    }
+  });
+})();
 
-function isDone(item,dateKey,index){
-  return data.done[studyId(item,dateKey,index)]===true;
-}
+</script>
 
-function getStudiesInRange(start,end){
-  const items=[];
-
-  for(let d=cloneDate(start);d<=end;d.setDate(d.getDate()+1)){
-    const k=iso(d);
-    const list=entries(d);
-
-    list.forEach((item,index)=>{
-      items.push({
-        ...item,
-        plannedDate:k,
-        sourceIndex:index,
-        studyId:studyId(item,k,index),
-        completed:isDone(item,k,index)
+<script>
+(function () {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (error) {
+        console.warn('Offline support could not be enabled:', error);
       });
     });
   }
-
-  return items;
-}
-
-function getPreviousPendingStudies(current){
-  const pending=[];
-
-  for(let d=cloneDate(START);d<current;d.setDate(d.getDate()+1)){
-    const k=iso(d);
-    const list=entries(d);
-
-    list.forEach((item,index)=>{
-      if(!isDone(item,k,index)){
-        pending.push({
-          ...item,
-          plannedDate:k,
-          sourceIndex:index,
-          studyId:studyId(item,k,index),
-          carry:true
-        });
-      }
-    });
-  }
-
-  return pending;
-}
-
-function render(){
-  const now=todayDhaka();
-
-  let current=cloneDate(selected);
-  if(current<START) current=cloneDate(START);
-  if(current>END) current=cloneDate(END);
-
-  selected=current;
-
-  const idx=dayIndex(current);
-  const dayNo=Math.max(1,Math.min(DAYS,idx));
-  const daysLeft=Math.max(0,DAYS-dayNo);
-
-  document.getElementById('dayNo').textContent=dayNo;
-  document.getElementById('daysLeft').textContent=daysLeft;
-  document.getElementById('bar').style.width=Math.min(100,Math.max(0,dayNo/DAYS*100))+'%';
-  document.getElementById('startText').textContent='01 Oct 2026';
-  document.getElementById('endText').textContent='18 Apr 2027';
-
-  // 200 is the fixed plan denominator.
-  // Each routine study counts once when completed.
-  const allStudies=[];
-  Object.keys(data.routine).forEach(k=>{
-    const list=Array.isArray(data.routine[k])?data.routine[k]:[];
-    list.forEach((item,index)=>{
-      allStudies.push({item,dateKey:k,index});
-    });
-  });
-
-  const completedRaw=allStudies.reduce(
-    (n,x)=>n+(isDone(x.item,x.dateKey,x.index)?1:0),0
-  );
-
-  // Keep the fixed 200-study plan mathematically bounded.
-  const completed=Math.min(DAYS,completedRaw);
-  const studyLeft=DAYS-completed;
-  const completedPct=Math.round(completed/DAYS*100);
-  const studyLeftPct=100-completedPct;
-
-  document.getElementById('studyDone').innerHTML=
-    completed+' <span class="metric-sub">('+completedPct+'%)</span>';
-
-  document.getElementById('studyLeft').innerHTML=
-    studyLeft+' <span class="metric-sub">('+studyLeftPct+'%)</span>';
-
-  const carryCount=getPreviousPendingStudies(current).length;
-  document.getElementById('carryCount').textContent=carryCount;
-
-  document.getElementById('routineDate').textContent=fmt(current);
-  document.getElementById('routineDay').textContent='DAY '+idx+' / 200';
-  renderRoutine(current);
-  renderWeekly(current);
-  renderMonthly(current);
-  renderCalendar();
-}
-
-function renderRoutine(d){
-  const box=document.getElementById('routineList');
-  const k=iso(d);
-  const list=entries(d);
-
-  if(!list.length){
-    box.innerHTML='<div class="empty">এই দিনে কোনো Study নেই।</div>';
-    return;
-  }
-
-  box.innerHTML=list.map((x,i)=>{
-    const id=studyId(x,k,i);
-    const checked=data.done[id]===true;
-
-    return `<div class="routine-item" data-study-id="${escapeAttr(id)}" data-date="${escapeAttr(k)}">
-
-      <input
-        type="checkbox"
-        class="routine-action check-action"
-        ${checked?'checked':''}
-        title="${checked?'Undo':'Complete'}"
-        aria-label="${checked?'Undo':'Complete'}"
-        onchange="toggleRoutineById(this)"
-      >
-
-      <div class="routine-content">
-        <span class="subject">${escapeHtml(x.subject||'Study')}</span>
-        <span class="topic">${renderTopic(x.topic)}</span>
-      </div>
-
-      <button
-        type="button"
-        class="routine-action delete-action"
-        title="Delete"
-        aria-label="Delete"
-        data-date="${escapeAttr(k)}" data-id="${escapeAttr(id)}" onclick="deleteRoutineDirect(this.dataset.date, this.dataset.id)"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 6h18"></path>
-          <path d="M8 6V4h8v2"></path>
-          <path d="M19 6l-1 14H6L5 6"></path>
-          <path d="M10 11v5"></path>
-          <path d="M14 11v5"></path>
-        </svg>
-      </button>
-
-    </div>`;
-  }).join('');
-
-  // Show earlier studies for subjects planned on the selected routine date.
-  const subjects=new Set(list.map(x=>normalizeSubject(x.subject)));
-  const prior=[];
-  for(let day=cloneDate(START);day<cloneDate(d);day.setDate(day.getDate()+1)){
-    const dk=iso(day);
-    entries(day).forEach((item,index)=>{
-      if(subjects.has(normalizeSubject(item.subject))){
-        prior.push({...item,plannedDate:dk,studyId:studyId(item,dk,index),completed:isDone(item,dk,index)});
-      }
-    });
-  }
-  if(prior.length){
-    box.innerHTML+=`<div class="revision-group-title">SUBJECT RECAP</div><div class="revision-list">
-      ${prior.map(x=>`<label class="revision-item">
-        <input type="checkbox" ${x.completed?'checked':''} onchange="toggleDone('${escapeAttr(x.studyId)}',this.checked)">
-        <div><div class="subject">${escapeHtml(x.subject||'Study')}</div>
-        <div class="topic">${renderTopic(x.topic)}</div>
-        <div class="revision-date">${displayDate(x.plannedDate)}</div></div>
-        <span class="status ${x.completed?'done':''}">${x.completed?'DONE':'PENDING'}</span>
-      </label>`).join('')}
-    </div>`;
-  }
-}
-
-function normalizeSubject(s){
-  return String(s||'Study').trim().replace(/\\s+/g,' ').toLocaleLowerCase();
-}
-
-/*
-  DIRECT button handlers.
-
-  These intentionally do not depend on event delegation.
-  Every button finds its own .routine-item and then uses
-  the permanent study UID stored on that row.
-*/
-function deleteRoutineDirect(dateKey,id){
-  if(!dateKey || !id) return false;
-
-  const list=data.routine[dateKey];
-  if(!Array.isArray(list)) return false;
-
-  const index=list.findIndex((item,index)=>{
-    if(!item) return false;
-    return String(studyId(item,dateKey,index))===String(id);
-  });
-
-  if(index<0) return false;
-
-  // Delete immediately. No confirm dialog, so the button cannot appear to do nothing.
-  list.splice(index,1);
-
-  if(list.length===0){
-    delete data.routine[dateKey];
-  }else{
-    data.routine[dateKey]=list;
-  }
-
-  // IMPORTANT: do NOT rebuild, shift, or clear done/revision maps.
-  // Permanent study IDs keep all remaining states attached to the correct study.
-  save();
-  render();
-  return false;
-}
-
-function deleteRoutineById(button){
-  if(!button) return false;
-  return deleteRoutineDirect(
-    button.getAttribute('data-date'),
-    button.getAttribute('data-id')
-  );
-}
-
-function toggleRoutineById(button){
-  const row=button.closest('.routine-item');
-  if(!row) return;
-
-  const id=row.getAttribute('data-study-id');
-  if(!id) return;
-
-  const current=data.done[id]===true;
-  toggleDone(id,!current);
-}
-
-function toggleDone(id,value){
-  if(!id) return;
-
-  if(value===true) data.done[id]=true;
-  else delete data.done[id];
-
-  save();
-  render();
-}
-
-function toggleDoneFromCalendar(id){
-  if(data.done[id]===true) delete data.done[id];
-  else data.done[id]=true;
-
-  save();
-  render();
-}
-
-function weekStartFor(d){
-  const start=cloneDate(d);
-  start.setDate(start.getDate()-((start.getDay()+1)%7)); // Saturday
-  return start;
-}
-
-function changeRecapWeek(delta){
-  recapWeekCursor=weekStartFor(recapWeekCursor);
-  recapWeekCursor.setDate(recapWeekCursor.getDate()+delta*7);
-  renderWeekly(recapWeekCursor);
-}
-function goRecapWeekToday(){
-  recapWeekCursor=todayDhaka();
-  renderWeekly(recapWeekCursor);
-}
-function changeRecapMonth(delta){
-  recapMonthCursor=new Date(recapMonthCursor.getFullYear(),recapMonthCursor.getMonth()+delta,1);
-  renderMonthly(recapMonthCursor);
-}
-function goRecapMonthToday(){
-  const now=todayDhaka();
-  recapMonthCursor=new Date(now.getFullYear(),now.getMonth(),1);
-  renderMonthly(recapMonthCursor);
-}
-
-function renderWeekly(d){
-  const start=weekStartFor(d);
-  const end=cloneDate(start);
-  end.setDate(end.getDate()+6);
-  const items=getStudiesInRange(start,end);
-  const box=document.getElementById('weeklyList');
-  const now=todayDhaka();
-  document.getElementById('weekLabel').textContent=
-    iso(start)===iso(weekStartFor(now))?'THIS WEEK':fmt(start).slice(0,6)+' → '+fmt(end).slice(0,6);
-  document.getElementById('weekCount').textContent=items.filter(x=>x.completed).length+'/'+items.length+' DONE';
-  if(!items.length){
-    box.innerHTML='<div class="empty">এই সপ্তাহে কোনো Study নেই।</div>';
-    return;
-  }
-  const groups=[];
-  for(let day=cloneDate(start);day<=end;day.setDate(day.getDate()+1)){
-    const dk=iso(day);
-    const dayItems=items.filter(x=>x.plannedDate===dk);
-    if(!dayItems.length) continue;
-    groups.push(`<div class="revision-group-title">${escapeHtml(fmt(day))}</div><div class="revision-list">
-      ${dayItems.map(x=>`<label class="revision-item">
-        <input type="checkbox" ${x.completed?'checked':''} onchange="toggleDone('${escapeAttr(x.studyId)}',this.checked)">
-        <div><div class="subject">${escapeHtml(x.subject||'Study')}</div>
-        <div class="topic">${renderTopic(x.topic)}</div>
-        <div class="revision-date">${displayDate(x.plannedDate)}</div></div>
-        <span class="status ${x.completed?'done':''}">${x.completed?'DONE':'PENDING'}</span>
-      </label>`).join('')}
-    </div>`);
-  }
-  box.innerHTML=groups.join('');
-}
-
-function renderMonthly(d){
-  const start=new Date(d.getFullYear(),d.getMonth(),1);
-  const end=new Date(d.getFullYear(),d.getMonth()+1,0);
-  const items=getStudiesInRange(start,end);
-  const box=document.getElementById('monthlyList');
-  const now=todayDhaka();
-  document.getElementById('monthLabel').textContent=
-    start.getFullYear()===now.getFullYear()&&start.getMonth()===now.getMonth()
-      ?'THIS MONTH':d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
-  document.getElementById('monthCount').textContent=items.filter(x=>x.completed).length+'/'+items.length+' DONE';
-  if(!items.length){
-    box.innerHTML='<div class="empty">এই মাসে কোনো Study নেই।</div>';
-    return;
-  }
-  const groups=[];
-  for(let day=cloneDate(start);day<=end;day.setDate(day.getDate()+1)){
-    const dk=iso(day);
-    const dayItems=items.filter(x=>x.plannedDate===dk);
-    if(!dayItems.length) continue;
-    groups.push(`<div class="revision-group-title">${escapeHtml(fmt(day))}</div><div class="revision-list">
-      ${dayItems.map(x=>`<label class="revision-item">
-        <input type="checkbox" ${x.completed?'checked':''} onchange="toggleDone('${escapeAttr(x.studyId)}',this.checked)">
-        <div><div class="subject">${escapeHtml(x.subject||'Study')}</div>
-        <div class="topic">${renderTopic(x.topic)}</div>
-        <div class="revision-date">${displayDate(x.plannedDate)}</div></div>
-        <span class="status ${x.completed?'done':''}">${x.completed?'DONE':'PENDING'}</span>
-      </label>`).join('')}
-    </div>`);
-  }
-  box.innerHTML=groups.join('');
-}
-
-function toggleRevision(type,id,value){
-  if(type!=='weeklyRevision' && type!=='monthlyRevision') return;
-
-  data[type] ||= {};
-
-  if(value===true) data[type][id]=true;
-  else delete data[type][id];
-
-  save();
-  render();
-}
-
-function calendarStatus(d){
-  const k=iso(d);
-  const list=entries(d);
-  const total=list.length;
-  const done=list.filter((x,i)=>isDone(x,k,i)).length;
-  const todayKey=iso(todayDhaka());
-  const isToday=k===todayKey;
-
-  if(!inPlan(d)) return {type:'outside',done,total,isToday};
-
-  if(total===0) return {type:'empty',done,total,isToday};
-
-  if(k<todayKey && done<total){
-    return {type:'missed',done,total,isToday};
-  }
-
-  if(done===total) return {type:'done',done,total,isToday};
-  if(done>0) return {type:'partial',done,total,isToday};
-
-  return {type:'pending',done,total,isToday};
-}
-
-function renderCalendar(){
-  const box=document.getElementById('calendar');
-  const y=calCursor.getFullYear(),m=calCursor.getMonth();
-
-  document.getElementById('calMonth').textContent=
-    calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
-
-  let h=['MON','TUE','WED','THU','FRI','SAT','SUN']
-    .map(x=>`<div class="cal-head">${x}</div>`).join('');
-
-  const first=new Date(y,m,1);
-  const offset=(first.getDay()+6)%7;
-  const days=new Date(y,m+1,0).getDate();
-
-  for(let i=0;i<offset;i++) h+='<div></div>';
-
-  for(let n=1;n<=days;n++){
-    const d=new Date(y,m,n), k=iso(d);
-    if(!inPlan(d)) continue;
-    const st=calendarStatus(d);
-
-    let cls='cal-day '+st.type;
-    if(st.isToday) cls+=' today';
-    if(iso(selected)===k) cls+=' selected-date';
-
-    h+=`<div class="${cls}" ${st.type!=='outside'?`onclick="selectDate('${k}')"`:''}>
-      <div class="n">${n}</div>
-      <span class="selected-marker" aria-label="Selected routine date"></span>
-    </div>`;
-  }
-
-  box.innerHTML=h;
-}
-
-function selectDate(k){
-  const d=new Date(k+'T00:00:00');
-  if(!inPlan(d)) return;
-
-  selected=d;
-  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
-  render();
-
-  // Calendar click -> automatically take the user to the Routine section.
-  // The Routine card itself stays in its fixed layout position; only the page
-  // scrolls to it, and its internal list starts at the selected date.
-  requestAnimationFrame(()=>{
-    const routineCard=document.querySelector('.routine-card');
-    const routineList=document.getElementById('routineList');
-
-    if(routineList){
-      routineList.scrollTop=0;
-    }
-
-    if(routineCard){
-      const top=routineCard.getBoundingClientRect().top + window.scrollY - 66;
-      window.scrollTo({
-        top:Math.max(0,top),
-        behavior:'smooth'
-      });
-    }
-  });
-}
-
-function changeMonth(n){
-  const next=new Date(calCursor.getFullYear(),calCursor.getMonth()+n,1);
-  const startMonth=new Date(START.getFullYear(),START.getMonth(),1);
-  const endMonth=new Date(END.getFullYear(),END.getMonth(),1);
-
-  if(next<startMonth || next>endMonth) return;
-
-  calCursor=next;
-  renderCalendar();
-}
-
-function changeRoutineDay(delta){
-  let next=cloneDate(selected);
-  next.setDate(next.getDate()+delta);
-
-  if(next<START || next>END) return;
-
-  selected=next;
-  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
-  render();
-}
-
-function goToday(){
-  const now=todayDhaka();
-  const today=inPlan(now)?cloneDate(now):cloneDate(START);
-
-  selected=today;
-  calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
-  render();
-
-  requestAnimationFrame(()=>{
-    const routineCard=document.querySelector('.routine-card');
-    if(routineCard){
-      const top=routineCard.getBoundingClientRect().top + window.scrollY - 66;
-      window.scrollTo({top:Math.max(0,top),behavior:'smooth'});
-    }
-  });
-}
-
-function openBulk(){
-  document.getElementById('bulkModal').classList.add('open');
-}
-
-function closeBulk(){
-  document.getElementById('bulkModal').classList.remove('open');
-}
-
-/*
-  BULK FORMAT
-  -----------
-  A new study starts ONLY when a line matches:
-  Date | Subject | Topic
-
-  Every following non-date line becomes part of that same Topic,
-  preserving line breaks. Therefore a multiline topic is ONE study.
-*/
-function parsePlanDate(s){
-  const raw=String(s).trim();
-  const m=raw.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{4})$/);
-  if(!m) return new Date(raw);
-
-  const months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-  const mi=months.indexOf(m[2].slice(0,3).toLowerCase());
-  if(mi<0) return null;
-
-  const d=new Date(Number(m[3]),mi,Number(m[1]));
-  if(d.getFullYear()!==Number(m[3]) || d.getMonth()!==mi || d.getDate()!==Number(m[1])) return null;
-  return d;
-}
-
-function parseRoutineBulk(raw){
-  const lines=String(raw||'').split(/\r?\n/);
-  const result=[];
-  let current=null;
-
-  for(const rawLine of lines){
-    // Keep the original line content, but use a trimmed copy for detecting headers.
-    const line=rawLine.trim();
-    if(!line) continue;
-
-    const parts=line.split('|').map(x=>x.trim());
-    const parsedDate=parts.length>=3 ? parsePlanDate(parts[0]) : null;
-
-    // Date | Subject | starts a NEW study.
-    if(parts.length>=3 && parsedDate && inPlan(parsedDate)){
-      if(current) result.push(current);
-
-      current={
-        date:iso(parsedDate),
-        subject:parts[1]||'Study',
-        topic:parts.slice(2).join(' | ').trim()
-      };
-      continue;
-    }
-
-    // No new Date | Subject | Topic line:
-    // this line belongs to the current study's multiline Topic.
-    if(current){
-      current.topic += (current.topic ? '\n' : '') + rawLine.trimEnd();
-    }
-  }
-
-  if(current) result.push(current);
-  return result;
-}
-
-
-function showToast(message){
-  let toast=document.getElementById('soikatToast');
-  if(!toast){
-    toast=document.createElement('div');
-    toast.id='soikatToast';
-    toast.className='toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent=message;
-  toast.classList.add('show');
-  clearTimeout(window.__soikatToastTimer);
-  window.__soikatToastTimer=setTimeout(()=>{
-    toast.classList.remove('show');
-  },1800);
-}
-
-function importBulk(){
-  const input=document.getElementById('bulkInput');
-  const rows=parseRoutineBulk(input.value);
-
-  if(!rows.length){
-    alert('কোনো valid routine পাওয়া যায়নি। Format: 01 Oct 2026 | Bangla | Topic');
-    return;
-  }
-
-  rows.forEach(row=>{
-    data.routine[row.date] ||= [];
-
-    data.routine[row.date].push({
-      uid:makeUid(),
-      subject:row.subject,
-      topic:row.topic
-    });
-  });
-
-  save();
-  closeBulk();
-  input.value='';
-  render();
-
-  showToast('Routine Inserted');
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g,c=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[c]));
-}
-
-function renderTopic(s){
-  let text=String(s??'Untitled');
-
-  // Some older imports may contain the literal characters \\n instead of a real line break.
-  text=text.replace(/\\r?\\n/g,'\n');
-
-  // Real multiline topics stay line-by-line.
-  let lines=text.split(/\r?\n/);
-
-  // If an older record flattened the topic into comma-separated text,
-  // display each comma-separated part on its own line without changing storage.
-  if(lines.length===1 && /,\s*/.test(text)){
-    lines=text.split(/,\s*/);
-  }
-
-  return lines
-    .map(line=>escapeHtml(line))
-    .join('<br>');
-}
-
-function escapeAttr(s){
-  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-}
-
-// Initial state.
-const bootDate=todayDhaka();
-selected=cloneDate(inPlan(bootDate)?bootDate:START);
-calCursor=new Date(selected.getFullYear(),selected.getMonth(),1);
-
-render();
-
-// Trusted internet time sync. If offline, saved offset remains usable.
-syncTrustedDate(false);
-
-// Periodic refresh; this never clears or replaces existing study data.
-setInterval(()=>{
-  syncTrustedDate(false);
-  render();
-},15*60*1000);
+})();
 </script>
 </body>
 </html>
