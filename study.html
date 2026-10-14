@@ -292,6 +292,7 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   .header-brand{font-size:12px;letter-spacing:.12em}
 }
 @media(max-width:560px){
+  input,select,textarea{font-size:16px}
   .wrap{padding:76px 12px 18px}
   .routine-nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
   .routine-nav button{font-size:8px;padding:7px 5px}
@@ -1109,11 +1110,11 @@ function renderCalendar(){
   document.getElementById('calMonth').textContent=
     calCursor.toLocaleDateString('en-US',{month:'long',year:'numeric'}).toUpperCase();
 
-  let h=['MON','TUE','WED','THU','FRI','SAT','SUN']
+  let h=['SUN','MON','TUE','WED','THU','FRI','SAT']
     .map(x=>`<div class="cal-head">${x}</div>`).join('');
 
   const first=new Date(y,m,1);
-  const offset=(first.getDay()+6)%7;
+  const offset=first.getDay();
   const days=new Date(y,m+1,0).getDate();
 
   for(let i=0;i<offset;i++) h+='<div></div>';
