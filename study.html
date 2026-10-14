@@ -42,7 +42,7 @@ button:hover,.btn:hover{border-color:#3a5278;background:#111d31}
 .section-title h2{margin:0;font-size:14px}.tag{font-size:9px;letter-spacing:.1em;color:var(--muted);border:1px solid var(--line);padding:4px 6px;border-radius:6px}
 .daybar{display:flex;justify-content:space-between;align-items:center;background:#0a1220;border:1px solid var(--line);padding:9px 10px;border-radius:8px;margin-bottom:6px}
 .daybar strong{font-size:12px}.daybar span{font-size:10px;color:var(--muted)}
-.routine-head{gap:10px}.routine-head h2{flex:none}.routine-head{margin-bottom:8px}.routine-head>button{padding:6px 8px;font-size:9px}.routine-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:6px}.routine-nav button{padding:7px 8px;font-size:9px;white-space:nowrap;min-width:0}
+.routine-head{gap:10px}.routine-head h2{flex:none}.routine-head{margin-bottom:8px}.routine-head>button{padding:6px 8px;font-size:9px}.routine-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:6px}.routine-nav button{padding:7px 8px;font-size:9px;white-space:nowrap;min-width:0}.recap-nav{margin-bottom:8px}.recap-nav button{font-size:8px;padding:7px 3px}
 .study-row{display:grid;grid-template-columns:35px 1fr auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #162238}
 .study-row:last-child{border-bottom:0}
 .check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
@@ -309,6 +309,74 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 }
 
 .footer-soikat{color:#7c8cff;}
+
+/* ===== STUDY SEGMENT CARDS: ROUTINE + RECAP ===== */
+.routine-card #routineList,
+.weekly-card #weeklyList,
+.monthly-card #monthlyList{
+  min-width:0;
+}
+.routine-item{
+  position:relative;
+  border:1px solid #1d2c44;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(17,29,49,.94),rgba(9,17,30,.96));
+  padding:11px 9px;
+  margin:0 0 8px;
+  transition:border-color .2s ease,background .2s ease,transform .2s ease,box-shadow .2s ease;
+  animation:segmentEnter .28s ease both;
+}
+.routine-item:last-child{margin-bottom:0}
+.routine-item:hover{
+  border-color:#35547b;
+  background:linear-gradient(135deg,rgba(20,37,61,.98),rgba(10,19,34,.98));
+  box-shadow:0 5px 16px rgba(0,0,0,.16);
+  transform:translateY(-1px);
+}
+.routine-item:has(.check-action:checked){
+  border-color:rgba(53,227,154,.38);
+  background:linear-gradient(135deg,rgba(13,42,33,.72),rgba(9,20,29,.96));
+}
+.revision-list{
+  gap:7px;
+}
+.revision-item{
+  position:relative;
+  border:1px solid #1d2c44;
+  border-top:1px solid #1d2c44;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(17,29,49,.92),rgba(9,17,30,.96));
+  padding:10px 9px;
+  margin:0;
+  transition:border-color .2s ease,background .2s ease,transform .2s ease,box-shadow .2s ease;
+  animation:segmentEnter .28s ease both;
+}
+.revision-item:hover{
+  border-color:#35547b;
+  background:linear-gradient(135deg,rgba(20,37,61,.98),rgba(10,19,34,.98));
+  box-shadow:0 5px 16px rgba(0,0,0,.16);
+  transform:translateY(-1px);
+}
+.revision-item:has(input:checked){
+  border-color:rgba(53,227,154,.38);
+  background:linear-gradient(135deg,rgba(13,42,33,.72),rgba(9,20,29,.96));
+}
+.revision-group-title{
+  margin-top:13px;
+  margin-bottom:7px;
+  padding:0 2px 6px;
+}
+@keyframes segmentEnter{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(hover:none){
+  .routine-item:hover,.revision-item:hover{transform:none;box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .routine-item,.revision-item{animation:none;transition:none}
+}
+
 </style>
 </head>
 <body>
@@ -366,11 +434,21 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 
   <div>
     <div class="card weekly-card">
-      <div class="section-title rev-title-stack"><h2>WEEKLY REVISION</h2><div class="rev-date-label" id="weekLabel">THIS WEEK</div><div class="rev-count-label" id="weekCount">0/0 ✅</div></div>
+      <div class="section-title rev-title-stack"><h2>WEEKLY RECAP</h2><div class="rev-date-label" id="weekLabel">THIS WEEK</div><div class="rev-count-label" id="weekCount">0/0</div></div>
+      <div class="routine-nav recap-nav">
+        <button type="button" onclick="changeRecapWeek(-1)">PREVIOUS WEEK</button>
+        <button type="button" onclick="goRecapWeekToday()">THIS WEEK</button>
+        <button type="button" onclick="changeRecapWeek(1)">NEXT WEEK</button>
+      </div>
       <div id="weeklyList"></div>
     </div>
     <div class="card monthly-card" style="margin-top:16px">
-      <div class="section-title rev-title-stack"><h2>MONTHLY REVISION</h2><div class="rev-date-label" id="monthLabel">THIS MONTH</div><div class="rev-count-label" id="monthCount">0/0 ✅</div></div>
+      <div class="section-title rev-title-stack"><h2>MONTHLY RECAP</h2><div class="rev-date-label" id="monthLabel">THIS MONTH</div><div class="rev-count-label" id="monthCount">0/0</div></div>
+      <div class="routine-nav recap-nav">
+        <button type="button" onclick="changeRecapMonth(-1)">PREVIOUS MONTH</button>
+        <button type="button" onclick="goRecapMonthToday()">THIS MONTH</button>
+        <button type="button" onclick="changeRecapMonth(1)">NEXT MONTH</button>
+      </div>
       <div id="monthlyList"></div>
     </div>
   </div>
@@ -432,6 +510,8 @@ let trustedSource = localStorage.getItem(KEY+'_trusted_source') || 'none';
 
 let selected = new Date();
 let calCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
+let recapWeekCursor = cloneDate(selected);
+let recapMonthCursor = new Date(selected.getFullYear(), selected.getMonth(), 1);
 
 function pad(n){return String(n).padStart(2,'0')}
 
@@ -763,6 +843,33 @@ function renderRoutine(d){
 
     </div>`;
   }).join('');
+
+  // Show earlier studies for subjects planned on the selected routine date.
+  const subjects=new Set(list.map(x=>normalizeSubject(x.subject)));
+  const prior=[];
+  for(let day=cloneDate(START);day<cloneDate(d);day.setDate(day.getDate()+1)){
+    const dk=iso(day);
+    entries(day).forEach((item,index)=>{
+      if(subjects.has(normalizeSubject(item.subject))){
+        prior.push({...item,plannedDate:dk,studyId:studyId(item,dk,index),completed:isDone(item,dk,index)});
+      }
+    });
+  }
+  if(prior.length){
+    box.innerHTML+=`<div class="revision-group-title">SUBJECT RECAP</div><div class="revision-list">
+      ${prior.map(x=>`<label class="revision-item">
+        <input type="checkbox" ${x.completed?'checked':''} onchange="toggleDone('${escapeAttr(x.studyId)}',this.checked)">
+        <div><div class="subject">${escapeHtml(x.subject||'Study')}</div>
+        <div class="topic">${renderTopic(x.topic)}</div>
+        <div class="revision-date">${displayDate(x.plannedDate)}</div></div>
+        <span class="status ${x.completed?'done':''}">${x.completed?'DONE':'PENDING'}</span>
+      </label>`).join('')}
+    </div>`;
+  }
+}
+
+function normalizeSubject(s){
+  return String(s||'Study').trim().replace(/\\s+/g,' ').toLocaleLowerCase();
 }
 
 /*
@@ -838,73 +945,61 @@ function toggleDoneFromCalendar(id){
   render();
 }
 
-function renderWeekly(d){
-  // Saturday -> Friday.
+function weekStartFor(d){
   const start=cloneDate(d);
-  const day=start.getDay();
-  const daysFromSaturday=(day+1)%7;
-  start.setDate(start.getDate()-daysFromSaturday);
+  start.setDate(start.getDate()-((start.getDay()+1)%7)); // Saturday
+  return start;
+}
 
+function changeRecapWeek(delta){
+  recapWeekCursor=weekStartFor(recapWeekCursor);
+  recapWeekCursor.setDate(recapWeekCursor.getDate()+delta*7);
+  renderWeekly(recapWeekCursor);
+}
+function goRecapWeekToday(){
+  recapWeekCursor=todayDhaka();
+  renderWeekly(recapWeekCursor);
+}
+function changeRecapMonth(delta){
+  recapMonthCursor=new Date(recapMonthCursor.getFullYear(),recapMonthCursor.getMonth()+delta,1);
+  renderMonthly(recapMonthCursor);
+}
+function goRecapMonthToday(){
+  const now=todayDhaka();
+  recapMonthCursor=new Date(now.getFullYear(),now.getMonth(),1);
+  renderMonthly(recapMonthCursor);
+}
+
+function renderWeekly(d){
+  const start=weekStartFor(d);
   const end=cloneDate(start);
   end.setDate(end.getDate()+6);
-
   const items=getStudiesInRange(start,end);
   const box=document.getElementById('weeklyList');
-
+  const now=todayDhaka();
   document.getElementById('weekLabel').textContent=
-    fmt(start).slice(0,6)+' → '+fmt(end).slice(0,6);
-
+    iso(start)===iso(weekStartFor(now))?'THIS WEEK':fmt(start).slice(0,6)+' → '+fmt(end).slice(0,6);
+  document.getElementById('weekCount').textContent=items.filter(x=>x.completed).length+'/'+items.length+' DONE';
   if(!items.length){
     box.innerHTML='<div class="empty">এই সপ্তাহে কোনো Study নেই।</div>';
     return;
   }
-
-  const revisedCount=items.reduce(
-    (n,x)=>n+(data.weeklyRevision[x.studyId]===true?1:0),0
-  );
-  document.getElementById('weekCount').textContent=
-    revisedCount+'/'+items.length+' ✅';
-
-  const pendingRoutine=items.filter(x=>!x.completed);
-  const completedRoutine=items.filter(x=>x.completed);
-
-  box.innerHTML=`
-    ${pendingRoutine.length ? `
-      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
-      <div class="revision-list">
-        ${pendingRoutine.map(x=>{
-          const revised=!!data.weeklyRevision[x.studyId];
-          return `<label class="revision-item">
-            <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('weeklyRevision','${escapeAttr(x.studyId)}',this.checked)">
-            <div>
-              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
-              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
-              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
-            </div>
-            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
-          </label>`;
-        }).join('')}
-      </div>` : ''}
-
-    ${completedRoutine.length ? `
-      <div class="revision-group-title">COMPLETED — REVISION</div>
-      <div class="revision-list">
-        ${completedRoutine.map(x=>{
-          const revised=!!data.weeklyRevision[x.studyId];
-          return `<label class="revision-item">
-            <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('weeklyRevision','${escapeAttr(x.studyId)}',this.checked)">
-            <div>
-              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
-              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
-              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
-            </div>
-            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
-          </label>`;
-        }).join('')}
-      </div>` : ''}
-  `;
+  const groups=[];
+  for(let day=cloneDate(start);day<=end;day.setDate(day.getDate()+1)){
+    const dk=iso(day);
+    const dayItems=items.filter(x=>x.plannedDate===dk);
+    if(!dayItems.length) continue;
+    groups.push(`<div class="revision-group-title">${escapeHtml(fmt(day))}</div><div class="revision-list">
+      ${dayItems.map(x=>`<label class="revision-item">
+        <input type="checkbox" ${x.completed?'checked':''} onchange="toggleDone('${escapeAttr(x.studyId)}',this.checked)">
+        <div><div class="subject">${escapeHtml(x.subject||'Study')}</div>
+        <div class="topic">${renderTopic(x.topic)}</div>
+        <div class="revision-date">${displayDate(x.plannedDate)}</div></div>
+        <span class="status ${x.completed?'done':''}">${x.completed?'DONE':'PENDING'}</span>
+      </label>`).join('')}
+    </div>`);
+  }
+  box.innerHTML=groups.join('');
 }
 
 function renderMonthly(d){
@@ -912,61 +1007,31 @@ function renderMonthly(d){
   const end=new Date(d.getFullYear(),d.getMonth()+1,0);
   const items=getStudiesInRange(start,end);
   const box=document.getElementById('monthlyList');
-
+  const now=todayDhaka();
   document.getElementById('monthLabel').textContent=
-    d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
-
+    start.getFullYear()===now.getFullYear()&&start.getMonth()===now.getMonth()
+      ?'THIS MONTH':d.toLocaleDateString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+  document.getElementById('monthCount').textContent=items.filter(x=>x.completed).length+'/'+items.length+' DONE';
   if(!items.length){
     box.innerHTML='<div class="empty">এই মাসে কোনো Study নেই।</div>';
     return;
   }
-
-  const revisedCount=items.reduce(
-    (n,x)=>n+(data.monthlyRevision[x.studyId]===true?1:0),0
-  );
-  document.getElementById('monthCount').textContent=
-    revisedCount+'/'+items.length+' ✅';
-
-  const pendingRoutine=items.filter(x=>!x.completed);
-  const completedRoutine=items.filter(x=>x.completed);
-
-  box.innerHTML=`
-    ${pendingRoutine.length ? `
-      <div class="revision-group-title">PENDING — REVISION / CATCH UP</div>
-      <div class="revision-list">
-        ${pendingRoutine.map(x=>{
-          const revised=!!data.monthlyRevision[x.studyId];
-          return `<label class="revision-item">
-            <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('monthlyRevision','${escapeAttr(x.studyId)}',this.checked)">
-            <div>
-              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
-              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
-              <div class="revision-date">Not Completed: ${displayDate(x.plannedDate)}</div>
-            </div>
-            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
-          </label>`;
-        }).join('')}
-      </div>` : ''}
-
-    ${completedRoutine.length ? `
-      <div class="revision-group-title">COMPLETED — REVISION</div>
-      <div class="revision-list">
-        ${completedRoutine.map(x=>{
-          const revised=!!data.monthlyRevision[x.studyId];
-          return `<label class="revision-item">
-            <input type="checkbox" ${revised?'checked':''}
-              onchange="toggleRevision('monthlyRevision','${escapeAttr(x.studyId)}',this.checked)">
-            <div>
-              <div class="subject">${escapeHtml(x.subject||'Study')}</div>
-              <div class="topic">${escapeHtml(x.topic||'Untitled')}</div>
-              <div class="revision-date">Completed: ${displayDate(x.plannedDate)}</div>
-            </div>
-            <span class="status ${revised?'done':''}">${revised?'REVISED':'TO REVISE'}</span>
-          </label>`;
-        }).join('')}
-      </div>` : ''}
-  `;
+  const groups=[];
+  for(let day=cloneDate(start);day<=end;day.setDate(day.getDate()+1)){
+    const dk=iso(day);
+    const dayItems=items.filter(x=>x.plannedDate===dk);
+    if(!dayItems.length) continue;
+    groups.push(`<div class="revision-group-title">${escapeHtml(fmt(day))}</div><div class="revision-list">
+      ${dayItems.map(x=>`<label class="revision-item">
+        <input type="checkbox" ${x.completed?'checked':''} onchange="toggleDone('${escapeAttr(x.studyId)}',this.checked)">
+        <div><div class="subject">${escapeHtml(x.subject||'Study')}</div>
+        <div class="topic">${renderTopic(x.topic)}</div>
+        <div class="revision-date">${displayDate(x.plannedDate)}</div></div>
+        <span class="status ${x.completed?'done':''}">${x.completed?'DONE':'PENDING'}</span>
+      </label>`).join('')}
+    </div>`);
+  }
+  box.innerHTML=groups.join('');
 }
 
 function toggleRevision(type,id,value){
