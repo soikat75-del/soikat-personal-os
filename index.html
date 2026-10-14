@@ -1448,6 +1448,51 @@ body::after{
 }
 
 .footer-soikat{color:#7c8cff;}
+
+/* ================= COMPACT HEADER BACKUP BUTTONS ================= */
+.subtitle-row{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-top:18px}
+.subtitle-row .subtitle{margin-top:0}
+.backup-quick-actions{display:flex;align-items:center;justify-content:center;gap:7px}
+.backup-btn{min-height:27px;padding:5px 10px;border:1px solid rgba(80,145,255,.38);border-radius:7px;background:rgba(10,24,43,.72);color:#a9c9ff;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.backup-btn.secondary{background:rgba(15,13,35,.72);border-color:rgba(157,115,255,.38);color:#c6b5ff}
+.backup-btn:hover{filter:brightness(1.15);border-color:#729fff;transform:translateY(-1px)}
+.backup-file{display:none}
+
+.backup-status{
+  position:fixed;left:50%;bottom:22px;z-index:10001;
+  display:block;max-width:calc(100vw - 28px);width:max-content;
+  padding:10px 16px;border:1px solid #fff;
+  border-radius:8px;background:#fff;color:#000;
+  font-size:12px;font-weight:600;line-height:1.45;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;visibility:hidden;transform:translate(-50%,10px);
+  transition:opacity .22s ease,transform .22s ease,visibility .22s;
+  pointer-events:none;
+}
+.backup-status.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.backup-status.error{border-color:#fff;background:#fff;color:#000}
+@media(max-width:600px){.backup-status{bottom:16px;padding:10px 14px;font-size:11px}}
+
+.backup-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(1,5,14,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.backup-modal.open{display:flex}
+.backup-dialog{width:min(360px,100%);padding:24px 22px 20px;text-align:center;border:1px solid rgba(91,139,255,.38);border-radius:18px;background:linear-gradient(145deg,#0b1729,#080d1b);box-shadow:0 24px 80px rgba(0,0,0,.55),0 0 35px rgba(61,104,255,.12);animation:backupPop .2s ease-out}
+.backup-dialog-icon{width:48px;height:48px;margin:0 auto 14px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(82,130,255,.12);border:1px solid rgba(112,151,255,.28);color:#a9c9ff;font-size:22px}
+.backup-dialog h2{font-size:17px;letter-spacing:.02em;margin-bottom:8px}
+.backup-dialog p{font-size:12px;line-height:1.6;color:#91a2bd;margin-bottom:20px}
+.backup-dialog-actions{display:flex;gap:8px}
+.backup-dialog-actions button{flex:1;min-height:38px;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer}
+.backup-cancel{background:#101a2a;border:1px solid #293b56;color:#aabbd2}
+.backup-confirm{background:linear-gradient(100deg,#347fff,#7864ff);border:1px solid transparent;color:#fff}
+@keyframes backupPop{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:600px){
+ .subtitle-row{gap:9px;margin-top:13px}
+ .subtitle-row .subtitle{font-size:9px;letter-spacing:clamp(3px,1.2vw,5px)}
+ .backup-quick-actions{gap:7px}
+ .backup-btn{min-height:27px;padding:5px 10px;font-size:9px}
+ .backup-dialog{padding:22px 18px 18px;border-radius:16px}
+}
+@media(prefers-reduced-motion:reduce){.backup-dialog{animation:none}.backup-btn,.backup-status{transition:none}}
+
 </style>
 </head>
 
@@ -1465,8 +1510,12 @@ body::after{
         SOIKAT
     </h1>
 
-    <div class="subtitle">
-        PERSONAL OS
+    <div class="subtitle-row">
+        <div class="subtitle">PERSONAL OS</div>
+        <div class="backup-quick-actions" aria-label="Data backup">
+            <button class="backup-btn" id="exportBackupBtn" type="button">↓ EXPORT</button>
+            <button class="backup-btn secondary" id="importBackupBtn" type="button">↑ IMPORT</button>
+        </div>
     </div>
 
     <div class="header-line"></div>
@@ -1764,6 +1813,22 @@ body::after{
 </section>
 
 
+
+<!-- Backup controls and custom import confirmation -->
+<input class="backup-file" id="backupFileInput" type="file" accept=".json,application/json">
+<div class="backup-status" id="backupStatus" role="status" aria-live="polite" hidden></div>
+<div class="backup-modal" id="backupImportModal" role="dialog" aria-modal="true" aria-labelledby="backupModalTitle" aria-describedby="backupModalMessage">
+  <div class="backup-dialog">
+    <div class="backup-dialog-icon" aria-hidden="true">↑</div>
+    <h2 id="backupModalTitle">IMPORT BACKUP</h2>
+    <p id="backupModalMessage">এই ব্যাকআপ ইমপোর্ট করলে বর্তমান ডিভাইসের LocalStorage ডাটা সম্পূর্ণ রিপ্লেস হবে। আগে প্রয়োজনীয় ব্যাকআপ রেখে নাও।</p>
+    <div class="backup-dialog-actions">
+      <button class="backup-cancel" id="cancelBackupImport" type="button">CANCEL</button>
+      <button class="backup-confirm" id="confirmBackupImport" type="button">IMPORT</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= FOOTER ================= -->
 
 <footer class="footer">
@@ -1808,6 +1873,87 @@ document.querySelectorAll(".card").forEach(card => {
     });
 
 });
+
+
+/* ================= CENTRAL DATA BACKUP ================= */
+(function(){
+  const exportBtn=document.getElementById("exportBackupBtn");
+  const importBtn=document.getElementById("importBackupBtn");
+  const fileInput=document.getElementById("backupFileInput");
+  const status=document.getElementById("backupStatus");
+  const modal=document.getElementById("backupImportModal");
+  const cancelBtn=document.getElementById("cancelBackupImport");
+  const confirmBtn=document.getElementById("confirmBackupImport");
+  if(!exportBtn||!importBtn||!fileInput||!status||!modal||!cancelBtn||!confirmBtn)return;
+  let pendingBackup=null;
+  let statusTimer=null;
+  function setStatus(message,type="success",duration=2600){
+    status.textContent=message;
+    status.hidden=false;
+    status.classList.toggle("error",type==="error");
+    status.classList.add("show");
+    if(statusTimer)clearTimeout(statusTimer);
+    statusTimer=setTimeout(()=>{status.classList.remove("show");},duration);
+  }
+  function closeModal(){modal.classList.remove("open");pendingBackup=null;}
+  function openModal(){modal.classList.add("open");confirmBtn.focus();}
+
+  exportBtn.addEventListener("click",()=>{
+    try{
+      const data={};
+      for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key!==null)data[key]=localStorage.getItem(key);
+      }
+      const backup={format:"SOIKAT_PERSONAL_OS_BACKUP",version:1,exportedAt:new Date().toISOString(),origin:location.origin,storage:data};
+      const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+      const url=URL.createObjectURL(blob);
+      const link=document.createElement("a");
+      link.href=url;
+      link.download=`soikat-personal-os-backup-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(link);link.click();link.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      setStatus("Export complete.");
+    }catch(error){setStatus("Export failed. Check browser storage permissions.","error");}
+  });
+
+  importBtn.addEventListener("click",()=>fileInput.click());
+  cancelBtn.addEventListener("click",()=>{closeModal();fileInput.value="";});
+  modal.addEventListener("click",e=>{if(e.target===modal){closeModal();fileInput.value="";}});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&modal.classList.contains("open")){closeModal();fileInput.value="";}});
+
+  fileInput.addEventListener("change",async()=>{
+    const file=fileInput.files&&fileInput.files[0];
+    if(!file)return;
+    try{
+      const parsed=JSON.parse(await file.text());
+      if(!parsed||parsed.format!=="SOIKAT_PERSONAL_OS_BACKUP"||!parsed.storage||typeof parsed.storage!=="object"||Array.isArray(parsed.storage))throw new Error("invalid backup");
+      const entries=Object.entries(parsed.storage);
+      for(const [key,value] of entries){if(typeof key!=="string"||typeof value!=="string")throw new Error("invalid storage entry");}
+      pendingBackup=entries;
+      openModal();
+    }catch(error){setStatus("Import failed: the selected file is not a valid backup.","error");fileInput.value="";}
+  });
+
+  confirmBtn.addEventListener("click",()=>{
+    if(!pendingBackup)return;
+    const entries=pendingBackup;
+    // Keep an in-memory rollback copy so a failed restore does not leave a partial import.
+    const previous={};
+    for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key!==null)previous[key]=localStorage.getItem(key);}
+    try{
+      localStorage.clear();
+      for(const [key,value] of entries)localStorage.setItem(key,value);
+      closeModal();fileInput.value="";
+      setStatus("Import successful.","success",1800);
+      // Give the success toast time to be seen before refreshing the dashboard.
+      setTimeout(()=>location.reload(),1800);
+    }catch(error){
+      try{localStorage.clear();for(const [key,value] of Object.entries(previous))localStorage.setItem(key,value);}catch(rollbackError){}
+      closeModal();fileInput.value="";setStatus("Import failed. Existing data was restored where possible.","error");
+    }
+  });
+})();
 
 </script>
 
