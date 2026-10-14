@@ -966,6 +966,27 @@ footer{
 
 @media(max-width:600px){
 
+ /* Keep data tables and grid children inside the phone viewport. */
+ .main-grid,
+ .main-grid > div,
+ .panel,
+ .table-wrap{
+  min-width:0;
+  max-width:100%;
+ }
+
+ .table-wrap{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+ }
+
+ .table-wrap table{
+  min-width:620px;
+ }
+
+
+
  .container{
   width:100%;
   max-width:none;
