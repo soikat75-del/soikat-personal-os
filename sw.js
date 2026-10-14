@@ -1,4 +1,4 @@
-const CACHE_NAME = 'soikat-personal-os-v1';
+const CACHE_NAME = 'soikat-personal-os-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,7 +8,10 @@ const APP_SHELL = [
   './live-tv.html',
   './offline.html',
   './manifest.webmanifest',
-  './icon.svg'
+  './icon.svg',
+  './apple-touch-icon.png',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', event => {
