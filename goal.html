@@ -2520,45 +2520,19 @@ function renderCalendar(){
  grid.innerHTML=html;
 
 
-/*
- Tooltip only on desktop.
- No tooltip on mobile/touch.
-*/
-
- if(
-  window.matchMedia(
-   "(hover: hover) and (pointer: fine)"
-  ).matches
- ){
-
-  grid.querySelectorAll(
-   ".day:not(.empty)[data-inrange='true']"
-  ).forEach(
-   day=>{
-
-    day.addEventListener(
-     "mouseenter",
-     e=>showDayTooltip(
-      e,
-      day
-     )
-    );
-
-    day.addEventListener(
-     "mousemove",
-     moveDayTooltip
-    );
-
-    day.addEventListener(
-     "mouseleave",
-     hideDayTooltip
-    );
-
-   }
-  );
-
- }
-
+const desktopHover=window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+ grid.querySelectorAll(".day:not(.empty)[data-inrange='true']").forEach(day=>{
+  if(desktopHover){
+   day.addEventListener("mouseenter",e=>showDayTooltip(e,day));
+   day.addEventListener("mousemove",moveDayTooltip);
+   day.addEventListener("mouseleave",hideDayTooltip);
+  }else{
+   day.addEventListener("click",e=>{
+    e.preventDefault(); e.stopPropagation();
+    showDayTooltip(e,day,true);
+   });
+  }
+ });
 }
 
 
@@ -2704,18 +2678,11 @@ function renderTable(entries){
 
 function showDayTooltip(
  event,
- el
+ el,
+ touchMode=false
 ){
 
- if(
-  !window.matchMedia(
-   "(hover: hover) and (pointer: fine)"
-  ).matches
- ){
-
-  return;
-
- }
+ if(!touchMode && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
 
  if(
@@ -2842,8 +2809,13 @@ function showDayTooltip(
   const safeNote=String(note).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   tooltip.innerHTML+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #26384e;color:#9db0c6">${safeNote} · ${money(cumulative)} cumulative</div>`;
  }
+ if(touchMode){
+  tooltip.innerHTML+='<button type="button" class="tt-close" aria-label="Close tooltip">×</button>';
+  tooltip.querySelector(".tt-close").addEventListener("click",e=>{e.stopPropagation();hideDayTooltip();});
+  tooltip.style.left=""; tooltip.style.top="";
+ }
  tooltip.classList.add("show");
- moveDayTooltip(event);
+ if(!touchMode) moveDayTooltip(event);
 
 }
 
@@ -3470,6 +3442,14 @@ document
   }
 );
 
+
+// Touch tooltip closes when the user scrolls or taps outside it.
+document.addEventListener("click",e=>{
+ if(!e.target.closest(".day") && !e.target.closest(".day-tooltip")) hideDayTooltip();
+});
+window.addEventListener("scroll",()=>{
+ if(!window.matchMedia("(hover: hover) and (pointer: fine)").matches) hideDayTooltip();
+},{passive:true});
 
 /* ================= INITIAL ================= */
 
