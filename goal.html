@@ -1534,6 +1534,9 @@ footer{
    step="1"
    placeholder="৳ Enter net profit">
 
+  <label for="entryNote">Note</label>
+  <input id="entryNote" type="text" maxlength="80" placeholder="e.g. bKash, Nagad">
+
   <button id="addButton">
    Add Entry
   </button>
@@ -1809,6 +1812,25 @@ function rangeTotal(e,a,b){
 
 }
 
+
+const NOTES_STORAGE_KEY="soikat_1l_goal_notes_v1";
+function getEntryNotes(){try{return JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY))||{};}catch{return {};}}
+function saveEntryNotes(notes){localStorage.setItem(NOTES_STORAGE_KEY,JSON.stringify(notes));}
+function normalizedNote(value){return String(value||"").trim().toLocaleLowerCase();}
+function cumulativeNoteTotal(note,throughDate,entries=getEntries(),notes=getEntryNotes()){
+ const target=normalizedNote(note); if(!target)return 0;
+ return Object.entries(entries).reduce((sum,[date,amount])=>date<=throughDate&&normalizedNote(notes[date])===target?sum+Number(amount||0):sum,0);
+}
+function updateEntryPreview(){
+ const date=document.getElementById("entryDate").value, raw=document.getElementById("profit").value, entries=getEntries();
+ const saved=Object.prototype.hasOwnProperty.call(entries,date), draft=raw.trim()!=="", has=draft||saved;
+ const net=draft?Number(raw):Number(entries[date]||0), valid=has&&Number.isFinite(net)&&net>=0, diff=net-DAILY_TARGET;
+ document.getElementById("todayNet").textContent=valid?money(net):"—";
+ document.getElementById("difference").textContent=valid?(diff>=0?"+":"−")+money(Math.abs(diff)):"—";
+ document.getElementById("achievement").textContent=valid?percent(net/DAILY_TARGET*100):"—";
+ document.getElementById("difference").style.color=valid?(diff>=0?"var(--green)":"var(--red)"):"var(--text)";
+ document.getElementById("achievement").style.color=valid?(net>=DAILY_TARGET?"var(--green)":net>=DAILY_TARGET*.8?"var(--yellow)":"var(--red)"):"var(--text)";
+}
 
 function showToast(msg){
 
@@ -2802,8 +2824,14 @@ function showDayTooltip(
  }
 
 
+ const notes=getEntryNotes();
+ const note=notes[key];
+ if(normalizedNote(note)){
+  const cumulative=cumulativeNoteTotal(note,key);
+  const safeNote=String(note).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  tooltip.innerHTML+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #26384e;color:#9db0c6">${safeNote} · ${money(cumulative)} cumulative</div>`;
+ }
  tooltip.classList.add("show");
-
  moveDayTooltip(event);
 
 }
@@ -3173,10 +3201,9 @@ document
 /* ================= CALENDAR DATE ================= */
 
 function selectCalendarDate(key){
-
- document.getElementById(
-  "entryDate"
- ).value=key;
+ document.getElementById("entryDate").value=key;
+ document.getElementById("profit").value="";
+ document.getElementById("entryNote").value=getEntryNotes()[key]||"";
 
  calendarDate=
   parseDate(key);
@@ -3256,14 +3283,13 @@ function addEntry(){
 
 
  entries[date]=profit;
-
-
  saveEntries(entries);
-
-
- document.getElementById(
-  "profit"
- ).value="";
+ const notes=getEntryNotes();
+ const note=document.getElementById("entryNote").value.trim();
+ if(note) notes[date]=note; else delete notes[date];
+ saveEntryNotes(notes);
+ document.getElementById("profit").value="";
+ document.getElementById("entryNote").value="";
 
 
  calendarDate=
@@ -3287,11 +3313,10 @@ function deleteEntry(date){
 
 
  delete entries[date];
-
-
  saveEntries(entries);
-
-
+ const notes=getEntryNotes();
+ delete notes[date];
+ saveEntryNotes(notes);
  render();
 
 
@@ -3330,6 +3355,9 @@ document
  );
 
 
+document.getElementById("profit").addEventListener("input",updateEntryPreview);
+document.getElementById("entryNote").addEventListener("input",updateEntryPreview);
+
 document
  .getElementById(
   "entryDate"
@@ -3338,6 +3366,9 @@ document
   "change",
   ()=>{
 
+   const selectedKey=document.getElementById("entryDate").value;
+   document.getElementById("profit").value="";
+   document.getElementById("entryNote").value=getEntryNotes()[selectedKey]||"";
    calendarDate=
     parseDate(
      document.getElementById(
