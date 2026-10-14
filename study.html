@@ -261,10 +261,32 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   body{padding-top:58px}
   .hero,.grid{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
-  .routine-card,.calendar-card,.weekly-card,.monthly-card{height:auto}
+
+  /* Match the desktop fixed-card layout on mobile:
+     keep the section controls visible and scroll the content inside each card. */
+  .routine-card,.weekly-card,.monthly-card{
+    display:flex;
+    flex-direction:column;
+    height:430px;
+    min-height:0;
+    overflow:hidden;
+  }
   .routine-card #routineList,
   .weekly-card #weeklyList,
-  .monthly-card #monthlyList{overflow:visible}
+  .monthly-card #monthlyList{
+    min-height:0;
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .weekly-card .revision-list,
+  .monthly-card .revision-list{
+    max-height:none;
+    overflow:visible;
+  }
+  .calendar-card{height:auto}
   .calendar-card .calendar{overflow:visible}
   header{grid-template-columns:auto 1fr auto;gap:10px}
   .header-brand{font-size:12px;letter-spacing:.12em}
