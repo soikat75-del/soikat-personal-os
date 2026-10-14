@@ -2,259 +2,874 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SOIKAT — NOTEPAD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>100K Goal — Soikat Personal OS</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
+
+html,body{
+ width:100%;
+ max-width:100%;
+ overflow-x:hidden;
+}
+
 :root{
-  --bg:#030914;
-  --panel:#071321;
-  --panel2:#091727;
-  --line:#1b3557;
-  --blue:#3d96ff;
-  --purple:#8d63ff;
-  --text:#f3f6ff;
-  --muted:#8198bd;
-  --red:#ff416c;
-  --green:#28dca7;
+ --bg:#07111d;
+ --panel:#0d1a29;
+ --line:#21354d;
+ --text:#f5f8fc;
+ --muted:#8191a7;
+ --green:#35e58f;
+ --blue:#4da3ff;
+ --purple:#a879ff;
+ --orange:#ffb43d;
+ --cyan:#36d8e8;
+ --pink:#ff70b5;
+ --red:#ff6570;
+ --yellow:#ffc44d;
 }
-html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-body{overflow-x:hidden}
-body::before{
-  content:"";position:fixed;inset:0;z-index:-2;
-  background:
-    radial-gradient(circle at 8% 0%,rgba(28,92,210,.23),transparent 32%),
-    radial-gradient(circle at 100% 100%,rgba(113,48,220,.17),transparent 32%),
-    linear-gradient(135deg,#020812,#050d19 55%,#080412);
+
+body{
+ min-height:100vh;
+ color:var(--text);
+ font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+ background:
+ radial-gradient(circle at 8% 0%,rgba(45,120,255,.13),transparent 28%),
+ radial-gradient(circle at 92% 12%,rgba(166,105,255,.11),transparent 27%),
+ var(--bg);
 }
-body::after{
-  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(70,120,255,.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(70,120,255,.035) 1px,transparent 1px);
-  background-size:72px 72px;
-  transform:perspective(700px) rotateX(58deg) scale(1.5) translateY(12%);
-  transform-origin:center bottom;
+
+.container{
+ width:min(1320px,calc(100% - 42px));
+ margin:auto;
 }
+
 .topbar{
-  height:58px;border-bottom:1px solid rgba(105,140,180,.18);
-  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
-  gap:20px;padding:0 32px;position:sticky;top:0;z-index:50;
-  background:transparent;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+ height:58px;
+ border-bottom:1px solid rgba(105,140,180,.18);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:14px;
+ position:fixed;
+ top:0;
+ left:0;
+ right:0;
+ z-index:1000;
+ background:transparent;
+ backdrop-filter:blur(12px);
+ -webkit-backdrop-filter:blur(12px);
 }
-.back{color:#82a9df;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.5px;justify-self:start}
+
+.back{
+ color:#a9b6c8;
+ text-decoration:none;
+ font-size:13px;
+ white-space:nowrap;
+}
+
 .back:hover{color:#fff}
-.logo{
-  font-size:15px;font-weight:700;letter-spacing:.18em;
-  background:linear-gradient(110deg,#72a9ff,#fff 32%,#a9baff 55%,#927cff);
-  background-size:250% auto;
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  animation:
-    brandReveal .8s ease forwards,
-    brandShine 6s linear infinite,
-    brandBreath 4s ease-in-out infinite;
-  will-change:background-position,transform,text-shadow,opacity;
-}
-.clock{justify-self:end;color:#8fa8d0;font-size:13px}
-.app{width:min(1480px,96%);margin:auto;padding:16px 0 0;display:grid;grid-template-columns:340px minmax(0,1fr);gap:12px}
-.panel{background:rgba(7,19,33,.82);border:1px solid var(--line);border-radius:17px;box-shadow:0 18px 55px rgba(0,0,0,.18);overflow:hidden}
-.sidebar{padding:14px;height:calc(100vh - 112px);min-height:520px}
-/* Action row: Add Note + Search + Archive on one line */
-.mobile-actions{display:grid;grid-template-columns:minmax(0,1fr) 46px 46px;gap:8px;align-items:center;width:100%;}
-.mobile-actions .new-btn{width:100%;height:46px;margin:0;font-size:15px;}
-.mobile-actions .new-btn span{font-size:22px;margin-right:8px;}
-.mobile-actions .search-toggle,.mobile-actions .archive-btn{width:46px;height:46px;margin:0;padding:0;border:1px solid #29476e;border-radius:10px;background:#071525;color:#9ab1d4;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.mobile-actions .search-toggle{font-size:22px;}
-.mobile-actions .archive-btn{font-size:18px;}
-.mobile-actions .archive-btn span{display:none;}
 
-.new-btn{
-  width:100%;height:52px;border:0;border-radius:13px;color:#fff;font-size:20px;font-weight:700;
-  background:linear-gradient(110deg,#3198ff,#7257ff);box-shadow:0 12px 30px rgba(59,117,255,.2)
-}
-.new-btn span{font-size:30px;font-weight:300;vertical-align:-2px;margin-right:14px}
-.search{margin-top:12px;height:46px;border:1px solid #29476e;border-radius:12px;display:flex;align-items:center;padding:0 16px;background:#071525}
-.search-icon{font-size:24px;color:#87a5d2;margin-right:12px}
-.search input{width:100%;background:transparent;border:0;outline:0;color:#fff;font-size:15px}
-.search input::placeholder{color:#7890b5}
-.archive-btn{width:100%;height:40px;margin-top:10px;border:1px solid #29476e;border-radius:10px;background:#071525;color:#89a6d1;font-size:12px;cursor:pointer}.archive-btn:hover{border-color:#3b8fff;color:#fff}.notes{margin-top:12px;height:calc(100% - 170px);overflow:auto;padding-right:2px}
-.notes::-webkit-scrollbar,.editor-body::-webkit-scrollbar{width:5px}
-.notes::-webkit-scrollbar-thumb,.editor-body::-webkit-scrollbar-thumb{background:#29466a;border-radius:10px}
-.note{
-  position:relative;border:1px solid #1e395c;border-radius:12px;background:linear-gradient(90deg,#0a1728,#091625);
-  padding:15px 16px 14px 30px;margin-bottom:10px;cursor:pointer;transition:.18s
-}
-.note::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:5px;border-radius:0 5px 5px 0;background:#3e91ff}
-.note:nth-child(2)::before{background:#9a5dff}
-.note:nth-child(3)::before{background:#2ce0aa}
-.note:nth-child(4)::before{background:#ffd329}
-.note:nth-child(5)::before{background:#ff426d}
-.note:nth-child(6)::before{background:#ff9a35}
-.note.active{border-color:#328eff;box-shadow:0 0 0 1px #328eff33 inset}
-.note-title{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:28px}
-.pin{position:absolute;right:16px;top:15px;color:#579cff;font-size:15px}
-.editor{height:calc(100vh - 112px);min-height:520px;padding:14px 16px}
-.title-input{
-  width:100%;height:58px;border:1px solid #28486d;border-radius:13px;background:#071525;
-  color:#fff;padding:0 18px;font-size:24px;font-weight:700;outline:none
-}
-.title-input:focus{border-color:#398fff;box-shadow:0 0 0 2px #398fff18}
-.note-current-date{margin-top:8px;color:#86a1ca;font-size:12px;padding-left:2px}.note-reminder-icon{margin-left:7px;color:#68b0ff;font-size:13px}
-.toolbar{display:flex;align-items:center;gap:8px;margin:10px 0}
-.date-box,.tool-btn,.save-state{
-  height:54px;border:1px solid #223f64;border-radius:12px;background:#071525;
-  color:#89a6d1;display:flex;align-items:center;padding:0 16px
-}
-.date-box{font-size:14px}
-.current-date-box{width:max-content;margin-top:8px;height:38px;padding:0 10px;font-size:12px;gap:7px}
-.spacer{flex:1}
-.tool-btn{font-size:14px;gap:9px}.icon-btn{width:38px;height:38px;justify-content:center;padding:0;font-size:15px}.date-box{height:38px;padding:0 10px;font-size:12px}.toolbar{gap:7px}
-.tool-btn.pin-btn{color:#5ca1ff;border-color:#223f64}.tool-btn.pin-btn.pinned{border-color:#328eff;box-shadow:0 0 0 1px #328eff33 inset}
-.tool-btn.delete{color:#ff496d}
-.save-state{gap:9px}
-.dot{width:12px;height:12px;border-radius:50%;background:#28dca7;box-shadow:0 0 10px #28dca766}
-.editor-body{
-  height:calc(100% - 116px);min-height:300px;border:1px solid #223f64;border-radius:13px;
-  background:linear-gradient(145deg,#071321,#050f1b);padding:16px 20px;display:flex;flex-direction:column
-}
-.editor-checklist-btn{position:absolute;top:9px;right:10px;z-index:3;width:32px;height:32px;border:1px solid #223f64;border-radius:8px;background:#071525;color:#9ab1d4;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;padding:0}.editor-checklist-btn:hover{border-color:#3b8fff;color:#fff}.editor-body{position:relative}
-.content{flex:1;width:100%;resize:none;border:0;outline:0;background:transparent;color:#dfe9fa;font-size:18px;line-height:1.6;font-family:Arial,Helvetica,sans-serif}
-.content::placeholder{color:#6680a8}
-.counter{text-align:right;color:#7892b8;font-size:12px;padding-top:8px}
-footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-top:38px;padding:0 0 20px;color:#8292a2;font-size:11px;letter-spacing:4px}
-.footer-line{width:150px;height:1px;background:linear-gradient(90deg,transparent,#526b82)}
-.footer-line.right{background:linear-gradient(90deg,#526b82,transparent)}
-.heart{color:#ff416c;font-size:14px;display:inline-block;animation:heartbeat 1.8s infinite}
-@keyframes heartbeat{0%,100%{transform:scale(1)}10%{transform:scale(1.22)}20%{transform:scale(1)}30%{transform:scale(1.12)}}
-
-
-
-
-.countdown-display{flex:none;margin-bottom:10px;padding:8px 10px;border:1px solid #29476e;border-radius:10px;background:#071525;color:#a9c5ef;font-size:13px;font-weight:700;text-align:center;letter-spacing:.2px}
-.feature-btn{width:36px;height:36px;border:1px solid #223f64;border-radius:9px;background:#071525;color:#9ab1d4;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;padding:0}
-.feature-btn:hover{border-color:#3b8fff;color:#fff}
-.feature-btn.active{border-color:#328eff;color:#fff;box-shadow:0 0 0 1px #328eff33 inset}
-.note-meta span{display:inline-flex;align-items:center}
-.feature-modal{display:none;position:fixed;inset:0;z-index:300;background:rgba(1,6,14,.78);backdrop-filter:blur(9px);align-items:center;justify-content:center;padding:18px}
-.feature-modal.show{display:flex}
-.feature-box{width:min(430px,100%);background:#071321;border:1px solid #29476e;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.55);overflow:hidden}
-.feature-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid #1b3557}
-.feature-head strong{font-size:15px;letter-spacing:1px}
-.feature-body{padding:18px}
-.feature-body label{display:block;color:#88a2c7;font-size:11px;margin:0 0 7px}
-.feature-body input[type="date"],.feature-body input[type="time"]{width:100%;height:43px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#fff;padding:0 11px;outline:0;margin-bottom:13px;cursor:pointer;color-scheme:dark;appearance:auto;-webkit-appearance:auto}.feature-body input[type="date"]::-webkit-calendar-picker-indicator,.feature-body input[type="time"]::-webkit-calendar-picker-indicator{opacity:1;cursor:pointer;filter:invert(1)}
-.feature-body input:focus{border-color:#398fff}
-.feature-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.feature-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
-.feature-actions button{height:36px;border:1px solid #29476e;border-radius:8px;background:#071525;color:#9ab0d2;padding:0 12px;cursor:pointer;font-size:11px}
-.feature-actions .primary{color:#fff;border-color:#328eff;background:#12315a}
-.feature-actions .danger{color:#ff5576;border-color:#6d2940}
-.countdown-badge{color:#b99cff!important}
-.reminder-badge{color:#68b0ff!important}
-.reminder-display{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
-.reminder-fixed{color:#68b0ff}.reminder-live{color:#b99cff}.reminder-sep{color:#4f678b}
-.editor{position:relative}
-.mobile-editor-close{display:none}
-@media(max-width:600px){
-  .editor{display:none;position:fixed;inset:0;z-index:120;width:100%;height:100dvh;min-height:0;margin:0;padding:10px;border-radius:0;overflow:auto;background:#030914}
-  .editor.mobile-open{display:block}
-  .mobile-editor-close{display:flex;position:absolute;right:10px;top:10px;width:36px;height:36px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#b8c9e3;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:5}
+.brand{
+ font-size:15px;
+ font-weight:700;
+ letter-spacing:.18em;
+ white-space:nowrap;
+ text-align:center;
+ background:linear-gradient(
+  110deg,
+  #ffffff 10%,
+  #9ebcff 45%,
+  #ffffff 60%,
+  #758fff 80%,
+  #ffffff 100%
+ );
+ background-size:250% auto;
+ -webkit-background-clip:text;
+ background-clip:text;
+ color:transparent;
+ animation:
+  brandReveal .8s ease forwards,
+  brandShine 6s linear infinite,
+  brandBreath 4s ease-in-out infinite;
 }
 
-@media(max-width:600px){
-  .toolbar{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;min-width:0;overflow:hidden}
-  .current-date-box{flex:1 1 auto;min-width:0;width:auto;margin-top:8px;overflow:hidden}
-  .current-date-box span:last-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .toolbar .spacer{display:none}
-  .feature-btn{width:34px;height:34px;min-width:34px;flex:0 0 34px;font-size:14px}
-  .toolbar .icon-btn{width:36px;height:36px;min-width:36px;flex:0 0 36px}
-  .feature-row{grid-template-columns:1fr}
-  .feature-box{width:100%}
+.top-date{
+ color:#8291a5;
+ font-size:12px;
+ white-space:nowrap;
 }
 
-.archive-reader{display:none;position:fixed;inset:0;z-index:250;background:rgba(1,6,14,.78);backdrop-filter:blur(9px);align-items:center;justify-content:center;padding:18px}
-.archive-reader.show{display:flex}
-.reader-box{width:min(760px,100%);max-height:88vh;background:#071321;border:1px solid #29476e;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.55);overflow:hidden;display:flex;flex-direction:column}
-.reader-head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:17px 18px;border-bottom:1px solid #1b3557}
-.reader-title{font-size:19px;font-weight:800;color:#f3f6ff;word-break:break-word}
-.reader-date{margin-top:6px;color:#7f99bd;font-size:11px}
-.reader-content{padding:22px 24px;overflow:auto;white-space:pre-wrap;word-break:break-word;color:#dfe9fa;font-size:16px;line-height:1.7;min-height:180px}
-.reader-actions{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid #1b3557}
-.reader-actions button{height:34px;border:1px solid #29476e;border-radius:8px;background:#071525;padding:0 11px;cursor:pointer;font-size:11px}
-.reader-actions .restore{color:#35dca9;border-color:#236b59}
-.reader-actions .forever{color:#ff5576;border-color:#6d2940}
+/* ================= TITLE ================= */
 
-.archive-modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(1,6,14,.72);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:18px}
-.archive-modal.show{display:flex}
-.archive-box{width:min(720px,100%);max-height:min(720px,90vh);background:#071321;border:1px solid #29476e;border-radius:16px;box-shadow:0 25px 80px rgba(0,0,0,.5);overflow:hidden}
-.archive-head{height:62px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1b3557}
-.archive-head strong{font-size:16px;letter-spacing:1px}
-.archive-close{width:34px;height:34px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#9ab0d2;cursor:pointer;font-size:18px}
-.archive-list{padding:14px;overflow:auto;max-height:calc(90vh - 62px)}
-.archive-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border:1px solid #1d385b;border-radius:11px;background:#091727;padding:13px 14px;margin-bottom:9px}
-.archive-title{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.archive-date{margin-top:5px;color:#7d96ba;font-size:11px}
-.archive-actions{display:flex;gap:6px}
-.archive-actions button{height:32px;border:1px solid #29476e;border-radius:8px;background:#071525;color:#8fa8cc;padding:0 9px;cursor:pointer;font-size:11px}
-.archive-actions .read{color:#67a9ff;border-color:#28558a}.archive-actions .restore{color:#35dca9;border-color:#236b59}
-.archive-actions .forever{color:#ff5576;border-color:#6d2940}
-.archive-empty{padding:35px 15px;text-align:center;color:#6f88ad;font-size:13px}
-.empty{padding:30px;color:#6f88ad;text-align:center}
-
-.reminder-mode{margin-top:14px}
-.reminder-mode>label{display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;opacity:.7}
-.mode-switch{display:flex;gap:7px}
-.mode-btn{flex:1;height:36px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#aeb8d0;border-radius:8px;font:600 11px inherit;cursor:pointer}
-.mode-btn.active{border-color:#4d7cff;background:rgba(77,124,255,.12);color:#dce6ff}
-
-@media(min-width:601px){
-  .mobile-actions{grid-template-columns:minmax(0,1fr) 46px;}
-  .mobile-actions .search-toggle{display:none;}
-}
-@media(max-width:900px){
-  .topbar{padding:0 16px}.app{grid-template-columns:1fr}
-  .sidebar,.editor{height:auto;min-height:0}.notes{height:auto;max-height:360px}.editor{min-height:650px}
-}
-@media(max-width:600px){
-  .topbar{height:48px;grid-template-columns:auto minmax(0,1fr) auto;gap:5px;padding:0 8px}
-  .logo{font-size:10px;letter-spacing:1.2px;text-align:center;white-space:nowrap;min-width:0}
-  .back{font-size:9px;white-space:nowrap}.clock{display:block;justify-self:end;font-size:8px;white-space:nowrap;color:#8fa8d0;min-width:max-content}
-  .app{width:94%;padding-top:6px;gap:10px}
-  .sidebar{padding:12px;border-radius:14px}
-
-  .mobile-actions{display:grid;grid-template-columns:minmax(0,1fr) 42px 42px;gap:7px;align-items:center}
-  .mobile-actions .new-btn{height:46px;font-size:15px;margin:0}
-  .mobile-actions .new-btn span{font-size:22px;margin-right:8px}
-  .mobile-actions .search-toggle,.mobile-actions .archive-btn{width:42px;height:42px;margin:0;padding:0;border:1px solid #29476e;border-radius:10px;background:#071525;color:#9ab1d4;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  .mobile-actions .search-toggle{font-size:22px}
-  .mobile-actions .archive-btn{font-size:18px}
-  .mobile-actions .archive-btn span{display:none}
-  .search{display:none;margin:8px 0 0;height:42px}
-  .search.mobile-search-open{display:flex}
-  .search-icon{font-size:21px;margin-right:9px}
-  .search input{font-size:14px}
-  .archive-btn{height:38px;font-size:11px}.notes{margin-top:12px;max-height:260px}
-  .note{padding:13px 14px 12px 25px;margin-bottom:8px}
-  .note-title{font-size:15px}
-  .pin{right:12px;top:12px;font-size:14px}
-  .editor{padding:10px;min-height:520px;border-radius:14px}
-  .title-input{height:50px;font-size:18px;padding:0 13px}
-  .toolbar{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px 38px;gap:7px;margin:12px 0;align-items:center}
-  .date-box{width:auto;height:38px;min-width:0;padding:0 9px;font-size:11px;white-space:nowrap;overflow:hidden}
-  .date-box span{overflow:hidden;text-overflow:ellipsis}
-  .spacer{display:none}
-  .tool-btn{height:38px}
-  .icon-btn{width:38px;font-size:15px}
-  .editor-body{height:calc(100vh - 170px);min-height:0;padding:12px 13px;border-radius:11px}
-  .content{font-size:16px;line-height:1.5}
-  .counter{font-size:11px;padding-top:9px}
-  footer{gap:10px;font-size:7px;letter-spacing:1.5px;margin-top:20px;padding-bottom:15px}
-  .footer-line{width:42px}
+.title{
+ padding:20px 0 14px;
+ display:flex;
+ justify-content:space-between;
+ align-items:flex-end;
+ gap:15px;
 }
 
-.footer-soikat{color:#7c8cff;}
+.kicker{
+ color:#708097;
+ font-size:11px;
+ letter-spacing:.18em;
+ text-transform:uppercase;
+ margin-bottom:5px;
+}
 
-  50%{opacity:.78;transform:scale(1.025)}
+h1{
+ font-size:29px;
+ letter-spacing:-.03em;
+}
+
+.period{
+ margin-top:4px;
+ color:var(--muted);
+ font-size:12px;
+}
+
+.pill{
+ padding:8px 13px;
+ border:1px solid #2b405d;
+ background:#102238;
+ border-radius:999px;
+ color:#a3b6cc;
+ font-size:11px;
+ white-space:nowrap;
+ flex-shrink:0;
+}
+
+/* ================= GOAL ================= */
+
+.goal{
+ background:linear-gradient(135deg,#10243a,#0d1a2b);
+ border:1px solid #28415f;
+ border-radius:13px;
+ padding:18px;
+ box-shadow:0 16px 45px rgba(0,0,0,.18);
+}
+
+.goal-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:end;
+}
+
+.goal-label{
+ color:#8ea0b7;
+ font-size:12px;
+ text-transform:uppercase;
+ letter-spacing:.13em;
+}
+
+.amount{
+ font-size:34px;
+ font-weight:700;
+ margin-top:5px;
+}
+
+.percent{
+ font-size:26px;
+ color:var(--green);
+ font-weight:700;
+}
+
+.bar{
+ height:8px;
+ background:#17283b;
+ border-radius:99px;
+ margin-top:14px;
+ overflow:hidden;
+}
+
+.fill{
+ height:100%;
+ width:0;
+ background:linear-gradient(90deg,#26d879,#4ee8a1);
+ border-radius:99px;
+ transition:width .35s ease;
+}
+
+.goal-bottom{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ gap:10px;
+ margin-top:7px;
+ font-size:11px;
+ color:#7f90a6;
+}
+
+.days-left{
+ color:#8eb6df;
+ font-weight:700;
+ white-space:nowrap;
+}
+
+/* ================= MAIN ================= */
+
+.main-grid{
+ display:grid;
+ grid-template-columns:1.08fr 1fr;
+ gap:10px;
+ margin-top:10px;
+}
+
+.panel{
+ background:linear-gradient(145deg,#0d1927,#0b1520);
+ border:1px solid var(--line);
+ border-radius:12px;
+ padding:15px;
+}
+
+.panel-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:12px;
+}
+
+.panel-title{
+ font-size:15px;
+ font-weight:650;
+}
+
+.panel-tag{
+ font-size:10px;
+ color:#7f90a6;
+ border:1px solid #26384f;
+ border-radius:20px;
+ padding:5px 8px;
+}
+
+/* ================= CALENDAR ================= */
+
+.calendar-panel{
+ padding:16px;
+}
+
+.calendar-head{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:10px;
+ gap:8px;
+}
+
+.month-title{
+ font-size:15px;
+ font-weight:650;
+}
+
+.calendar-nav{
+ display:flex;
+ gap:6px;
+}
+
+.nav-btn{
+ width:32px;
+ height:32px;
+ padding:0;
+ background:#0b1725;
+ border:1px solid #26384e;
+ color:#b9c7d8;
+ font-size:17px;
+ cursor:pointer;
+}
+
+.nav-btn:hover{
+ background:#132338;
+}
+
+.weekdays,
+.calendar-grid{
+ display:grid;
+ grid-template-columns:repeat(7,1fr);
+ gap:4px;
+}
+
+.weekdays div{
+ text-align:center;
+ color:#667890;
+ font-size:9px;
+ padding-bottom:4px;
+}
+
+.day{
+ min-height:43px;
+ border:1px solid #17283b;
+ background:#091522;
+ border-radius:7px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#aebbd0;
+ font-size:11px;
+ cursor:pointer;
+ position:relative;
+ transition:
+  transform .15s ease,
+  border-color .15s ease,
+  background .15s ease,
+  box-shadow .15s ease;
+}
+
+.day:hover{
+ border-color:#3b5d80;
+ background:#102238;
+}
+
+.day.empty{
+ background:transparent;
+ border-color:transparent;
+ cursor:default;
+}
+
+.day.outside{
+ opacity:.35;
+}
+
+.day.good{
+ background:rgba(53,229,143,.13);
+ border-color:rgba(53,229,143,.38);
+ color:#75e9ab;
+}
+
+.day.partial{
+ background:rgba(255,196,77,.13);
+ border-color:rgba(255,196,77,.40);
+ color:#ffd06b;
+}
+
+.day.below{
+ background:rgba(255,101,112,.13);
+ border-color:rgba(255,101,112,.38);
+ color:#ff8b93;
+}
+
+.day.selected{
+ outline:2px solid var(--blue);
+ outline-offset:1px;
+}
+
+.day.today{
+ box-shadow:inset 0 0 0 1px #d9e7ff;
+}
+
+.day .dot{
+ position:absolute;
+ width:4px;
+ height:4px;
+ border-radius:50%;
+ right:5px;
+ top:5px;
+ background:currentColor;
+}
+
+.day .day-number{
+ position:relative;
+ z-index:2;
+}
+
+.day .day-income{
+ position:absolute;
+ left:6px;
+ right:6px;
+ bottom:4px;
+ text-align:center;
+ font-size:8px;
+ font-weight:700;
+ color:inherit;
+ opacity:.95;
+}
+
+.day.no-entry .day-income{
+ display:none;
+}
+
+.day:not(.empty):hover{
+ transform:translateY(-2px);
+ border-color:#5b86b0;
+ box-shadow:0 8px 20px rgba(0,0,0,.22);
+ z-index:5;
+}
+
+.day.good:hover{
+ box-shadow:0 8px 22px rgba(53,229,143,.13);
+}
+
+.day.partial:hover{
+ box-shadow:0 8px 22px rgba(255,196,77,.13);
+}
+
+.day.below:hover{
+ box-shadow:0 8px 22px rgba(255,101,112,.13);
+}
+
+/* ================= LEGEND ================= */
+
+.calendar-legend{
+ display:flex;
+ flex-wrap:wrap;
+ gap:9px;
+ margin-top:8px;
+ color:#73839a;
+ font-size:9px;
+}
+
+.legend-item{
+ display:flex;
+ align-items:center;
+ gap:5px;
+}
+
+.legend-dot{
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ flex:0 0 7px;
+}
+
+.legend-green{background:var(--green)}
+.legend-yellow{background:var(--yellow)}
+.legend-red{background:var(--red)}
+.legend-gray{background:#667890}
+
+/* ================= TOOLTIP ================= */
+
+.day-tooltip{
+ position:fixed;
+ z-index:9999;
+ pointer-events:none;
+ min-width:150px;
+ max-width:210px;
+ padding:10px 11px;
+ border:1px solid #35506e;
+ border-radius:9px;
+ background:#0b1725;
+ box-shadow:0 12px 30px rgba(0,0,0,.35);
+ color:#dbe6f3;
+ font-size:11px;
+ line-height:1.45;
+ opacity:0;
+ transform:translateY(5px);
+ transition:opacity .12s ease,transform .12s ease;
+}
+
+.day-tooltip.show{
+ opacity:1;
+ transform:translateY(0);
+}
+
+.day-tooltip .tt-date{
+ color:#9db0c6;
+ margin-bottom:4px;
+}
+
+.day-tooltip .tt-net{
+ font-size:16px;
+ font-weight:800;
+ color:#fff;
+ margin-bottom:3px;
+}
+
+.day-tooltip .tt-status{
+ margin-top:0;
+ color:#dbe6f3;
+}
+
+/* ================= OVERVIEW ================= */
+
+.overview{
+ margin-top:10px;
+}
+
+.overview-top{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:10px;
+}
+
+.pace-number{
+ font-size:29px;
+ font-weight:750;
+ color:var(--green);
+}
+
+.pace-label{
+ font-size:11px;
+ color:#8394aa;
+ letter-spacing:.1em;
+ text-transform:uppercase;
+}
+
+.pace-sub{
+ font-size:12px;
+ color:#72839a;
+ margin-top:3px;
+}
+
+.pace-bar{
+ height:8px;
+ background:#17283b;
+ border-radius:99px;
+ overflow:hidden;
+ margin:7px 0 5px;
+}
+
+.pace-fill{
+ height:100%;
+ width:0;
+ border-radius:99px;
+ background:linear-gradient(90deg,#26d879,#4ee8a1);
+ transition:.3s;
+}
+
+.metric-grid{
+ display:grid;
+ grid-template-columns:repeat(3,1fr);
+ gap:6px;
+}
+
+.metric{
+ background:#09131e;
+ border:1px solid #1c2b3e;
+ border-radius:9px;
+ padding:9px;
+}
+
+.metric span{
+ display:block;
+ color:#74859b;
+ font-size:10px;
+}
+
+.metric strong{
+ display:block;
+ margin-top:4px;
+ font-size:13px;
+}
+
+.metric.green strong{color:var(--green)}
+.metric.blue strong{color:var(--blue)}
+.metric.orange strong{color:var(--orange)}
+.metric.red strong{color:var(--red)}
+
+.report{
+ margin-top:8px;
+ padding:9px 11px;
+ border-radius:9px;
+ background:rgba(77,163,255,.07);
+ border:1px solid rgba(77,163,255,.18);
+ font-size:11px;
+ line-height:1.55;
+ color:#9cafc5;
+}
+
+.report strong{color:#fff}
+.report .good{color:var(--green)}
+.report .bad{color:var(--red)}
+
+/* ================= DAILY ENTRY ================= */
+
+label{
+ display:block;
+ font-size:10px;
+ color:#8190a5;
+ letter-spacing:.1em;
+ text-transform:uppercase;
+ margin-bottom:7px;
+}
+
+input{
+ width:100%;
+ background:#08121d;
+ border:1px solid #26384e;
+ border-radius:9px;
+ padding:10px;
+ color:#fff;
+ outline:none;
+ margin-bottom:10px;
+}
+
+input:focus{
+ border-color:#3e78ad;
+}
+
+button{
+ width:100%;
+ border:0;
+ border-radius:9px;
+ padding:10px;
+ font-weight:700;
+ background:linear-gradient(90deg,#2788ff,#6a67ff);
+ color:white;
+ cursor:pointer;
+}
+
+button:hover{
+ filter:brightness(1.1);
+}
+
+.entry-layout{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:6px;
+}
+
+.mini{
+ background:#09131e;
+ border:1px solid #1c2b3e;
+ border-radius:9px;
+ padding:8px;
+}
+
+.mini span{
+ display:block;
+ color:#74859b;
+ font-size:10px;
+}
+
+.mini strong{
+ display:block;
+ margin-top:5px;
+ font-size:13px;
+}
+
+/* ================= TABLE ================= */
+
+.table-wrap{
+ overflow-x:auto;
+}
+
+table{
+ width:100%;
+ border-collapse:collapse;
+ font-size:12px;
+}
+
+th{
+ text-align:left;
+ color:#718198;
+ font-weight:500;
+ padding:0 8px 11px;
+ border-bottom:1px solid #213047;
+}
+
+td{
+ padding:9px 7px;
+ border-bottom:1px solid #182638;
+}
+
+.net{
+ color:var(--green);
+ font-weight:700;
+}
+
+.positive{color:var(--green)}
+.negative{color:var(--red)}
+
+.status{
+ display:inline-block;
+ font-size:9px;
+ padding:4px 7px;
+ border-radius:20px;
+ background:rgba(53,229,143,.1);
+ color:var(--green);
+ border:1px solid rgba(53,229,143,.25);
+}
+
+.status-partial{
+ background:rgba(255,196,77,.09);
+ color:var(--yellow);
+ border-color:rgba(255,196,77,.25);
+}
+
+.status-below{
+ background:rgba(255,101,112,.08);
+ color:var(--red);
+ border-color:rgba(255,101,112,.25);
+}
+
+.delete-btn{
+ width:auto;
+ padding:4px 7px;
+ font-size:9px;
+ background:transparent;
+ border:1px solid #2b394b;
+ color:#7e8da2;
+}
+
+.delete-btn:hover{
+ color:var(--red);
+ border-color:#70404a;
+}
+
+/* ================= MONTHLY REPORT ================= */
+
+.monthly-report-btn{
+ width:auto;
+ padding:5px 8px;
+ margin-left:7px;
+ background:transparent;
+ border:1px solid #29425e;
+ color:#8eb6df;
+ font-size:9px;
+ font-weight:600;
+ border-radius:7px;
+}
+
+.monthly-report-btn:hover{
+ background:#102238;
+ color:#fff;
+ filter:none;
+}
+
+.report-modal{
+ position:fixed;
+ inset:0;
+ z-index:10000;
+ display:none;
+ align-items:center;
+ justify-content:center;
+ padding:18px;
+ background:rgba(0,0,0,.68);
+}
+
+.report-modal.open{
+ display:flex;
+}
+
+.report-box{
+ width:min(620px,100%);
+ max-height:86vh;
+ overflow:auto;
+ background:#0d1927;
+ border:1px solid #29425e;
+ border-radius:13px;
+ box-shadow:0 24px 70px rgba(0,0,0,.45);
+ padding:16px;
+}
+
+.report-box-head{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ margin-bottom:12px;
+}
+
+.report-box-title{
+ font-size:16px;
+ font-weight:700;
+}
+
+.report-close{
+ width:30px;
+ height:30px;
+ padding:0;
+ background:#0a1521;
+ border:1px solid #26384e;
+ color:#aebbd0;
+ font-size:17px;
+}
+
+.report-summary{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:6px;
+ margin-bottom:12px;
+}
+
+.report-stat{
+ background:#09131e;
+ border:1px solid #1c2b3e;
+ border-radius:8px;
+ padding:8px;
+}
+
+.report-stat span{
+ display:block;
+ color:#74859b;
+ font-size:9px;
+}
+
+.report-stat strong{
+ display:block;
+ margin-top:4px;
+ font-size:13px;
+}
+
+.report-list{
+ border-top:1px solid #1c2b3e;
+}
+
+.report-row{
+ display:grid;
+ grid-template-columns:85px 1fr 80px;
+ gap:8px;
+ align-items:center;
+ padding:8px 0;
+ border-bottom:1px solid #182638;
+ font-size:11px;
+}
+
+.report-row .r-date{
+ color:#8191a7;
+}
+
+.report-row .r-net{
+ color:var(--green);
+ font-weight:700;
+ text-align:right;
+}
+
+.report-note{
+ color:#8191a7;
+ font-size:10px;
+ margin-top:9px;
+}
+
+/* ================= FOOTER ================= */
+
+footer{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:35px;
+ margin-top:38px;
+ padding:0 0 20px;
+ color:#8292a2;
+ font-size:11px;
+ letter-spacing:4px;
+ animation:fadeUp 1s .55s both;
+}
+
+.footer-line{
+ width:150px;
+ height:1px;
+ background:linear-gradient(90deg,transparent,#526b82);
+}
+
+.footer-line.right{
+ background:linear-gradient(90deg,#526b82,transparent);
+}
+
+.heart{
+ color:#ff416c;
+ font-size:14px;
+ display:inline-block;
+ animation:heartbeat 1.8s infinite;
+}
+
+@keyframes heartbeat{
+ 0%,100%{transform:scale(1)}
+ 10%{transform:scale(1.22)}
+ 20%{transform:scale(1)}
+ 30%{transform:scale(1.12)}
 }
 
 @keyframes brandReveal{
@@ -269,10 +884,12 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   letter-spacing:.18em;
  }
 }
+
 @keyframes brandShine{
  0%{background-position:0% center}
  100%{background-position:250% center}
 }
+
 @keyframes brandBreath{
  0%,100%{
   text-shadow:0 0 20px rgba(180,210,255,.05);
@@ -282,833 +899,2627 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
  }
 }
 
+@keyframes fadeUp{
+ from{
+  opacity:0;
+  transform:translateY(8px);
+ }
+ to{
+  opacity:1;
+  transform:translateY(0);
+ }
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+ position:fixed;
+ left:50%;
+ bottom:25px;
+ transform:translateX(-50%) translateY(20px);
+ background:#edf2f7;
+ color:#09101a;
+ padding:10px 15px;
+ border-radius:8px;
+ font-size:12px;
+ opacity:0;
+ pointer-events:none;
+ transition:.25s ease;
+}
+
+.toast.show{
+ opacity:1;
+ transform:translateX(-50%) translateY(0);
+}
+
+/* ================= TABLET ================= */
+
+@media(max-width:1000px){
+
+ .main-grid{
+  grid-template-columns:1fr;
+ }
+
+ .entry-layout{
+  grid-template-columns:1fr;
+ }
+}
+
+@media(max-width:850px){
+
+ .container{
+  width:calc(100% - 28px);
+ }
+
+ .title{
+  align-items:center;
+  gap:15px;
+  flex-direction:row;
+ }
+
+ .metric-grid{
+  grid-template-columns:1fr;
+ }
+}
+
+/* ================= MOBILE ================= */
+
+@media(max-width:600px){
+
+ .container{
+  width:100%;
+  max-width:none;
+  padding:0 10px;
+  margin:0;
+ }
+
+ .topbar{
+  height:58px;
+  gap:6px;
+ }
+
+ .back{
+  font-size:11px;
+  flex-shrink:0;
+ }
+
+ .brand{
+  font-size:9px;
+  letter-spacing:.055em;
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+ }
+
+ .top-date{
+  display:block;
+  font-size:8px;
+  letter-spacing:-.02em;
+  flex-shrink:0;
+ }
+
+ .title{
+  padding:18px 0 12px;
+  flex-direction:row;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+ }
+
+ .kicker{
+  font-size:9px;
+  letter-spacing:.13em;
+  margin-bottom:4px;
+ }
+
+ h1{
+  font-size:27px;
+ }
+
+ .period{
+  font-size:9px;
+  line-height:1.45;
+  max-width:220px;
+ }
+
+ .pill{
+  padding:7px 9px;
+  font-size:9px;
+  flex-shrink:0;
+ }
+
+ .goal{
+  padding:16px;
+ }
+
+ .goal-top{
+  align-items:flex-start;
+ }
+
+ .amount{
+  font-size:31px;
+ }
+
+ .percent{
+  font-size:21px;
+ }
+
+ .goal-bottom{
+  font-size:9px;
+  flex-wrap:nowrap;
+ }
+
+ .days-left{
+  font-size:9px;
+ }
+
+ .calendar-panel{
+  padding:13px;
+ }
+
+ .calendar-head{
+  gap:5px;
+  margin-bottom:9px;
+ }
+
+ .month-title{
+  font-size:14px;
+ }
+
+ .calendar-nav{
+  gap:4px;
+ }
+
+ .nav-btn{
+  width:29px;
+  height:29px;
+  font-size:16px;
+ }
+
+ .weekdays,
+ .calendar-grid{
+  gap:3px;
+ }
+
+ .weekdays div{
+  font-size:8px;
+  padding-bottom:3px;
+ }
+
+ .day{
+  min-height:45px;
+  border-radius:6px;
+  font-size:10px;
+ }
+
+ .day .day-income{
+  left:2px;
+  right:2px;
+  bottom:3px;
+  font-size:7px;
+ }
+
+ .day .dot{
+  width:3px;
+  height:3px;
+  right:3px;
+  top:3px;
+ }
+
+ .day:not(.empty):hover{
+  transform:none;
+  box-shadow:none;
+ }
+
+ .day.good:hover,
+ .day.partial:hover,
+ .day.below:hover{
+  box-shadow:none;
+ }
+
+ .day-tooltip{
+  display:none !important;
+ }
+
+ .calendar-legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:8px;
+  color:#73839a;
+  font-size:9px;
+ }
+
+ .legend-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+ }
+
+ .legend-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  flex:0 0 7px;
+ }
+
+ .pace-number{
+  font-size:26px;
+ }
+
+ .pace-label{
+  font-size:10px;
+ }
+
+ .pace-sub{
+  font-size:10px;
+  line-height:1.4;
+ }
+
+ .panel{
+  padding:13px;
+ }
+
+ .panel-title{
+  font-size:14px;
+ }
+
+ .panel-tag{
+  font-size:9px;
+ }
+
+ .input{
+  padding:10px;
+ }
+
+ .report-summary{
+  grid-template-columns:repeat(2,1fr);
+ }
+
+ .report-row{
+  grid-template-columns:72px 1fr 70px;
+ }
+
+ footer{
+  width:100%;
+  overflow:hidden;
+  padding:0 0 14px;
+  font-size:9px;
+  letter-spacing:2px;
+  gap:12px;
+ }
+
+ .footer-line{
+  width:55px;
+ }
+
+ .heart{
+  font-size:13px;
+ }
+}
+
+/* ================= VERY SMALL PHONE ================= */
+
+@media(max-width:380px){
+
+ .container{
+  width:100%;
+  max-width:none;
+  padding:0 8px;
+  margin:0;
+ }
+
+ .topbar{
+  gap:5px;
+ }
+
+ .back{
+  font-size:9px;
+ }
+
+ .brand{
+  font-size:8px;
+  letter-spacing:.035em;
+ }
+
+ .title{
+  gap:6px;
+ }
+
+ .kicker{
+  font-size:8px;
+ }
+
+ h1{
+  font-size:24px;
+ }
+
+ .period{
+  font-size:8px;
+  max-width:190px;
+ }
+
+ .pill{
+  font-size:8px;
+  padding:6px 7px;
+ }
+
+ .goal{
+  padding:14px;
+ }
+
+ .amount{
+  font-size:28px;
+ }
+
+ .percent{
+  font-size:19px;
+ }
+
+ .goal-bottom{
+  font-size:8px;
+ }
+
+ .days-left{
+  font-size:8px;
+ }
+
+ .calendar-panel{
+  padding:10px;
+ }
+
+ .month-title{
+  font-size:13px;
+ }
+
+ .monthly-report-btn{
+  font-size:7px;
+  padding:3px 5px;
+ }
+
+ .nav-btn{
+  width:27px;
+  height:27px;
+ }
+
+ .day{
+  min-height:41px;
+  font-size:9px;
+ }
+
+ .day .day-income{
+  font-size:6.5px;
+ }
+
+ footer{
+  font-size:8px;
+  gap:8px;
+ }
+
+ .footer-line{
+  width:38px;
+ }
+}
+.footer-soikat{color:#7c8cff;}
 </style>
+
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#030914">
 </head>
+
 <body>
 
-<header class="topbar">
-  <a class="back" href="javascript:history.back()">← Back</a>
-  <div class="logo">SOIKAT · NOTEPAD</div>
-  <div class="clock" id="clock"></div>
-</header>
+<div class="container">
 
-<main class="app">
-  <aside class="panel sidebar">
-    <div class="mobile-actions">
-      <button class="new-btn" type="button" onclick="newNote()"><span>＋</span>New Note</button>
-      <button class="search-toggle" type="button" aria-label="Search" onclick="toggleMobileSearch()">⌕</button>
-      <button type="button" class="archive-btn" onclick="openArchive()"><span>🗃️ &nbsp; Archive</span>🗃️</button>
-    </div>
-    <div class="search" id="searchBox">
-      <div class="search-icon">⌕</div>
-      <input id="search" type="text" placeholder="Search notes..." oninput="renderNotes()">
-    </div>
-
-    <div class="notes" id="notes"></div>
-  </aside>
-
-  <section class="panel editor" id="editorPanel">
-    <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
-    <input id="title" class="title-input" placeholder="Note title" oninput="saveCurrent()">
-    <div class="toolbar">
-      <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
-      <div class="spacer"></div>
-      <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
-      
-      <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
-      <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
-    </div>
-    <div class="editor-body">
-      <button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
-      <div id="reminderDisplay" class="countdown-display" style="display:none"></div>
-      <textarea id="content" class="content" placeholder="Start writing..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
-      <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
-    </div>
-  </section>
-</main>
-
-<div class="feature-modal" id="reminderModal" onclick="closeFeatureModal(event,'reminderModal')">
-  <div class="feature-box" onclick="event.stopPropagation()">
-    <div class="feature-head">
-      <strong>🔔 REMINDER</strong>
-      <button type="button" class="archive-close" onclick="closeFeatureModal(null,'reminderModal')">×</button>
-    </div>
-    <div class="feature-body">
-      <div class="feature-row">
-        <div>
-          <label>Date</label>
-          <input type="date" id="reminderDate">
-        </div>
-        <div>
-          <label>Time</label>
-          <input type="time" id="reminderTime">
-        </div>
-      </div>
-      <div class="reminder-mode">
-        <label>Display</label>
-        <div class="mode-switch">
-          <button type="button" id="reminderFixedBtn" class="mode-btn active">Fixed Time</button>
-          <button type="button" id="reminderLiveBtn" class="mode-btn">Live Countdown</button>
-        </div>
-      </div>
-      <div class="feature-actions">
-        <button type="button" class="danger" id="clearReminderBtn">Clear</button>
-        <button type="button" class="primary" id="saveReminderBtn">Set Reminder</button>
-      </div>
-    </div>
-  </div>
+<div class="topbar">
+ <a class="back" href="javascript:history.back()">← Back</a>
+ <div class="brand">SOIKAT · 100K GOAL</div>
+ <div class="top-date">1 Oct 2026 → 31 Dec 2027</div>
 </div>
 
-<div class="archive-modal" id="archiveModal" onclick="closeArchive(event)">
-  <div class="archive-box" onclick="event.stopPropagation()">
-    <div class="archive-head">
-      <strong>ARCHIVE</strong>
-      <button type="button" class="archive-close" onclick="closeArchive()">×</button>
-    </div>
-    <div class="archive-list" id="archiveList"></div>
+<div style="height:58px;"></div>
+
+<section class="title">
+
+ <div>
+  <div class="kicker">Personal Target</div>
+  <h1>৳1,00,000</h1>
+  <div class="period">A 457-day journey toward the target</div>
+ </div>
+
+ <div class="pill">৳220 / DAY</div>
+
+</section>
+
+<section class="goal">
+
+ <div class="goal-top">
+
+  <div>
+   <div class="goal-label">Overall Progress</div>
+   <div class="amount" id="overallAmount">৳0</div>
   </div>
+
+  <div class="percent" id="overallPercent">0%</div>
+
+ </div>
+
+ <div class="bar">
+  <div class="fill" id="overallFill"></div>
+ </div>
+
+ <div class="goal-bottom">
+  <span id="earnedLabel">৳0 earned</span>
+  <span class="days-left" id="daysLeft">457 DAYS LEFT</span>
+  <span>Target ৳1,00,000</span>
+ </div>
+
+</section>
+
+<section class="main-grid">
+
+<div>
+
+ <div class="panel calendar-panel">
+
+  <div class="calendar-head">
+
+   <div>
+    <span class="month-title" id="calendarTitle">October 2026</span>
+
+    <button
+     class="monthly-report-btn"
+     id="monthlyReportBtn"
+     type="button">
+     Monthly Report →
+    </button>
+   </div>
+
+   <div class="calendar-nav">
+
+    <button
+     class="nav-btn"
+     id="prevMonth">
+     ‹
+    </button>
+
+    <button
+     class="nav-btn"
+     id="nextMonth">
+     ›
+    </button>
+
+   </div>
+
+  </div>
+
+  <div class="weekdays">
+   <div>Sun</div>
+   <div>Mon</div>
+   <div>Tue</div>
+   <div>Wed</div>
+   <div>Thu</div>
+   <div>Fri</div>
+   <div>Sat</div>
+  </div>
+
+  <div
+   class="calendar-grid"
+   id="calendarGrid">
+  </div>
+
+  <div class="calendar-legend">
+
+   <div class="legend-item">
+    <span class="legend-dot legend-green"></span>
+    100%+ met
+   </div>
+
+   <div class="legend-item">
+    <span class="legend-dot legend-yellow"></span>
+    80–99%
+   </div>
+
+   <div class="legend-item">
+    <span class="legend-dot legend-red"></span>
+    &lt;80%
+   </div>
+
+   <div class="legend-item">
+    <span class="legend-dot legend-gray"></span>
+    No entry
+   </div>
+
+  </div>
+
+ </div>
+
+ <div class="panel overview">
+
+  <div class="overview-top">
+
+   <div>
+
+    <div class="pace-label">
+     Monthly Pace ·
+     <span id="overviewMonth">
+      October 2026
+     </span>
+    </div>
+
+    <div class="pace-sub">
+     Progress is based on how much should have been earned by today.
+    </div>
+
+   </div>
+
+   <div
+    class="pace-number"
+    id="pacePercent">
+    0%
+   </div>
+
+  </div>
+
+  <div class="pace-bar">
+   <div
+    class="pace-fill"
+    id="paceFill">
+   </div>
+  </div>
+
+  <div class="metric-grid">
+
+   <div class="metric">
+    <span>Expected by Today</span>
+    <strong id="expectedToday">৳0</strong>
+   </div>
+
+   <div class="metric green">
+    <span>Actual So Far</span>
+    <strong id="actualToday">৳0</strong>
+   </div>
+
+   <div class="metric blue">
+    <span>Projected Average</span>
+    <strong id="currentAverage">৳220/day</strong>
+   </div>
+
+   <div class="metric">
+    <span>Monthly Target</span>
+    <strong id="monthlyTarget">৳0</strong>
+   </div>
+
+   <div class="metric orange">
+    <span>Projected Month-End</span>
+    <strong id="projectedEnd">৳0</strong>
+   </div>
+
+   <div class="metric red">
+    <span>Projected Shortfall</span>
+    <strong id="projectedShortfall">৳0</strong>
+   </div>
+
+  </div>
+
+  <div
+   class="report"
+   id="paceReport">
+   Add daily entries to generate the pace report.
+  </div>
+
+ </div>
+
 </div>
 
-<div class="archive-reader" id="archiveReader" onclick="closeArchiveReader(event)">
-  <div class="reader-box" onclick="event.stopPropagation()">
-    <div class="reader-head">
-      <div>
-        <div class="reader-title" id="readerTitle"></div>
-        <div class="reader-date" id="readerDate"></div>
-      </div>
-      <button type="button" class="archive-close" onclick="closeArchiveReader()">×</button>
-    </div>
-    <div class="reader-content" id="readerContent"></div>
-    <div class="reader-actions">
-      <button type="button" class="restore" id="readerRestoreBtn">Restore</button>
-      <button type="button" class="forever" id="readerForeverBtn">Delete Forever</button>
-    </div>
+<div>
+
+ <div class="panel daily-entry-panel">
+
+  <div class="panel-head">
+   <div class="panel-title">Daily Entry</div>
+   <div class="panel-tag">NET ONLY</div>
   </div>
+
+  <label for="entryDate">Date</label>
+
+  <input
+   id="entryDate"
+   type="date">
+
+  <label for="profit">Net Profit</label>
+
+  <input
+   id="profit"
+   type="number"
+   min="0"
+   step="1"
+   placeholder="৳ Enter net profit">
+
+  <label for="entryNote">Note</label>
+  <input id="entryNote" type="text" maxlength="80" placeholder="e.g. bKash, Nagad">
+
+  <button id="addButton">
+   Add Entry
+  </button>
+
+  <div
+   class="entry-layout"
+   style="margin-top:14px">
+
+   <div class="mini">
+    <span>Daily Target</span>
+    <strong>৳220</strong>
+   </div>
+
+   <div class="mini">
+    <span>Selected Net</span>
+    <strong id="todayNet">—</strong>
+   </div>
+
+   <div class="mini">
+    <span>Difference</span>
+    <strong id="difference">—</strong>
+   </div>
+
+   <div class="mini">
+    <span>Achievement</span>
+    <strong id="achievement">—</strong>
+   </div>
+
+  </div>
+
+ </div>
+
+ <div class="panel recent-panel">
+
+  <div class="panel-head">
+   <div class="panel-title">Recent Entries</div>
+   <div class="panel-tag">LATEST 10</div>
+  </div>
+
+  <div class="table-wrap">
+
+   <table>
+
+    <thead>
+     <tr>
+      <th>Date</th>
+      <th>Net</th>
+      <th>Target</th>
+      <th>Diff</th>
+      <th>Achievement</th>
+      <th>Status</th>
+      <th></th>
+     </tr>
+    </thead>
+
+    <tbody id="recentEntriesBody"></tbody>
+
+   </table>
+
+  </div>
+
+ </div>
+
 </div>
+
+</section>
 
 <footer>
-  <span class="footer-line"></span>
-  <div>Built with <span class="heart">♥</span> by <span class="footer-soikat" style="color:#7c8cff !important;">Soikat</span></div>
-  <span class="footer-line right"></span>
+
+ <span class="footer-line"></span>
+
+ <span>
+  Built with
+  <span class="heart">♥</span>
+  by <span class="footer-soikat">Soikat</span>
+ </span>
+
+ <span class="footer-line right"></span>
+
 </footer>
 
+</div>
+
+<div
+ class="report-modal"
+ id="reportModal">
+
+ <div class="report-box">
+
+  <div class="report-box-head">
+
+   <div
+    class="report-box-title"
+    id="reportTitle">
+    Monthly Report
+   </div>
+
+   <button
+    class="report-close"
+    type="button"
+    onclick="closeMonthlyReport()">
+    ×
+   </button>
+
+  </div>
+
+  <div class="report-summary">
+
+   <div class="report-stat">
+    <span>MONTHLY TARGET</span>
+    <strong id="reportTarget">৳0</strong>
+   </div>
+
+   <div class="report-stat">
+    <span>ACTUAL</span>
+    <strong id="reportActual">৳0</strong>
+   </div>
+
+   <div class="report-stat">
+    <span>ACHIEVEMENT</span>
+    <strong id="reportAchievement">0%</strong>
+   </div>
+
+   <div class="report-stat">
+    <span>AVERAGE / DAY</span>
+    <strong id="reportAverage">৳0</strong>
+   </div>
+
+  </div>
+
+  <div
+   class="report-list"
+   id="reportList">
+  </div>
+
+  <div
+   class="report-note"
+   id="reportNote">
+  </div>
+
+ </div>
+
+</div>
+
+<div
+ class="day-tooltip"
+ id="dayTooltip">
+</div>
+
+<div
+ class="toast"
+ id="toast">
+</div>
+
 <script>
-const KEY="soikat_notepad_v1";
-const ARCHIVE_KEY="soikat_notepad_archive_v1";
-const ARCHIVE_DAYS=30;
-let notes=[];
-let archive=[];
-let currentId=null;
-let draftMode=false;
-let reminderTimer=null;
 
-function now(){
-  return new Date().toLocaleString("en-GB",{
-    day:"2-digit",month:"short",year:"numeric",
-    hour:"2-digit",minute:"2-digit",hour12:true
-  });
-}
-function load(){
-  try{notes=JSON.parse(localStorage.getItem(KEY)||"[]")}catch{notes=[]}
-  try{archive=JSON.parse(localStorage.getItem(ARCHIVE_KEY)||"[]")}catch{archive=[]}
-  purgeExpiredArchive();
+const TARGET=100000;
+const DAILY_TARGET=220;
 
-  // No default/demo notes on new devices.
-  // Also remove only the exact built-in demo notes from older versions.
-  const before=notes.length;
-  notes=notes.filter(n=>{
-    const title=String(n?.title||"");
-    const content=String(n?.content||"");
-    if(title==="BCS Preparation Plan" &&
-       content==="Follow 200 Days Study Plan\nDaily 2-3 focused sessions\nWeekly revision (Friday)" &&
-       n.pinned===true && !n.reminder && !n.countdownDate) return false;
-    if((title==="Important Links" || title==="Monthly Goals") &&
-       content==="" && n.pinned===false && !n.reminder && !n.countdownDate) return false;
-    return true;
-  });
-  if(notes.length!==before) persist();
+const START_DATE="2026-10-01";
+const END_DATE="2027-12-31";
 
-  currentId=notes[0]?.id||null;
-  draftMode=false;
-  render();
+const STORAGE_KEY="soikat_1l_goal_entries_v4";
+
+const startDate=parseDate(START_DATE);
+const endDate=parseDate(END_DATE);
+
+let calendarDate=new Date(2026,9,1);
+
+
+/* ================= HELPERS ================= */
+
+function parseDate(v){
+
+ const [y,m,d]=v.split("-").map(Number);
+
+ return new Date(y,m-1,d);
+
 }
-function persist(){localStorage.setItem(KEY,JSON.stringify(notes))}
-function persistArchive(){localStorage.setItem(ARCHIVE_KEY,JSON.stringify(archive))}
-function purgeExpiredArchive(){
-  const limit=Date.now()-(ARCHIVE_DAYS*24*60*60*1000);
-  const before=archive.length;
-  archive=archive.filter(n=>{
-    const t=Number(n.deletedAt||0);
-    return t>limit;
-  });
-  if(archive.length!==before) persistArchive();
+
+
+function dateKey(d){
+
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
 }
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+
+function money(v){
+
+ return "৳"+Math.round(v).toLocaleString("en-IN");
+
 }
-function renderNotes(){
-  const q=document.getElementById("search").value.trim().toLowerCase();
-  const box=document.getElementById("notes");
-  let list=notes.filter(n=>(n.title+" "+n.content).toLowerCase().includes(q));
-  list.sort((a,b)=>(b.pinned-a.pinned)||((b.updated||"").localeCompare(a.updated||"")));
-  if(!list.length){box.innerHTML='<div class="empty">No notes found.</div>';return}
-  box.innerHTML=list.map(n=>`
-    <div class="note ${n.id===currentId?"active":""}" onclick="selectNote('${n.id}')">
-      <div class="note-title">${escapeHtml(n.title||"Untitled")}${n.reminder?'<span class="note-reminder-icon" title="Reminder set">🔔</span>':""}</div>
-      ${n.pinned?'<div class="pin">📌</div>':""}
-    </div>`).join("");
+
+
+function percent(v){
+
+ if(!isFinite(v)||v<=0){
+
+  return "0%";
+
+ }
+
+ return v.toFixed(1).replace(".0","")+"%";
+
 }
-function selectNote(id){
-  draftMode=false;
-  currentId=id;
-  if(window.innerWidth<=600){
-    document.getElementById("editorPanel").classList.add("mobile-open");
+
+
+function daysInclusive(a,b){
+
+ return Math.floor((b-a)/86400000)+1;
+
+}
+
+
+function getEntries(){
+
+ try{
+
+  return JSON.parse(
+   localStorage.getItem(STORAGE_KEY)
+  )||{};
+
+ }catch{
+
+  return {};
+
+ }
+
+}
+
+
+function saveEntries(e){
+
+ localStorage.setItem(
+  STORAGE_KEY,
+  JSON.stringify(e)
+ );
+
+}
+
+
+function totalIncome(e){
+
+ return Object.values(e)
+  .reduce(
+   (s,v)=>s+Number(v||0),
+   0
+  );
+
+}
+
+
+function rangeTotal(e,a,b){
+
+ let total=0;
+
+ Object.entries(e).forEach(
+  ([k,v])=>{
+
+   const d=parseDate(k);
+
+   if(d>=a&&d<=b){
+
+    total+=Number(v||0);
+
+   }
+
   }
-  render();
+ );
+
+ return total;
+
 }
-function current(){return notes.find(n=>n.id===currentId)}
+
+
+const NOTES_STORAGE_KEY="soikat_1l_goal_notes_v1";
+function getEntryNotes(){try{return JSON.parse(localStorage.getItem(NOTES_STORAGE_KEY))||{};}catch{return {};}}
+function saveEntryNotes(notes){localStorage.setItem(NOTES_STORAGE_KEY,JSON.stringify(notes));}
+function normalizedNote(value){return String(value||"").trim().toLocaleLowerCase();}
+function cumulativeNoteTotal(note,throughDate,entries=getEntries(),notes=getEntryNotes()){
+ const target=normalizedNote(note); if(!target)return 0;
+ return Object.entries(entries).reduce((sum,[date,amount])=>date<=throughDate&&normalizedNote(notes[date])===target?sum+Number(amount||0):sum,0);
+}
+function updateEntryPreview(){
+ const date=document.getElementById("entryDate").value, raw=document.getElementById("profit").value, entries=getEntries();
+ const saved=Object.prototype.hasOwnProperty.call(entries,date), draft=raw.trim()!=="", has=draft||saved;
+ const net=draft?Number(raw):Number(entries[date]||0), valid=has&&Number.isFinite(net)&&net>=0, diff=net-DAILY_TARGET;
+ document.getElementById("todayNet").textContent=valid?money(net):"—";
+ document.getElementById("difference").textContent=valid?(diff>=0?"+":"−")+money(Math.abs(diff)):"—";
+ document.getElementById("achievement").textContent=valid?percent(net/DAILY_TARGET*100):"—";
+ document.getElementById("difference").style.color=valid?(diff>=0?"var(--green)":"var(--red)"):"var(--text)";
+ document.getElementById("achievement").style.color=valid?(net>=DAILY_TARGET?"var(--green)":net>=DAILY_TARGET*.8?"var(--yellow)":"var(--red)"):"var(--text)";
+}
+
+function showToast(msg){
+
+ const toast=
+  document.getElementById("toast");
+
+ toast.textContent=msg;
+
+ toast.classList.add("show");
+
+ setTimeout(
+  ()=>{
+   toast.classList.remove("show");
+  },
+  1800
+ );
+
+}
+
+
+/* ================= COUNTDOWN ================= */
+
+function updateDaysLeft(){
+
+ const now=new Date();
+
+ const today=new Date(
+  now.getFullYear(),
+  now.getMonth(),
+  now.getDate()
+ );
+
+ let daysLeft;
+
+ if(today<startDate){
+
+  daysLeft=
+   daysInclusive(
+    startDate,
+    endDate
+   );
+
+ }else if(today>endDate){
+
+  daysLeft=0;
+
+ }else{
+
+  daysLeft=
+   Math.max(
+    0,
+    Math.floor(
+     (endDate-today)/86400000
+    )
+   );
+
+ }
+
+ document.getElementById(
+  "daysLeft"
+ ).textContent=
+  daysLeft+
+  (
+   daysLeft===1?
+   " DAY LEFT":
+   " DAYS LEFT"
+  );
+
+}
+
+
+/* ================= MONTH ================= */
+
+function monthRange(d){
+
+ const start=
+  new Date(
+   d.getFullYear(),
+   d.getMonth(),
+   1
+  );
+
+ const end=
+  new Date(
+   d.getFullYear(),
+   d.getMonth()+1,
+   0
+  );
+
+ return{
+  start,
+  end,
+  days:end.getDate()
+ };
+
+}
+
+
+function currentMonthUntilSelected(selected){
+
+ const month=monthRange(selected);
+
+ const end=
+  selected<month.end?
+  selected:
+  month.end;
+
+ return{
+  start:month.start,
+  end,
+  month
+ };
+
+}
+
+
+/* ================= RENDER ================= */
+
 function render(){
-  renderNotes();
-  const n=current();
-  if(!n){
-    document.getElementById("title").value="";
-    document.getElementById("content").value="";
-    document.getElementById("date").textContent=now();
-    document.getElementById("count").textContent="0";
-    updateLastEditedDisplay(null);
-    document.getElementById("pinIcon").textContent="📌";
-    document.getElementById("pinBtn").classList.remove("pinned");
-    document.getElementById("reminderBtn").classList.remove("active");
-  
-    document.getElementById("reminderDisplay").style.display="none";
-    return;
+
+ const entries=getEntries();
+
+ const total=totalIncome(entries);
+
+ const overall=
+  Math.min(
+   100,
+   total/TARGET*100
+  );
+
+ document.getElementById(
+  "overallAmount"
+ ).textContent=money(total);
+
+ document.getElementById(
+  "overallPercent"
+ ).textContent=percent(overall);
+
+ document.getElementById(
+  "overallFill"
+ ).style.width=
+  Math.min(
+   100,
+   overall
+  )+"%";
+
+ document.getElementById(
+  "earnedLabel"
+ ).textContent=
+  money(total)+" earned";
+
+ updateDaysLeft();
+
+
+ const selected=
+  parseDate(
+   document.getElementById(
+    "entryDate"
+   ).value
+  );
+
+
+ const info=
+  currentMonthUntilSelected(
+   selected
+  );
+
+
+ const elapsedDays=
+  daysInclusive(
+   info.start,
+   info.end
+  );
+
+
+ const actual=
+  rangeTotal(
+   entries,
+   info.start,
+   info.end
+  );
+
+
+ const expected=
+  elapsedDays*
+  DAILY_TARGET;
+
+
+ const pace=
+  expected?
+  actual/expected*100:
+  0;
+
+
+ const monthlyTarget=
+  info.month.days*
+  DAILY_TARGET;
+
+
+/* ================= PROJECTED AVERAGE ================= */
+
+ const selectedKey=
+  dateKey(selected);
+
+
+ const hasSelectedEntry=
+  Object.prototype.hasOwnProperty.call(
+   entries,
+   selectedKey
+  );
+
+
+ const selectedNet=
+  Number(
+   entries[selectedKey]||0
+  );
+
+
+ let projectedAverage=0;
+
+ if(
+  hasSelectedEntry &&
+  selectedNet>=DAILY_TARGET
+ ){
+
+  projectedAverage=0;
+
+ }else{
+
+  const remainingDays=
+   Math.max(
+    1,
+    info.month.days-
+    elapsedDays+1
+   );
+
+  const remainingAmount=
+   Math.max(
+    0,
+    monthlyTarget-actual
+   );
+
+  projectedAverage=
+   remainingAmount/
+   remainingDays;
+
+ }
+
+
+ const currentAverage=
+  elapsedDays?
+  actual/elapsedDays:
+  0;
+
+
+ const projectedMonthEnd=
+  currentAverage*
+  info.month.days;
+
+
+ const shortfall=
+  projectedMonthEnd-
+  monthlyTarget;
+
+
+ document.getElementById(
+  "overviewMonth"
+ ).textContent=
+  selected.toLocaleDateString(
+   "en-US",
+   {
+    month:"long",
+    year:"numeric"
+   }
+  );
+
+
+ document.getElementById(
+  "pacePercent"
+ ).textContent=
+  percent(pace);
+
+
+ document.getElementById(
+  "paceFill"
+ ).style.width=
+  Math.min(
+   100,
+   Math.max(
+    0,
+    pace
+   )
+  )+"%";
+
+
+ document.getElementById(
+  "expectedToday"
+ ).textContent=
+  money(expected);
+
+
+ document.getElementById(
+  "actualToday"
+ ).textContent=
+  money(actual);
+
+
+ document.getElementById(
+  "currentAverage"
+ ).textContent=
+  money(projectedAverage)+
+  "/day";
+
+
+ document.getElementById(
+  "monthlyTarget"
+ ).textContent=
+  money(monthlyTarget);
+
+
+ document.getElementById(
+  "projectedEnd"
+ ).textContent=
+  money(projectedMonthEnd);
+
+
+ document.getElementById(
+  "projectedShortfall"
+ ).textContent=
+  (
+   shortfall>=0?
+   "+":
+   "−"
+  )+
+  money(
+   Math.abs(shortfall)
+  );
+
+
+ document.getElementById(
+  "projectedShortfall"
+ ).style.color=
+  shortfall>=0?
+  "var(--green)":
+  "var(--red)";
+
+
+ const report=
+  document.getElementById(
+   "paceReport"
+  );
+
+
+ if(elapsedDays===0){
+
+  report.textContent=
+   "No data yet.";
+
+ }else{
+
+  report.innerHTML=
+   `You are currently at
+   <strong class="${
+    pace>=100?
+    "good":
+    "bad"
+   }">
+    ${percent(pace)} pace
+   </strong>
+   with an average of
+   <strong class="${
+    currentAverage>=DAILY_TARGET?
+    "good":
+    "bad"
+   }">
+    ${money(currentAverage)}/day
+   </strong>.
+   You need
+   <strong class="${
+    projectedAverage<=DAILY_TARGET?
+    "good":
+    "bad"
+   }">
+    ${money(projectedAverage)}/day
+   </strong>
+   from today through the end of the month
+   to reach the monthly target.`;
+
+ }
+
+
+ const key=
+  dateKey(selected);
+
+
+ const has=
+  Object.prototype.hasOwnProperty.call(
+   entries,
+   key
+  );
+
+
+ const net=
+  Number(
+   entries[key]||0
+  );
+
+
+ const diff=
+  net-DAILY_TARGET;
+
+
+ document.getElementById(
+  "todayNet"
+ ).textContent=
+  has?
+  money(net):
+  "—";
+
+
+ document.getElementById(
+  "difference"
+ ).textContent=
+  has?
+  (
+   diff>=0?
+   "+":
+   "−"
+  )+
+  money(
+   Math.abs(diff)
+  ):
+  "—";
+
+
+ document.getElementById(
+  "achievement"
+ ).textContent=
+  has?
+  percent(
+   net/DAILY_TARGET*100
+  ):
+  "—";
+
+
+ document.getElementById(
+  "difference"
+ ).style.color=
+  has?
+  (
+   diff>=0?
+   "var(--green)":
+   "var(--red)"
+  ):
+  "var(--text)";
+
+
+ document.getElementById(
+  "achievement"
+ ).style.color=
+  has?
+  (
+   net>=DAILY_TARGET?
+   "var(--green)":
+   net>=DAILY_TARGET*.8?
+   "var(--yellow)":
+   "var(--red)"
+  ):
+  "var(--text)";
+
+
+ renderCalendar();
+
+ renderTable(entries);
+
+}
+
+
+/* ================= CALENDAR ================= */
+
+function renderCalendar(){
+
+ const grid=
+  document.getElementById(
+   "calendarGrid"
+  );
+
+ const title=
+  document.getElementById(
+   "calendarTitle"
+  );
+
+
+ const year=
+  calendarDate.getFullYear();
+
+ const month=
+  calendarDate.getMonth();
+
+
+ title.textContent=
+  new Date(
+   year,
+   month,
+   1
+  ).toLocaleDateString(
+   "en-US",
+   {
+    month:"long",
+    year:"numeric"
+   }
+  );
+
+
+ const first=
+  new Date(
+   year,
+   month,
+   1
+  );
+
+
+ const last=
+  new Date(
+   year,
+   month+1,
+   0
+  );
+
+
+ const firstDay=
+  first.getDay();
+
+
+ const entries=
+  getEntries();
+
+
+ let html="";
+
+
+ for(
+  let i=0;
+  i<firstDay;
+  i++
+ ){
+
+  html+=
+   `<div class="day empty"></div>`;
+
+ }
+
+
+ for(
+  let n=1;
+  n<=last.getDate();
+  n++
+ ){
+
+  const d=
+   new Date(
+    year,
+    month,
+    n
+   );
+
+
+  const key=
+   dateKey(d);
+
+
+  const inRange=
+   d>=startDate&&
+   d<=endDate;
+
+
+  const has=
+   Object.prototype.hasOwnProperty.call(
+    entries,
+    key
+   );
+
+
+  const value=
+   Number(
+    entries[key]||0
+   );
+
+
+  let cls="day";
+
+
+  if(!inRange){
+
+   cls+=" outside";
+
   }
-  document.getElementById("title").value=n.title||"";
-  document.getElementById("content").value=n.content||"";
-  document.getElementById("date").textContent=n.updated||now();
-  document.getElementById("count").textContent=(n.content||"").length;
-  updateLastEditedDisplay(n);
-  document.getElementById("pinIcon").textContent="📌";
-  document.getElementById("pinBtn").classList.toggle("pinned",!!n.pinned);
-  document.getElementById("reminderBtn").classList.toggle("active",!!n.reminder);
 
-  updateReminderDisplay(n);
-}
 
-function updateLastEditedDisplay(n){
-  const el=document.getElementById("lastEdited");
-  if(!el)return;
-  el.textContent=(n && n.updated) ? n.updated : "—";
-}
+  if(has){
 
-function saveCurrent(){
-  const title=document.getElementById("title").value;
-  const content=document.getElementById("content").value;
-  const hasText=title.trim()!=="" || content.trim()!=="";
+   const ratio=
+    value/DAILY_TARGET;
 
-  // A completely blank new note is only a draft and is never saved.
-  if(draftMode && !hasText){
-    document.getElementById("count").textContent=content.length;
-    updateLastEditedDisplay(null);
-    return;
+
+   cls+=
+    ratio>=1?
+    " good":
+    ratio>=.8?
+    " partial":
+    " below";
+
   }
 
-  let n=current();
 
-  // Create the note only when the user actually writes something.
-  if(!n && hasText){
-    n={
-      id:crypto.randomUUID(),
-      title:title.trim() || "Untitled Note",
-      content:content,
-      updated:now(),
-      pinned:false,
-      reminder:null,
-      countdownDate:null
-    };
-    notes.unshift(n);
-    currentId=n.id;
-    draftMode=false;
+  if(
+   key===
+   document.getElementById(
+    "entryDate"
+   ).value
+  ){
+
+   cls+=" selected";
+
   }
 
-  if(!n)return;
 
-  n.title=title.trim() || "Untitled Note";
-  n.content=content;
-  n.updated=now();
-  persist();
+  if(
+   key===
+   dateKey(new Date())
+  ){
 
-  document.getElementById("count").textContent=n.content.length;
-  updateLastEditedDisplay(n);
-  renderNotes();
-}
-function newNote(){
-  draftMode=true;
-  currentId=null;
-  if(window.innerWidth<=600){
-    document.getElementById("editorPanel").classList.add("mobile-open");
-  }
-  document.getElementById("title").value="";
-  document.getElementById("content").value="";
-  document.getElementById("count").textContent="0";
-  updateLastEditedDisplay(null);
-  document.getElementById("pinIcon").textContent="📌";
-  document.getElementById("pinBtn").classList.remove("pinned");
-  document.getElementById("reminderBtn").classList.remove("active");
+   cls+=" today";
 
-  document.getElementById("reminderDisplay").style.display="none";
-  renderNotes();
-  document.getElementById("title").focus();
-}
-function deleteCurrent(){
-  const n=current();
-
-  // Blank unsaved draft: nothing to archive.
-  if(draftMode || !n){
-    draftMode=false;
-    currentId=notes[0]?.id||null;
-    render();
-    return;
   }
 
-  // Move note to Archive instead of permanently deleting it.
-  archive.unshift({
-    ...n,
-    deletedAt:Date.now()
-  });
 
-  notes=notes.filter(x=>x.id!==n.id);
-  persist();
-  persistArchive();
+  html+=`
+   <div
+    class="${cls} ${
+     has?
+     "has-entry":
+     "no-entry"
+    }"
+    data-date="${key}"
+    data-net="${has?value:''}"
+    data-inrange="${inRange}"
+    ${
+     inRange?
+     `onclick="selectCalendarDate('${key}')"`:
+     ""
+    }>
 
-  currentId=notes[0]?.id||null;
-  draftMode=false;
-  render();
-}
+    <span class="day-number">
+     ${n}
+    </span>
 
-function togglePin(){
-  let n=current();
-  if(!n){
-    const title=document.getElementById("title").value.trim();
-    const content=document.getElementById("content").value;
-    if(!title && !content.trim()) return;
-    n={id:crypto.randomUUID(),title:title||"Untitled Note",content,updated:now(),pinned:false,reminder:null,countdownDate:null};
-    notes.unshift(n);
-    currentId=n.id;
-    draftMode=false;
-  }
-  n.pinned=!n.pinned;
-  n.updated=now();
-  persist();
-  render();
-}
-function formatArchiveDate(timestamp){
-  return new Date(timestamp).toLocaleString("en-GB",{
-    day:"2-digit",month:"short",year:"numeric",
-    hour:"2-digit",minute:"2-digit",hour12:true
-  });
-}
-function daysLeft(deletedAt){
-  const left=Math.ceil((deletedAt + ARCHIVE_DAYS*24*60*60*1000 - Date.now())/(24*60*60*1000));
-  return Math.max(0,left);
-}
-function openArchive(){
-  purgeExpiredArchive();
-  renderArchive();
-  document.getElementById("archiveModal").classList.add("show");
-}
-function closeArchive(event){
-  if(event && event.target!==document.getElementById("archiveModal")) return;
-  document.getElementById("archiveModal").classList.remove("show");
-}
-function renderArchive(){
-  const box=document.getElementById("archiveList");
-  if(!archive.length){
-    box.innerHTML='<div class="archive-empty">Archive is empty.</div>';
-    return;
-  }
-  box.innerHTML=archive.map(n=>`
-    <div class="archive-item">
-      <div>
-        <div class="archive-title">${escapeHtml(n.title||"Untitled Note")}</div>
-        <div class="archive-date">Deleted ${escapeHtml(formatArchiveDate(n.deletedAt))} · ${daysLeft(n.deletedAt)} day${daysLeft(n.deletedAt)===1?"":"s"} left</div>
-      </div>
-      <div class="archive-actions">
-        <button type="button" class="read" onclick="readArchivedNote('${n.id}')">Read</button>
-        <button type="button" class="restore" data-action="restore" data-id="${n.id}">Restore</button>
-        <button type="button" class="forever" data-action="forever" data-id="${n.id}" onclick="deleteForever(this.getAttribute('data-id'))">Delete Forever</button>
-      </div>
-    </div>
-  `).join("");
-}
-function restoreNote(id){
-  const n=archive.find(x=>x.id===id);
-  if(!n)return;
-  const restored={
-    id:n.id,
-    title:n.title||"Untitled Note",
-    content:n.content||"",
-    updated:n.updated||now(),
-    pinned:!!n.pinned,
-    reminder:n.reminder||null,
-    countdownDate:n.countdownDate||null
-  };
-  notes.unshift(restored);
-  archive=archive.filter(x=>x.id!==id);
-  persist();
-  persistArchive();
-  currentId=restored.id;
-  draftMode=false;
-  render();
-  renderArchive();
-}
-function deleteForever(id){
-  if(!id)return;
-  archive=archive.filter(x=>String(x.id)!==String(id));
-  persistArchive();
-  renderArchive();
-}
+    ${
+     has?
+     `
+      <span class="dot"></span>
 
-let readerNoteId=null;
-
-function readArchivedNote(id){
-  purgeExpiredArchive();
-  const n=archive.find(x=>x.id===id);
-  if(!n)return;
-  readerNoteId=id;
-  document.getElementById("readerTitle").textContent=n.title||"Untitled Note";
-  document.getElementById("readerDate").textContent=
-    "Deleted "+formatArchiveDate(n.deletedAt)+" · "+daysLeft(n.deletedAt)+" day"+(daysLeft(n.deletedAt)===1?"":"s")+" left";
-  document.getElementById("readerContent").textContent=n.content||"(This note has no written content.)";
-  document.getElementById("archiveReader").classList.add("show");
-}
-function closeArchiveReader(event){
-  if(event && event.target!==document.getElementById("archiveReader"))return;
-  document.getElementById("archiveReader").classList.remove("show");
-  readerNoteId=null;
-}
-function restoreFromReader(){
-  if(!readerNoteId)return;
-  const id=readerNoteId;
-  closeArchiveReader();
-  restoreNote(id);
-}
-function deleteForeverFromReader(){
-  if(!readerNoteId)return;
-  const id=readerNoteId;
-
-  archive=archive.filter(x=>String(x.id)!==String(id));
-  persistArchive();
-
-  readerNoteId=null;
-  document.getElementById("archiveReader").classList.remove("show");
-  renderArchive();
-}
-
-document.getElementById("archiveList").addEventListener("click", function(e){
-  const btn=e.target.closest("button[data-action]");
-  if(!btn)return;
-
-  e.preventDefault();
-  e.stopPropagation();
-
-  const id=btn.getAttribute("data-id");
-  if(!id)return;
-
-  if(btn.getAttribute("data-action")==="restore"){
-    restoreNote(id);
-  }else if(btn.getAttribute("data-action")==="forever"){
-    deleteForever(id);
-  }
-});
-
-document.getElementById("readerRestoreBtn").addEventListener("click", function(e){
-  e.preventDefault();
-  e.stopPropagation();
-  restoreFromReader();
-});
-
-document.getElementById("readerForeverBtn").addEventListener("click", function(e){
-  e.preventDefault();
-  e.stopPropagation();
-  deleteForeverFromReader();
-});
-
-
-function countdownText(target){
-  if(!target)return "";
-  const end=new Date(target);
-  const diff=end.getTime()-Date.now();
-  if(diff<=0){
-    const abs=Math.abs(diff);
-    const days=Math.floor(abs/86400000);
-    const hours=Math.floor((abs%86400000)/3600000);
-    const minutes=Math.floor((abs%3600000)/60000);
-    if(days) return days+"d overdue";
-    if(hours) return hours+"h overdue";
-    return minutes+"m overdue";
-  }
-  const days=Math.floor(diff/86400000);
-  const hours=Math.floor((diff%86400000)/3600000);
-  const minutes=Math.floor((diff%3600000)/60000);
-  if(days>0)return days+"d "+hours+"h";
-  if(hours>0)return hours+"h "+minutes+"m";
-  return minutes+"m";
-}
-
-function countdownLongText(target){
-  if(!target)return "";
-  const end=new Date(target);
-  const diff=end.getTime()-Date.now();
-  const abs=Math.abs(diff);
-  const days=Math.floor(abs/86400000);
-  const hours=Math.floor((abs%86400000)/3600000);
-  const minutes=Math.floor((abs%3600000)/60000);
-  const seconds=Math.floor((abs%60000)/1000);
-  const d=days+" day"+(days===1?"":"s");
-  const h=hours+" hour"+(hours===1?"":"s");
-  const m=minutes+" minute"+(minutes===1?"":"s");
-  const s=seconds+" second"+(seconds===1?"":"s");
-  return diff>0 ? d+", "+h+", "+m+", "+s : d+", "+h+", "+m+", "+s+" overdue";
-}
-
-
-function insertChecklistItem(){
-  const el=document.getElementById("content");
-  const start=el.selectionStart;
-  const end=el.selectionEnd;
-  const before=el.value.slice(0,start);
-  const selected=el.value.slice(start,end);
-
-  // If the cursor is on a line, toggle/add a checkbox prefix.
-  const lineStart=before.lastIndexOf("\n")+1;
-  const lineEnd=el.value.indexOf("\n",start);
-  const actualEnd=lineEnd===-1?el.value.length:lineEnd;
-  const line=el.value.slice(lineStart,actualEnd);
-
-  if(/^\s*☐\s?/.test(line)){
-    const updatedLine=line.replace(/^(\s*)☐\s?/,"$1");
-    el.value=el.value.slice(0,lineStart)+updatedLine+el.value.slice(actualEnd);
-    el.selectionStart=el.selectionEnd=lineStart+updatedLine.length;
-  }else if(/^\s*☑\s?/.test(line)){
-    const updatedLine=line.replace(/^(\s*)☑\s?/,"$1");
-    el.value=el.value.slice(0,lineStart)+updatedLine+el.value.slice(actualEnd);
-    el.selectionStart=el.selectionEnd=lineStart+updatedLine.length;
-  }else{
-    const replacement="☐ "+selected;
-    el.setRangeText(replacement,start,end,"end");
-  }
-
-  saveCurrent();
-  el.focus();
-}
-
-function handleEditorEnter(e){
-  if(e.key!=="Enter" || e.isComposing) return;
-
-  const el=e.target;
-  const pos=el.selectionStart;
-  if(pos!==el.selectionEnd) return;
-
-  const before=el.value.slice(0,pos);
-  const after=el.value.slice(pos);
-
-  // Current line, without the newline before it.
-  const lineStart=before.lastIndexOf("\n")+1;
-  const line=before.slice(lineStart);
-
-  // If the previous Enter already created an empty marker,
-  // a second Enter exits the list and removes that marker.
-  const emptyMarker=/^([ \t]*)(☐|☑|[-*+#•▪▫◦→»›>])\s*$/;
-  const emptyNumber=/^([ \t]*)(\d+)([.]|।)\s*$/;
-  const emptyBangla=/^([ \t]*)([০-৯]+)([.]|।)\s*$/;
-
-  if(emptyMarker.test(line) || emptyNumber.test(line) || emptyBangla.test(line)){
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    const value=el.value;
-    el.value=value.slice(0,lineStart)+"\n"+after;
-    el.selectionStart=el.selectionEnd=lineStart+1;
-    el.dispatchEvent(new Event("input",{bubbles:true}));
-    return;
-  }
-
-  let insert="";
-
-  // Checklist: ☐ Task -> Enter -> ☐
-  let m=line.match(/^([ \t]*)(☐|☑)\s+(.+)$/);
-  if(m){
-    insert="\n"+m[1]+"☐ ";
-  }
-
-  // English numbering: 1. -> 2. (or 1। -> 2।)
-  if(!insert){
-    m=line.match(/^([ \t]*)(\d+)([.]|।)\s+(.+)$/);
-    if(m){
-      insert="\n"+m[1]+(Number(m[2])+1)+m[3]+" ";
+      <span class="day-income">
+       ${money(value)}
+      </span>
+     `:
+     ""
     }
-  }
 
-  // Bangla numbering: ১। -> ২।
-  if(!insert){
-    m=line.match(/^([ \t]*)([০-৯]+)([.]|।)\s+(.+)$/);
-    if(m){
-      const bd="০১২৩৪৫৬৭৮৯";
-      const n=Number(m[2].split("").map(ch=>bd.indexOf(ch)).join(""));
-      const next=String(n+1).split("").map(ch=>bd[Number(ch)]).join("");
-      insert="\n"+m[1]+next+m[3]+" ";
-    }
-  }
+   </div>
+  `;
 
-  // Common bullets: preserve exactly the bullet the user typed.
-  if(!insert){
-    m=line.match(/^([ \t]*)([-*+#•▪▫◦→»›>])\s+(.+)$/);
-    if(m){
-      insert="\n"+m[1]+m[2]+" ";
-    }
-  }
+ }
 
-  if(!insert) return;
 
-  e.preventDefault();
-  e.stopImmediatePropagation();
+ grid.innerHTML=html;
 
-  el.value=before+insert+after;
-  const newPos=before.length+insert.length;
-  el.selectionStart=el.selectionEnd=newPos;
-  el.dispatchEvent(new Event("input",{bubbles:true}));
-}
 
-function updateReminderDisplay(n){
-  const box=document.getElementById("reminderDisplay");
-  if(!box)return;
-  if(!n || !n.reminder){
-    box.style.display="none";
-    box.textContent="";
-    return;
-  }
-  const d=n.reminder.display||{fixed:true,live:false};
-  const parts=[];
-  if(d.fixed) parts.push('<span class="reminder-fixed">🔔 '+escapeHtml(reminderFixedText(n.reminder))+'</span>');
-  if(d.live) parts.push('<span class="reminder-live">⏳ '+escapeHtml(reminderLiveText(n.reminder))+'</span>');
-  if(!parts.length){
-    box.style.display="none";
-    box.textContent="";
-    return;
-  }
-  box.style.display="block";
-  box.innerHTML=parts.join('<span class="reminder-sep"> | </span>');
+/*
+ Tooltip only on desktop.
+ No tooltip on mobile/touch.
+*/
+
+ if(
+  window.matchMedia(
+   "(hover: hover) and (pointer: fine)"
+  ).matches
+ ){
+
+  grid.querySelectorAll(
+   ".day:not(.empty)[data-inrange='true']"
+  ).forEach(
+   day=>{
+
+    day.addEventListener(
+     "mouseenter",
+     e=>showDayTooltip(
+      e,
+      day
+     )
+    );
+
+    day.addEventListener(
+     "mousemove",
+     moveDayTooltip
+    );
+
+    day.addEventListener(
+     "mouseleave",
+     hideDayTooltip
+    );
+
+   }
+  );
+
+ }
+
 }
 
-function reminderTarget(r){
-  if(!r||!r.date||!r.time)return null;
-  return r.date+"T"+r.time+":00";
-}
-function reminderLiveText(r){
-  const target=reminderTarget(r);
-  if(!target)return "";
-  return countdownLongText(target);
-}
-function reminderFixedText(r){
-  if(!r||!r.date||!r.time)return "";
-  const d=new Date(r.date+"T"+r.time+":00");
-  return d.toLocaleString("en-GB",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true});
-}
-function reminderDisplayText(r){
-  if(!r)return "";
-  return "🔔 Fixed Time: "+reminderFixedText(r)+"  |  ⏳ Live Countdown: "+reminderLiveText(r);
-}
-function setReminderMode(mode){
-  const fixedBtn=document.getElementById("reminderFixedBtn");
-  const liveBtn=document.getElementById("reminderLiveBtn");
-  const btn=mode==="fixed" ? fixedBtn : liveBtn;
-  const other=mode==="fixed" ? liveBtn : fixedBtn;
-  const currently=btn.classList.contains("active");
-  if(currently && other.classList.contains("active")){
-    btn.classList.remove("active");
-  }else if(!currently){
-    btn.classList.add("active");
-  }
-}
-function openReminder(){
-  let n=current();
-  if(!n){
-    const title=document.getElementById("title").value.trim();
-    const content=document.getElementById("content").value;
-    if(!title && !content.trim()) return;
-    n={id:crypto.randomUUID(),title:title||"Untitled Note",content,updated:now(),pinned:false,reminder:null,countdownDate:null};
-    notes.unshift(n);
-    currentId=n.id;
-    draftMode=false;
-    persist();
-    renderNotes();
-  }
-  const r=n.reminder||{};
-  document.getElementById("reminderDate").value=r.date||"";
-  document.getElementById("reminderTime").value=r.time||"";
-  const display=r.display || (r.mode==="live" ? {fixed:false,live:true} : {fixed:true,live:false});
-  document.getElementById("reminderFixedBtn").classList.toggle("active",!!display.fixed);
-  document.getElementById("reminderLiveBtn").classList.toggle("active",!!display.live);
-  document.getElementById("reminderFixedBtn").dataset.selected=display.fixed?"1":"0";
-  document.getElementById("reminderLiveBtn").dataset.selected=display.live?"1":"0";
-  document.getElementById("reminderModal").classList.add("show");
-}
-function saveReminder(){
-  const n=current();
-  if(!n)return;
-  const date=document.getElementById("reminderDate").value;
-  let time=document.getElementById("reminderTime").value;
-  if(!date)return;
-  if(!time) time="00:00";
-  const fixed=document.getElementById("reminderFixedBtn").classList.contains("active");
-  const live=document.getElementById("reminderLiveBtn").classList.contains("active");
-  n.reminder={date,time,display:{fixed,live},notified:false};
-  persist();
-  closeFeatureModal(null,"reminderModal");
-  render();
-  requestNotificationPermission();
-}
-function clearReminder(){
-  const n=current();
-  if(!n)return;
-  n.reminder=null;
-  persist();
-  closeFeatureModal(null,"reminderModal");
-  render();
-}
-function closeFeatureModal(event,id){
-  const modal=document.getElementById(id);
-  if(event && event.target!==modal)return;
-  modal.classList.remove("show");
-}
-function requestNotificationPermission(){
-  if("Notification" in window && Notification.permission==="default"){
-    Notification.requestPermission().catch(()=>{});
-  }
-}
-function checkReminders(){
-  const nowDate=new Date();
-  let changed=false;
-  notes.forEach(n=>{
-    if(!n.reminder||n.reminder.notified)return;
-    const target=new Date(reminderTarget(n.reminder));
-    if(nowDate.getTime()>=target.getTime()){
-      n.reminder.notified=true;
-      changed=true;
-      if("Notification" in window && Notification.permission==="granted"){
-        try{new Notification(n.title||"Soikat Notepad",{body:"Reminder: this note is due now."});}catch{}
-      }else{
-        // Fallback: make the note visibly marked.
-        document.title="🔔 "+(n.title||"Reminder")+" — SOIKAT";
-        setTimeout(()=>{document.title="SOIKAT — NOTEPAD"},5000);
+
+/* ================= TABLE ================= */
+
+function renderTable(entries){
+
+ const body=
+  document.getElementById(
+   "recentEntriesBody"
+  );
+
+
+ const rows=
+  Object.entries(entries)
+  .sort(
+   (a,b)=>
+    b[0].localeCompare(
+     a[0]
+    )
+  );
+
+
+ if(!rows.length){
+
+  body.innerHTML=`
+   <tr>
+    <td
+     colspan="7"
+     style="
+      text-align:center;
+      color:#596a7f;
+      padding:35px 10px">
+     No entries yet
+    </td>
+   </tr>
+  `;
+
+  return;
+
+ }
+
+
+ body.innerHTML=
+  rows
+  .slice(0,10)
+  .map(
+   ([date,value])=>{
+
+    const net=
+     Number(value||0);
+
+    const diff=
+     net-DAILY_TARGET;
+
+    const achievement=
+     net/
+     DAILY_TARGET*
+     100;
+
+
+    const status=
+     achievement>=100?
+     ["GOOD","status"]:
+     achievement>=80?
+     ["PARTIAL","status status-partial"]:
+     ["BELOW","status status-below"];
+
+
+    const formatted=
+     parseDate(date)
+     .toLocaleDateString(
+      "en-GB",
+      {
+       day:"2-digit",
+       month:"short",
+       year:"numeric"
       }
+     );
+
+
+    return `
+     <tr>
+
+      <td>
+       ${formatted}
+      </td>
+
+      <td class="net">
+       ${money(net)}
+      </td>
+
+      <td>
+       ${money(DAILY_TARGET)}
+      </td>
+
+      <td
+       class="${
+        diff>=0?
+        "positive":
+        "negative"
+       }">
+
+       ${
+        diff>=0?
+        "+":
+        "−"
+       }${money(
+        Math.abs(diff)
+       )}
+
+      </td>
+
+      <td>
+       ${percent(achievement)}
+      </td>
+
+      <td>
+       <span class="${status[1]}">
+        ${status[0]}
+       </span>
+      </td>
+
+      <td>
+       <button
+        class="delete-btn"
+        onclick="deleteEntry('${date}')">
+        Delete
+       </button>
+      </td>
+
+     </tr>
+    `;
+
+   }
+  )
+  .join("");
+
+}
+
+
+/* ================= TOOLTIP ================= */
+
+function showDayTooltip(
+ event,
+ el
+){
+
+ if(
+  !window.matchMedia(
+   "(hover: hover) and (pointer: fine)"
+  ).matches
+ ){
+
+  return;
+
+ }
+
+
+ if(
+  !el.dataset.inrange||
+  el.classList.contains("empty")
+ ){
+
+  return;
+
+ }
+
+
+ const key=
+  el.dataset.date;
+
+
+ const date=
+  parseDate(key);
+
+
+ const has=
+  el.dataset.net!=="";
+
+
+ const tooltip=
+  document.getElementById(
+   "dayTooltip"
+  );
+
+
+ if(!has){
+
+  tooltip.innerHTML=
+   `
+    <div class="tt-date">
+     ${date.toLocaleDateString(
+      "en-GB",
+      {
+       day:"2-digit",
+       month:"short",
+       year:"numeric"
+      }
+     )}
+    </div>
+
+    <div>
+     No entry
+    </div>
+   `;
+
+ }else{
+
+  const net=
+   Number(
+    el.dataset.net
+   );
+
+
+  const achievement=
+   net/
+   DAILY_TARGET*
+   100;
+
+
+  const diff=
+   net-
+   DAILY_TARGET;
+
+
+  const color=
+   achievement>=100?
+   "var(--green)":
+   achievement>=80?
+   "var(--yellow)":
+   "var(--red)";
+
+
+  const diffText=
+   diff>=0?
+   "+"+
+   money(
+    Math.abs(diff)
+   ):
+   "−"+
+   money(
+    Math.abs(diff)
+   );
+
+
+  const direction=
+   diff<0?
+   " below daily target":
+   diff>0?
+   " above daily target":
+   " at daily target";
+
+
+  tooltip.innerHTML=
+   `
+    <div class="tt-net">
+     ${money(net)}
+    </div>
+
+    <div
+     class="tt-status"
+     style="color:${color}">
+
+     Achievement
+     ${percent(achievement)}
+     ·
+     ${diffText}
+     ${direction}.
+
+    </div>
+   `;
+
+ }
+
+
+ const notes=getEntryNotes();
+ const note=notes[key];
+ if(normalizedNote(note)){
+  const cumulative=cumulativeNoteTotal(note,key);
+  const safeNote=String(note).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  tooltip.innerHTML+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #26384e;color:#9db0c6">${safeNote} · ${money(cumulative)} cumulative</div>`;
+ }
+ tooltip.classList.add("show");
+ moveDayTooltip(event);
+
+}
+
+
+function moveDayTooltip(event){
+
+ const tooltip=
+  document.getElementById(
+   "dayTooltip"
+  );
+
+
+ if(
+  !tooltip.classList.contains("show")
+ ){
+
+  return;
+
+ }
+
+
+ const padding=14;
+
+
+ let x=
+  event.clientX+
+  padding;
+
+
+ let y=
+  event.clientY+
+  padding;
+
+
+ const rect=
+  tooltip.getBoundingClientRect();
+
+
+ if(
+  x+
+  rect.width>
+  window.innerWidth-8
+ ){
+
+  x=
+   event.clientX-
+   rect.width-
+   padding;
+
+ }
+
+
+ if(
+  y+
+  rect.height>
+  window.innerHeight-8
+ ){
+
+  y=
+   event.clientY-
+   rect.height-
+   padding;
+
+ }
+
+
+ tooltip.style.left=
+  Math.max(
+   8,
+   x
+  )+"px";
+
+
+ tooltip.style.top=
+  Math.max(
+   8,
+   y
+  )+"px";
+
+}
+
+
+function hideDayTooltip(){
+
+ document
+  .getElementById(
+   "dayTooltip"
+  )
+  .classList.remove(
+   "show"
+  );
+
+}
+
+
+/* ================= MONTHLY REPORT ================= */
+
+function openMonthlyReport(){
+
+ const {
+  start,
+  end,
+  days
+ }=
+  monthRange(
+   calendarDate
+  );
+
+
+ const entries=
+  getEntries();
+
+
+ const rows=
+  Object.entries(entries)
+  .map(
+   ([date,value])=>({
+    date,
+    value:Number(value||0),
+    d:parseDate(date)
+   })
+  )
+  .filter(
+   x=>
+    x.d>=start&&
+    x.d<=end
+  )
+  .sort(
+   (a,b)=>
+    a.date.localeCompare(
+     b.date
+    )
+  );
+
+
+ const total=
+  rows.reduce(
+   (s,x)=>
+    s+x.value,
+   0
+  );
+
+
+ const target=
+  days*
+  DAILY_TARGET;
+
+
+ const achievement=
+  target?
+  total/target*100:
+  0;
+
+
+ const average=
+  rows.length?
+  total/rows.length:
+  0;
+
+
+ document.getElementById(
+  "reportTitle"
+ ).textContent=
+  `Monthly Report · ${
+   start.toLocaleDateString(
+    "en-US",
+    {
+     month:"long",
+     year:"numeric"
     }
-  });
-  if(changed){
-    persist();
-    renderNotes();
-  }
-}
-
-function toggleMobileSearch(){
-  if(window.innerWidth>600)return;
-  const box=document.getElementById("searchBox");
-  if(!box)return;
-  box.classList.toggle("mobile-search-open");
-  if(box.classList.contains("mobile-search-open")){
-    document.getElementById("search").focus();
-  }
-}
-function closeMobileEditor(){
-  const panel=document.getElementById("editorPanel");
-  if(!panel)return;
-  panel.classList.remove("mobile-open");
-  if(draftMode && !current()){
-    draftMode=false;
-    currentId=notes[0]?.id||null;
-    render();
-  }
-}
-
-function updateClock(){
-  document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
-    day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true
-  });
-}
-document.getElementById("deleteBtn").addEventListener("click", function(e){
-  e.preventDefault();
-  e.stopPropagation();
-  deleteCurrent();
-});
-
-document.getElementById("pinBtn").addEventListener("click", function(e){
-  e.preventDefault();
-  e.stopPropagation();
-  togglePin();
-});
+   )
+  }`;
 
 
+ document.getElementById(
+  "reportTarget"
+ ).textContent=
+  money(target);
 
 
-document.getElementById("content").addEventListener("click",function(e){
-  const el=e.target;
-  const pos=el.selectionStart;
-  const value=el.value;
-  let idx=-1;
-  if(value[pos]==="☐"||value[pos]==="☑") idx=pos;
-  else if(value[pos-1]==="☐"||value[pos-1]==="☑") idx=pos-1;
-  if(idx<0)return;
-  const next=value[idx]==="☐"?"☑":"☐";
-  el.value=value.slice(0,idx)+next+value.slice(idx+1);
-  el.selectionStart=el.selectionEnd=idx+1;
-  saveCurrent();
-});
+ document.getElementById(
+  "reportActual"
+ ).textContent=
+  money(total);
 
-document.getElementById("checklistBtn").addEventListener("click",function(e){
-  e.preventDefault();
-  insertChecklistItem();
-});
 
-document.getElementById("reminderBtn").addEventListener("click",function(e){
-  e.preventDefault();
-  openReminder();
-});
+ document.getElementById(
+  "reportAchievement"
+ ).textContent=
+  percent(achievement);
 
-// Make the native date/time pickers open reliably on supported browsers.
-["reminderDate","reminderTime"].forEach(function(id){
-  const input=document.getElementById(id);
-  if(!input)return;
-  input.addEventListener("click",function(){
-    this.focus();
-    if(typeof this.showPicker==="function"){
-      try{ this.showPicker(); }catch(e){}
+
+ document.getElementById(
+  "reportAverage"
+ ).textContent=
+  money(average);
+
+
+ const list=
+  document.getElementById(
+   "reportList"
+  );
+
+
+ if(!rows.length){
+
+  list.innerHTML=
+   `
+    <div
+     style="
+      padding:18px 0;
+      text-align:center;
+      color:#596a7f;
+      font-size:11px">
+
+     No entries for this month.
+
+    </div>
+   `;
+
+ }else{
+
+  list.innerHTML=
+   rows
+   .map(
+    x=>{
+
+     const achievement=
+      x.value/
+      DAILY_TARGET*
+      100;
+
+
+     const status=
+      achievement>=100?
+      "GOOD":
+      achievement>=80?
+      "PARTIAL":
+      "BELOW";
+
+
+     const cls=
+      achievement>=100?
+      "positive":
+      achievement>=80?
+      "":
+      "negative";
+
+
+     return `
+      <div class="report-row">
+
+       <span class="r-date">
+        ${x.d.toLocaleDateString(
+         "en-GB",
+         {
+          day:"2-digit",
+          month:"short"
+         }
+        )}
+       </span>
+
+       <span>
+        ${status}
+       </span>
+
+       <span
+        class="r-net ${cls}">
+
+        ${money(x.value)}
+
+       </span>
+
+      </div>
+     `;
+
     }
-  });
-  input.addEventListener("keydown",function(e){
-    if((e.key==="Enter" || e.key==="ArrowDown") && typeof this.showPicker==="function"){
-      try{ this.showPicker(); }catch(err){}
-    }
-  });
-});
+   )
+   .join("");
+
+ }
 
 
-document.getElementById("saveReminderBtn").addEventListener("click",saveReminder);
-document.getElementById("clearReminderBtn").addEventListener("click",clearReminder);
-document.getElementById("reminderFixedBtn").addEventListener("click",function(){setReminderMode("fixed")});
-document.getElementById("reminderLiveBtn").addEventListener("click",function(){setReminderMode("live")});
+ const daysWithEntry=
+  rows.length;
 
-setInterval(()=>{
-  checkReminders();
-  if(currentId){
-    const n=current();
-    if(n) updateReminderDisplay(n);
-    renderNotes();
+
+ const positiveDays=
+  rows.filter(
+   x=>
+    x.value>=DAILY_TARGET
+  ).length;
+
+
+ document.getElementById(
+  "reportNote"
+ ).textContent=
+  `${daysWithEntry} day${
+   daysWithEntry===1?
+   "":
+   "s"
+  } with entries · ${
+   positiveDays
+  } day${
+   positiveDays===1?
+   "":
+   "s"
+  } met the ৳${DAILY_TARGET} daily target.`;
+
+
+ document
+  .getElementById(
+   "reportModal"
+  )
+  .classList.add(
+   "open"
+  );
+
+}
+
+
+function closeMonthlyReport(){
+
+ document
+  .getElementById(
+   "reportModal"
+  )
+  .classList.remove(
+   "open"
+  );
+
+}
+
+
+document
+ .getElementById(
+  "monthlyReportBtn"
+ )
+ .addEventListener(
+  "click",
+  openMonthlyReport
+ );
+
+
+document
+ .getElementById(
+  "reportModal"
+ )
+ .addEventListener(
+  "click",
+  e=>{
+
+   if(
+    e.target.id===
+    "reportModal"
+   ){
+
+    closeMonthlyReport();
+
+   }
+
   }
-},1000);
+);
 
-load();updateClock();setInterval(updateClock,1000);
 
+/* ================= CALENDAR DATE ================= */
+
+function selectCalendarDate(key){
+ document.getElementById("entryDate").value=key;
+ document.getElementById("profit").value="";
+ document.getElementById("entryNote").value=getEntryNotes()[key]||"";
+
+ calendarDate=
+  parseDate(key);
+
+ hideDayTooltip();
+
+ /*
+  No scroll here.
+  Selecting a calendar date only
+  changes the selected date.
+ */
+
+ render();
+
+}
+
+
+/* ================= ADD ENTRY ================= */
+
+function addEntry(){
+
+ const date=
+  document.getElementById(
+   "entryDate"
+  ).value;
+
+
+ const profit=
+  Number(
+   document.getElementById(
+    "profit"
+   ).value
+  );
+
+
+ if(!date){
+
+  showToast(
+   "Select a date"
+  );
+
+  return;
+
+ }
+
+
+ if(
+  date<START_DATE||
+  date>END_DATE
+ ){
+
+  showToast(
+   "Date must be inside the goal period"
+  );
+
+  return;
+
+ }
+
+
+ if(
+  !Number.isFinite(profit)||
+  profit<0
+ ){
+
+  showToast(
+   "Enter a valid net profit"
+  );
+
+  return;
+
+ }
+
+
+ const entries=
+  getEntries();
+
+
+ entries[date]=profit;
+ saveEntries(entries);
+ const notes=getEntryNotes();
+ const note=document.getElementById("entryNote").value.trim();
+ if(note) notes[date]=note; else delete notes[date];
+ saveEntryNotes(notes);
+ document.getElementById("profit").value="";
+ document.getElementById("entryNote").value="";
+
+
+ calendarDate=
+  parseDate(date);
+
+
+ render();
+
+
+ showToast(
+  "Entry saved"
+ );
+
+}
+
+
+function deleteEntry(date){
+
+ const entries=
+  getEntries();
+
+
+ delete entries[date];
+ saveEntries(entries);
+ const notes=getEntryNotes();
+ delete notes[date];
+ saveEntryNotes(notes);
+ render();
+
+
+ showToast(
+  "Entry deleted"
+ );
+
+}
+
+
+/* ================= EVENTS ================= */
+
+document
+ .getElementById(
+  "addButton"
+ )
+ .addEventListener(
+  "click",
+  addEntry
+ );
+
+
+document
+ .getElementById(
+  "profit"
+ )
+ .addEventListener(
+  "keydown",
+  e=>{
+
+   if(e.key==="Enter"){
+    addEntry();
+   }
+
+  }
+ );
+
+
+document.getElementById("profit").addEventListener("input",updateEntryPreview);
+document.getElementById("entryNote").addEventListener("input",updateEntryPreview);
+
+document
+ .getElementById(
+  "entryDate"
+ )
+ .addEventListener(
+  "change",
+  ()=>{
+
+   const selectedKey=document.getElementById("entryDate").value;
+   document.getElementById("profit").value="";
+   document.getElementById("entryNote").value=getEntryNotes()[selectedKey]||"";
+   calendarDate=
+    parseDate(
+     document.getElementById(
+      "entryDate"
+     ).value
+    );
+
+   render();
+
+  }
+);
+
+
+/* ================= MONTH NAVIGATION ================= */
+
+document
+ .getElementById(
+  "prevMonth"
+ )
+ .addEventListener(
+  "click",
+  ()=>{
+
+   const next=
+    new Date(
+     calendarDate.getFullYear(),
+     calendarDate.getMonth()-1,
+     1
+    );
+
+
+   const firstMonth=
+    new Date(
+     startDate.getFullYear(),
+     startDate.getMonth(),
+     1
+    );
+
+
+   if(next>=firstMonth){
+
+    calendarDate=next;
+
+    hideDayTooltip();
+
+    renderCalendar();
+
+   }
+
+  }
+ );
+
+
+document
+ .getElementById(
+  "nextMonth"
+ )
+ .addEventListener(
+  "click",
+  ()=>{
+
+   const next=
+    new Date(
+     calendarDate.getFullYear(),
+     calendarDate.getMonth()+1,
+     1
+    );
+
+
+   const lastMonth=
+    new Date(
+     endDate.getFullYear(),
+     endDate.getMonth(),
+     1
+    );
+
+
+   if(next<=lastMonth){
+
+    calendarDate=next;
+
+    hideDayTooltip();
+
+    renderCalendar();
+
+   }
+
+  }
+);
+
+
+/* ================= INITIAL ================= */
+
+const today=
+ new Date();
+
+
+const initial=
+ today<startDate?
+ startDate:
+ today>endDate?
+ endDate:
+ today;
+
+
+document
+ .getElementById(
+  "entryDate"
+ ).value=
+ dateKey(initial);
+
+
+document
+ .getElementById(
+  "entryDate"
+ ).min=
+ START_DATE;
+
+
+document
+ .getElementById(
+  "entryDate"
+ ).max=
+ END_DATE;
+
+
+calendarDate=
+ new Date(
+  initial.getFullYear(),
+  initial.getMonth(),
+  1
+ );
+
+
+render();
+
+</script>
+
+<script>
+(function () {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (error) {
+        console.warn('Offline support could not be enabled:', error);
+      });
+    });
+  }
+})();
 </script>
 </body>
 </html>
