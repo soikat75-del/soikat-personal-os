@@ -1798,16 +1798,28 @@ document.addEventListener("change", function(e){
     });
   }
 
-  // Do not reset on refresh. Reset only when this page is restored by Back/Forward
-  // navigation (including iOS Safari/WebView back-forward cache).
+  // Record that this page was left. On return, reset for Back/Forward navigation,
+  // including mobile Safari/WebViews that do not consistently report BFCache flags.
+  // A normal refresh must preserve the timer.
+  const LEAVE_KEY="SOIKAT_LIVE_TV_LEFT_PAGE_AT";
+  window.addEventListener("pagehide",function(){
+    try{sessionStorage.setItem(LEAVE_KEY,String(Date.now()))}catch(err){}
+  });
   window.addEventListener("pageshow",function(e){
     let navType="";
     try{
       const nav=performance.getEntriesByType("navigation")[0];
       navType=nav ? nav.type : "";
     }catch(err){}
-    if(e.persisted || navType==="back_forward") resetSessionTimer();
+    let leftAt=0;
+    try{leftAt=Number(sessionStorage.getItem(LEAVE_KEY)||0)}catch(err){}
+    if(e.persisted || navType==="back_forward" || (leftAt>0 && navType!=="reload")){
+      resetSessionTimer();
+    }
+    try{sessionStorage.removeItem(LEAVE_KEY)}catch(err){}
   });
+  // popstate covers browser/device Back where the page remains in the active document.
+  window.addEventListener("popstate",function(){resetSessionTimer()});
 
   function tick(){
     elapsedMs=Math.max(0,Date.now()-startedAt);
