@@ -1798,11 +1798,11 @@ document.addEventListener("change", function(e){
     });
   }
 
-  // Browser toolbar Back / phone system Back can bypass the page's own button.
-  // Reset when leaving, then start a fresh session if this page is restored from bfcache.
+  // Reset when leaving via browser/device navigation, and always reset when
+  // this page becomes visible again (including iOS Safari/WebView history restore).
   window.addEventListener("pagehide",resetSessionTimer);
-  window.addEventListener("pageshow",function(e){
-    if(e.persisted) resetSessionTimer();
+  window.addEventListener("pageshow",function(){
+    resetSessionTimer();
   });
 
   function tick(){
