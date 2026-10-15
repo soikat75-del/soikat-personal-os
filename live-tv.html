@@ -413,18 +413,14 @@ footer{
 .channel-search-clear{height:40px;min-width:40px;border:1px solid #1c3555;border-radius:10px;background:#071321;color:#8ea6c7;cursor:pointer}
 .channel-search-clear:hover{border-color:#315f94;color:#fff}
 .categories{
-  width:min(1180px,calc(100% - 32px));
-  margin:0 auto;
+  width:calc(100% - 50px);
+  margin:0 25px;
   display:flex;
   align-items:center;
+  flex-wrap:wrap;
   gap:7px;
   padding:14px 0 12px;
-  overflow-x:auto;
-  scrollbar-width:none;
   justify-content:flex-start;
-  margin-left:25px;
-  margin-right:25px;
-  width:calc(100% - 50px);
 }
 @media(max-width:700px){
   .categories{width:calc(100% - 50px);margin-left:25px;margin-right:25px;justify-content:flex-start}
