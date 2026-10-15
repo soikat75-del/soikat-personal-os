@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SOIKAT · LIVE TV</title>
 
 <style>
@@ -833,6 +833,41 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<style>
+/* MOBILE VIEWPORT FIT — keep channel cards inside the screen */
+@media (max-width: 700px) {
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  main, .channels-section {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .channels-section {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  #channels.channels {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .channel-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .channel-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+</style>
+
 </head>
 
 <body>
