@@ -1741,6 +1741,25 @@ document.addEventListener("change", function(e){
     activeNotice=-1;
   });
 
+  // Back means ending this session: reset before navigating away.
+  const backButton=document.querySelector(".back");
+  if(backButton){
+    backButton.addEventListener("click",function(e){
+      e.preventDefault();
+      startedAt=Date.now();
+      elapsedMs=0;
+      activeNotice=-1;
+      try{
+        sessionStorage.setItem(START_KEY,String(startedAt));
+        sessionStorage.setItem(NOTICE_KEY,"-1");
+      }catch(err){}
+      timerEl.textContent="00:00:00";
+      timerEl.className="session-timer timer-stage-0";
+      reminder.classList.remove("show");
+      history.back();
+    });
+  }
+
   function tick(){
     elapsedMs=Math.max(0,Date.now()-startedAt);
     timerEl.textContent=formatDuration(elapsedMs);
@@ -1774,13 +1793,7 @@ document.addEventListener("change", function(e){
   setInterval(tick,1000);
 })();
 
-function updateClock(){
-  document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
-    day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true
-  });
-}
-updateClock();
-setInterval(updateClock,1000);
+
 </script>
 
 
