@@ -1776,24 +1776,35 @@ document.addEventListener("change", function(e){
     activeNotice=-1;
   });
 
-  // Back means ending this session: reset before navigating away.
+  // Reset session for the page's Back button and browser/device Back navigation.
+  function resetSessionTimer(){
+    startedAt=Date.now();
+    elapsedMs=0;
+    activeNotice=-1;
+    try{
+      sessionStorage.setItem(START_KEY,String(startedAt));
+      sessionStorage.setItem(NOTICE_KEY,"-1");
+    }catch(err){}
+    timerEl.textContent="00:00:00";
+    timerEl.className="session-timer timer-stage-0";
+    reminder.classList.remove("show");
+  }
+
   const backButton=document.querySelector(".back");
   if(backButton){
     backButton.addEventListener("click",function(e){
       e.preventDefault();
-      startedAt=Date.now();
-      elapsedMs=0;
-      activeNotice=-1;
-      try{
-        sessionStorage.setItem(START_KEY,String(startedAt));
-        sessionStorage.setItem(NOTICE_KEY,"-1");
-      }catch(err){}
-      timerEl.textContent="00:00:00";
-      timerEl.className="session-timer timer-stage-0";
-      reminder.classList.remove("show");
+      resetSessionTimer();
       history.back();
     });
   }
+
+  // Browser toolbar Back / phone system Back can bypass the page's own button.
+  // Reset when leaving, then start a fresh session if this page is restored from bfcache.
+  window.addEventListener("pagehide",resetSessionTimer);
+  window.addEventListener("pageshow",function(e){
+    if(e.persisted) resetSessionTimer();
+  });
 
   function tick(){
     elapsedMs=Math.max(0,Date.now()-startedAt);
