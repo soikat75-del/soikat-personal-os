@@ -1866,5 +1866,32 @@ document.addEventListener("change", function(e){
     </div>
   </div>
 </div>
+
+<button type="button" id="scrollToTopBtn" aria-label="Scroll to top" title="Back to top">↑</button>
+<style>
+#scrollToTopBtn{position:fixed;right:20px;bottom:22px;z-index:9997;width:46px;height:46px;border:1px solid #31547e;border-radius:50%;background:rgba(10,25,45,.94);color:#eaf2ff;font-size:25px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.35);cursor:pointer;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px);transition:opacity .2s ease,visibility .2s ease,transform .2s ease,border-color .2s ease}
+#scrollToTopBtn.visible{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
+#scrollToTopBtn:hover{border-color:#5e8fff;background:#102845}
+@media(max-width:600px){#scrollToTopBtn{right:14px;bottom:16px;width:42px;height:42px;font-size:23px}}
+</style>
+<script>
+(()=>{
+ const btn=document.getElementById('scrollToTopBtn');
+ if(!btn)return;
+ const threshold=500;
+ let scheduled=false;
+ function update(){
+   const y=window.scrollY||document.documentElement.scrollTop||0;
+   const maxScroll=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+   // Show only after the page has genuinely scrolled down; wheel input alone does not count.
+   btn.classList.toggle('visible',maxScroll>threshold && y>threshold);
+   scheduled=false;
+ }
+ window.addEventListener('scroll',()=>{if(!scheduled){scheduled=true;requestAnimationFrame(update)}},{passive:true});
+ window.addEventListener('resize',update,{passive:true});
+ btn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+ update();
+})();
+</script>
 </body>
 </html>
