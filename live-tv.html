@@ -669,6 +669,18 @@ footer{
 .channel-open{font-size:10px;letter-spacing:.12em;opacity:.55}.channel-open.channel-dead{color:#ff5b67;opacity:1;font-weight:800}
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
+/* User-panel favorites and selected channel */
+.channel-card{position:relative}
+.channel-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.channel-favorite{flex:0 0 28px;width:28px;height:32px;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#8ea6c7;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
+.channel-favorite:hover{border-color:#e8bd4a;color:#ffe08a}
+.channel-favorite.is-favorite{color:#ffd34d;border-color:#8e7330;background:#211c0c}
+.channel-card.currently-playing{border-color:#3d96ff;background:rgba(49,120,220,.13);box-shadow:0 0 0 1px rgba(61,150,255,.28) inset}
+.playing-label{display:block;margin-top:4px;color:#54d99a;font-size:9px;font-weight:800;letter-spacing:.08em}
+.admin-serial{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.admin-serial:active{cursor:grabbing}
+.admin-row.drag-target{border-color:#3d96ff;box-shadow:0 0 0 2px rgba(61,150,255,.25)}
+
 
 /* ===== ADMIN MOBILE COMPACT ===== */
 @media (max-width:600px){
@@ -872,12 +884,31 @@ function loadLocalCentralData(){
   }catch(e){return false}
 }
 
+const FAVORITES_KEY = "SOIKAT_LIVE_TV_FAVORITES";
+const SELECTED_CATEGORY_KEY = "SOIKAT_LIVE_TV_SELECTED_CATEGORY";
+let favoriteChannels = new Set();
+let currentlyPlayingKey = "";
+
+function channelFavoriteKey(channel){
+  return String(channel?.name || "") + "||" + String(channel?.url || "");
+}
+function loadFavorites(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(FAVORITES_KEY)||"[]");
+    favoriteChannels=new Set(Array.isArray(saved)?saved:[]);
+  }catch(e){favoriteChannels=new Set()}
+}
+function saveFavorites(){
+  try{localStorage.setItem(FAVORITES_KEY,JSON.stringify([...favoriteChannels]))}catch(e){}
+}
 function renderPublicCategories(){
   const wrap = document.getElementById("categories");
   if(!wrap) return;
   const active = selectedCategory || "ALL";
   const allCount = CHANNELS.length;
+  const favoriteCount = CHANNELS.filter(ch=>favoriteChannels.has(channelFavoriteKey(ch))).length;
   wrap.innerHTML = `<button class="category ${active==="ALL"?"active":""}" data-category="ALL">ALL${active==="ALL" ? ` (${allCount})` : ""}</button>` +
+    (favoriteCount ? `<button class="category ${active==="FAVORITES"?"active":""}" data-category="FAVORITES">⭐ FAVORITES${active==="FAVORITES" ? ` (${favoriteCount})` : ""}</button>` : "") +
     CATEGORIES.map(cat => {
       const name = String(cat).toUpperCase();
       const count = CHANNELS.filter(ch => String(ch.category || "").toUpperCase() === name).length;
@@ -885,9 +916,8 @@ function renderPublicCategories(){
     }).join("");
   wrap.querySelectorAll(".category").forEach(button => {
     button.addEventListener("click", function(){
-      wrap.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
-      this.classList.add("active");
       selectedCategory = String(this.dataset.category || "ALL").toUpperCase();
+      try{sessionStorage.setItem(SELECTED_CATEGORY_KEY,selectedCategory)}catch(e){}
       renderPublicCategories();
       renderChannels();
     });
@@ -948,7 +978,8 @@ function renderChannels(){
   const term = channelSearchTerm.trim().toLowerCase();
   const list = CHANNELS.filter(channel => {
     const categoryMatch = selectedCategory === "ALL" ||
-      String(channel.category || "").toUpperCase() === selectedCategory;
+      (selectedCategory === "FAVORITES" ? favoriteChannels.has(channelFavoriteKey(channel)) :
+      String(channel.category || "").toUpperCase() === selectedCategory);
     const searchMatch = !term ||
       String(channel.name || "").toLowerCase().includes(term);
     return categoryMatch && searchMatch;
@@ -963,17 +994,53 @@ function renderChannels(){
     return;
   }
 
-  channelsEl.innerHTML = list.map(channel => `
-    <a class="channel-card" href="${escapeAttr(channel.url)}" target="_blank" rel="noopener noreferrer">
+  channelsEl.innerHTML = list.map(channel => {
+    const key=channelFavoriteKey(channel);
+    const playing=currentlyPlayingKey===key;
+    const favorite=favoriteChannels.has(key);
+    return `
+    <a class="channel-card ${playing?"currently-playing":""}" data-channel-key="${escapeAttr(key)}" href="${escapeAttr(channel.url)}" target="_blank" rel="noopener noreferrer">
       <div class="channel-logo">
         ${channel.logo
           ? `<img src="${escapeAttr(channel.logo)}" alt="" referrerpolicy="no-referrer">`
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
-      <div class="channel-name">${escapeHtml(channel.name)}</div>
+      <div class="channel-name">${escapeHtml(channel.name)}${playing?`<span class="playing-label">CURRENTLY PLAYING</span>`:""}</div>
+      <button type="button" class="channel-favorite ${favorite?"is-favorite":""}" data-favorite-key="${escapeAttr(key)}" aria-label="${favorite?"Remove from favorites":"Add to favorites"}" title="${favorite?"Remove favorite":"Add favorite"}">${favorite?"★":"☆"}</button>
       <div class="channel-open ${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"channel-dead":""}">${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"DEAD":"OPEN"}</div>
-    </a>
-  `).join("");
+    </a>`;
+  }).join("");
+
+  channelsEl.querySelectorAll(".channel-favorite").forEach(button=>{
+    button.addEventListener("click",event=>{
+      event.preventDefault(); event.stopPropagation();
+      const key=button.dataset.favoriteKey;
+      if(favoriteChannels.has(key)) favoriteChannels.delete(key); else favoriteChannels.add(key);
+      if(selectedCategory==="FAVORITES" && !CHANNELS.some(ch=>favoriteChannels.has(channelFavoriteKey(ch)))) selectedCategory="ALL";
+      try{sessionStorage.setItem(SELECTED_CATEGORY_KEY,selectedCategory)}catch(e){}
+      saveFavorites();
+      renderPublicCategories();
+      renderChannels();
+    });
+  });
+  channelsEl.querySelectorAll(".channel-card").forEach(card=>{
+    card.addEventListener("click",event=>{
+      if(event.target.closest(".channel-favorite")) return;
+      document.querySelectorAll(".channel-card.currently-playing").forEach(oldCard=>{
+        oldCard.classList.remove("currently-playing");
+        oldCard.querySelector(".playing-label")?.remove();
+      });
+      currentlyPlayingKey=card.dataset.channelKey||"";
+      card.classList.add("currently-playing");
+      const name=card.querySelector(".channel-name");
+      if(name && !name.querySelector(".playing-label")){
+        const label=document.createElement("span");
+        label.className="playing-label";
+        label.textContent="CURRENTLY PLAYING";
+        name.appendChild(label);
+      }
+    });
+  });
 }
 
 function escapeHtml(value){
@@ -1016,6 +1083,24 @@ document.addEventListener("keydown", e => {
 /* ================= ADMIN PANEL / CATEGORIES ================= */
 let CATEGORIES = ["SPORTS","NEWS","MUSIC","MOVIES","INFOTAINMENT"];
 
+loadFavorites();
+try{
+  const remembered=String(sessionStorage.getItem(SELECTED_CATEGORY_KEY)||"ALL").toUpperCase();
+  selectedCategory=remembered==="FAVORITES"||remembered==="ALL"||CATEGORIES.some(c=>String(c).toUpperCase()===remembered)?remembered:"ALL";
+}catch(e){selectedCategory="ALL"}
+window.addEventListener("pageshow",()=>{
+  try{
+    const remembered=String(sessionStorage.getItem(SELECTED_CATEGORY_KEY)||selectedCategory||"ALL").toUpperCase();
+    if(remembered==="ALL"||remembered==="FAVORITES"||CATEGORIES.some(c=>String(c).toUpperCase()===remembered)) selectedCategory=remembered;
+  }catch(e){}
+  renderPublicCategories(); renderChannels();
+});
+document.addEventListener("click",event=>{
+  if(!event.target.closest(".channel-card") && currentlyPlayingKey){
+    currentlyPlayingKey="";
+    renderChannels();
+  }
+});
 loadCentralData();
 
 /* ================= ADMIN PANEL ================= */
@@ -1219,7 +1304,7 @@ function renderAdmin(){
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <div class="admin-left">
-          <span class="admin-serial">${i + 1}</span>
+          <span class="admin-serial" data-drag-index="${i}" title="Drag to reorder" aria-label="Drag to reorder channels">${i + 1}</span>
           <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
           <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="this.dataset.previous=this.value">
             ${categoryOptions(c.category)}
@@ -1249,6 +1334,49 @@ function renderAdmin(){
 
   document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels in ${escapeHtml(filter)}.</div>`;
 }
+
+/* Touch + mouse drag-to-reorder. Existing move buttons remain unchanged. */
+(function enableAdminRowDragging(){
+  let dragState=null;
+  document.addEventListener("pointerdown",event=>{
+    const handle=event.target.closest(".admin-serial");
+    if(!handle || !handle.closest("#adminRows")) return;
+    if(event.pointerType==="mouse" && event.button!==0) return;
+    const row=handle.closest(".admin-row");
+    if(!row) return;
+    dragState={source:Number(row.dataset.row),startX:event.clientX,startY:event.clientY,active:false,target:Number(row.dataset.row)};
+  });
+  document.addEventListener("pointermove",event=>{
+    if(!dragState) return;
+    if(!dragState.active){
+      if(Math.hypot(event.clientX-dragState.startX,event.clientY-dragState.startY)<7) return;
+      dragState.active=true;
+    }
+    event.preventDefault();
+    document.querySelectorAll("#adminRows .admin-row.drag-target").forEach(el=>el.classList.remove("drag-target"));
+    const under=document.elementFromPoint(event.clientX,event.clientY);
+    const row=under?.closest("#adminRows .admin-row");
+    if(row){
+      dragState.target=Number(row.dataset.row);
+      row.classList.add("drag-target");
+    }
+  },{passive:false});
+  document.addEventListener("pointerup",()=>{
+    if(!dragState) return;
+    const state=dragState; dragState=null;
+    document.querySelectorAll("#adminRows .admin-row.drag-target").forEach(el=>el.classList.remove("drag-target"));
+    if(!state.active || !Number.isInteger(state.source) || !Number.isInteger(state.target) ||
+       state.source===state.target || state.source<0 || state.target<0 ||
+       state.source>=CHANNELS.length || state.target>=CHANNELS.length) return;
+    const moved=CHANNELS.splice(state.source,1)[0];
+    CHANNELS.splice(state.target,0,moved);
+    renderAdmin();
+    renderChannels();
+    setAdminMessage(`Channel moved to serial ${state.target+1}. Saving automatically…`,"ok");
+    scheduleAutoSave();
+  });
+  document.addEventListener("pointercancel",()=>{dragState=null;document.querySelectorAll("#adminRows .admin-row.drag-target").forEach(el=>el.classList.remove("drag-target"))});
+})();
 
 function toggleAdminStatus(index){
   if(index<0 || index>=CHANNELS.length) return;
