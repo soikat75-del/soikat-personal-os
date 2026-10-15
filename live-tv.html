@@ -1798,11 +1798,15 @@ document.addEventListener("change", function(e){
     });
   }
 
-  // Reset when leaving via browser/device navigation, and always reset when
-  // this page becomes visible again (including iOS Safari/WebView history restore).
-  window.addEventListener("pagehide",resetSessionTimer);
-  window.addEventListener("pageshow",function(){
-    resetSessionTimer();
+  // Do not reset on refresh. Reset only when this page is restored by Back/Forward
+  // navigation (including iOS Safari/WebView back-forward cache).
+  window.addEventListener("pageshow",function(e){
+    let navType="";
+    try{
+      const nav=performance.getEntriesByType("navigation")[0];
+      navType=nav ? nav.type : "";
+    }catch(err){}
+    if(e.persisted || navType==="back_forward") resetSessionTimer();
   });
 
   function tick(){
