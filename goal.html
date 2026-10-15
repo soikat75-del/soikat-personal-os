@@ -2931,13 +2931,8 @@ function moveDayTooltip(event){
 
 function hideDayTooltip(){
 
- document
-  .getElementById(
-   "dayTooltip"
-  )
-  .classList.remove(
-   "show", "touch-mode"
-  );
+ const tooltip = document.getElementById("dayTooltip");
+ tooltip.classList.remove("show", "touch-mode");
  tooltip.style.left="";
  tooltip.style.top="";
  tooltip.style.bottom="";
