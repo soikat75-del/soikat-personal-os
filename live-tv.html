@@ -621,7 +621,7 @@ footer{
 .session-reminder.reminder-yellow{--reminder-color:#ffd34d}
 .session-reminder.reminder-orange{--reminder-color:#ff963f}
 .session-reminder.reminder-red{--reminder-color:#ff4b60}
-.session-reminder-text{flex:1;min-width:0;display:flex;align-items:flex-start;gap:12px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}\n.session-reminder-icon{flex:0 0 28px;width:28px;font-size:25px;line-height:1.25;text-align:center}\n.session-reminder-copy{flex:1;min-width:0}\n.session-reminder-title{font-size:14px;font-weight:800;line-height:1.4;color:#edf3ff;margin-bottom:3px}\n.session-reminder-body{font-size:13px;line-height:1.45;color:#a9b8ce}\n@media(max-width:700px){.session-reminder-text{gap:9px}.session-reminder-icon{flex-basis:25px;width:25px;font-size:23px}.session-reminder-title{font-size:13px}.session-reminder-body{font-size:12px}}
+.session-reminder-text{flex:1;min-width:0;display:flex;align-items:flex-start;gap:12px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}\n.session-reminder-icon{flex:0 0 28px;width:28px;font-size:25px;line-height:1.25;text-align:center}\n.session-reminder-copy{flex:1;min-width:0}\n.session-reminder-title{font-size:14px;font-weight:900;line-height:1.4;color:#edf3ff;margin-bottom:3px}\n.session-reminder-body{font-size:12px;line-height:1.45;color:#a9b8ce}\n@media(max-width:700px){.session-reminder-text{gap:9px}.session-reminder-icon{flex-basis:25px;width:25px;font-size:23px}.session-reminder-title{font-size:13px;font-weight:900}.session-reminder-body{font-size:11px}}
 .session-reminder-ok{flex:0 0 auto;align-self:center;min-height:32px;padding:0 12px;border:1px solid var(--reminder-color,#e8bd4a);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-size:11px;font-weight:800;cursor:pointer}
 .session-reminder-ok:hover{background:rgba(255,255,255,.13)}
 @media(max-width:700px){
@@ -1712,7 +1712,7 @@ document.addEventListener("change", function(e){
   }catch(e){startedAt=Date.now()}
 
   const notices=[
-    {at:15*60*1000,stage:1,color:"reminder-yellow",icon:"💡",title:"সময়টা সচেতনভাবে ব্যবহার করি",body:"মাত্র ৫ সেকেন্ড কেটে গেছে—নিজেকে জিজ্ঞেস করো, তুমি কি যা করতে এসেছিলে সেটাই করছ?"},
+    {at:15*60*1000,stage:1,color:"reminder-yellow",icon:"💡",title:"সময়টা সচেতনভাবে ব্যবহার করি",body:"অলরেডি ১৫ মিনিট কেটে গেছে—নিজেকে জিজ্ঞেস করো, তুমি কি যা করতে এসেছিলে সেটাই করছ?"},
     {at:30*60*1000,stage:1,color:"reminder-yellow",icon:"🧐",title:"ফোকাসটা ঠিক আছে তো?",body:"অকারণে স্ক্রল করতে করতে সময় চলে যায়। লক্ষ্য ঠিক রাখো, দরকারি কাজটাই আগে করো।"},
     {at:45*60*1000,stage:2,color:"reminder-orange",icon:"😐",title:"সময়ও একটা সম্পদ",body:"আরও একটু সচেতন হও—এখানে কাটানো সময় যেন তোমার কাজ বা পড়াশোনার সময় কেড়ে না নেয়।"},
     {at:60*60*1000,stage:3,color:"reminder-orange",icon:"😠",title:"এবার থামো, উদ্দেশ্যটা মনে করো",body:"শুধু পেজে পড়ে থাকা প্রোডাক্টিভিটি নয়। প্রয়োজন শেষ হলে বেরিয়ে গিয়ে নিজের কাজে ফিরো।"},
