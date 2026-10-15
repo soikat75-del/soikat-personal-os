@@ -1735,13 +1735,28 @@ document.addEventListener("change", function(e){
 
   const START_KEY="SOIKAT_LIVE_TV_SESSION_START";
   const NOTICE_KEY="SOIKAT_LIVE_TV_LAST_NOTICE";
+  const LEAVE_KEY="SOIKAT_LIVE_TV_LEFT_PAGE_AT";
   let startedAt=0;
   try{
-    startedAt=Number(sessionStorage.getItem(START_KEY)||0);
-    if(!startedAt || !Number.isFinite(startedAt)){
+    // If the page was left and opened again, begin a fresh session. A normal
+    // refresh is explicitly excluded so the existing timer is preserved.
+    let navType="";
+    try{
+      const nav=performance.getEntriesByType("navigation")[0];
+      navType=nav ? nav.type : "";
+    }catch(err){}
+    const wasLeft=Number(sessionStorage.getItem(LEAVE_KEY)||0)>0;
+    if(wasLeft && navType!=="reload"){
       startedAt=Date.now();
       sessionStorage.setItem(START_KEY,String(startedAt));
       sessionStorage.setItem(NOTICE_KEY,"-1");
+    }else{
+      startedAt=Number(sessionStorage.getItem(START_KEY)||0);
+      if(!startedAt || !Number.isFinite(startedAt)){
+        startedAt=Date.now();
+        sessionStorage.setItem(START_KEY,String(startedAt));
+        sessionStorage.setItem(NOTICE_KEY,"-1");
+      }
     }
   }catch(e){startedAt=Date.now()}
 
@@ -1801,7 +1816,6 @@ document.addEventListener("change", function(e){
   // Record that this page was left. On return, reset for Back/Forward navigation,
   // including mobile Safari/WebViews that do not consistently report BFCache flags.
   // A normal refresh must preserve the timer.
-  const LEAVE_KEY="SOIKAT_LIVE_TV_LEFT_PAGE_AT";
   window.addEventListener("pagehide",function(){
     try{sessionStorage.setItem(LEAVE_KEY,String(Date.now()))}catch(err){}
   });
