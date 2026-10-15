@@ -589,55 +589,6 @@ footer{
   .admin-fields{grid-template-columns:1fr}
   .admin-content{padding:14px}.admin-head{padding:16px}.admin-toolbar{justify-content:flex-end}
 }
-
-/* ===== SESSION TIMER + RIGHT-SIDE REMINDERS ===== */
-.clock-stack{justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0}
-.clock-stack .clock{justify-self:auto;white-space:nowrap}
-.session-timer{
-  position:relative;overflow:hidden;isolation:isolate;
-  min-width:112px;padding:5px 10px;border:1px solid #e8bd4a;border-radius:9px;
-  background:linear-gradient(135deg,rgba(37,31,12,.96),rgba(14,20,31,.98));
-  color:#ffe08a;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;
-  letter-spacing:.08em;text-align:center;box-shadow:0 0 14px rgba(232,189,74,.15);
-  transition:color .25s,border-color .25s,background .25s,box-shadow .25s;
-}
-.session-timer::before{content:"";position:absolute;inset:0;z-index:-1;transform:translateX(-120%);background:linear-gradient(105deg,transparent,rgba(255,255,255,.14),transparent);animation:sessionTimerShine 4s ease-in-out infinite}
-@keyframes sessionTimerShine{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
-.session-timer.timer-stage-0{border-color:#e8bd4a;color:#ffe08a;background:linear-gradient(135deg,#29220d,#101827);box-shadow:0 0 13px rgba(232,189,74,.16)}
-.session-timer.timer-stage-1{border-color:#ffd34d;color:#ffe08a;background:linear-gradient(135deg,#30270b,#101827);box-shadow:0 0 15px rgba(255,211,77,.22)}
-.session-timer.timer-stage-2{border-color:#ffad42;color:#ffc078;background:linear-gradient(135deg,#321d0b,#101827);box-shadow:0 0 16px rgba(255,145,50,.25)}
-.session-timer.timer-stage-3{border-color:#ff8a3d;color:#ffad70;background:linear-gradient(135deg,#351b0b,#101827);box-shadow:0 0 17px rgba(255,138,61,.28)}
-.session-timer.timer-stage-4{border-color:#ff5964;color:#ff8790;background:linear-gradient(135deg,#351016,#101827);box-shadow:0 0 18px rgba(255,65,85,.3)}
-.session-timer.timer-stage-5{border-color:#ff354d;color:#ff6878;background:linear-gradient(135deg,#3a0d17,#101827);box-shadow:0 0 20px rgba(255,53,77,.34);animation:timerRedPulse 1.6s ease-in-out infinite}
-@keyframes timerRedPulse{0%,100%{box-shadow:0 0 12px rgba(255,53,77,.22)}50%{box-shadow:0 0 23px rgba(255,53,77,.48)}}
-.session-reminder{
-  position:fixed;top:72px;right:14px;z-index:9998;width:min(330px,calc(100vw - 28px));
-  display:none;align-items:flex-start;gap:10px;padding:12px 12px 12px 14px;
-  border:1px solid var(--reminder-color,#e8bd4a);border-left:4px solid var(--reminder-color,#e8bd4a);
-  border-radius:12px;background:rgba(7,17,31,.97);color:#edf3ff;
-  box-shadow:0 12px 38px rgba(0,0,0,.48);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-}
-.session-reminder.show{display:flex;animation:reminderSlideIn .22s ease-out}
-@keyframes reminderSlideIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:translateX(0)}}
-.session-reminder.reminder-yellow{--reminder-color:#ffd34d}
-.session-reminder.reminder-orange{--reminder-color:#ff963f}
-.session-reminder.reminder-red{--reminder-color:#ff4b60}
-.session-reminder-text{flex:1;min-width:0;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
-.session-reminder-ok{flex:0 0 auto;align-self:center;min-height:32px;padding:0 12px;border:1px solid var(--reminder-color,#e8bd4a);border-radius:8px;background:rgba(255,255,255,.06);color:#fff;font-size:11px;font-weight:800;cursor:pointer}
-.session-reminder-ok:hover{background:rgba(255,255,255,.13)}
-@media(max-width:700px){
-  .clock-stack{gap:3px}
-  .clock-stack .clock{font-size:9px}
-  .session-timer{min-width:88px;padding:4px 7px;font-size:11px;border-radius:8px;letter-spacing:.04em}
-  .session-reminder{top:66px;right:8px;width:min(300px,calc(100vw - 16px));padding:10px;gap:8px}
-  .session-reminder-text{font-size:12px}
-  .session-reminder-ok{min-height:30px;padding:0 10px}
-}
-@media(max-width:390px){
-  .session-timer{min-width:78px;padding:4px 5px;font-size:10px}
-  .clock-stack .clock{font-size:8px}
-  .session-reminder{top:62px}
-}
 </style>
 
 <style>
@@ -836,20 +787,66 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
-</head>
+<style>\n/* QUICK TEST TIMER STATES — animated frame around the header timer only */
+.clock{
+  position:relative;isolation:isolate;justify-self:end;
+  padding:8px 12px;border:1px solid rgba(112,153,214,.42);border-radius:10px;
+  background:linear-gradient(135deg,rgba(17,38,65,.92),rgba(5,15,29,.94));
+  box-shadow:0 0 0 1px rgba(77,128,201,.08) inset,0 5px 18px rgba(0,0,0,.18);
+  font-variant-numeric:tabular-nums;transition:color .25s ease,border-color .25s ease,box-shadow .25s ease,background .25s ease;
+  text-align:right;white-space:nowrap;overflow:hidden;
+}
+.clock::before{
+  content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(110deg,transparent 15%,rgba(150,190,255,.14) 48%,transparent 75%);
+  background-size:220% 100%;animation:timerBoxShine 4s linear infinite;
+}
+.clock.timer-normal{color:#b8d0f5;border-color:rgba(112,153,214,.42);box-shadow:0 0 0 1px rgba(77,128,201,.08) inset,0 0 16px rgba(70,132,220,.10)}
+.clock.timer-yellow{color:#ffd45a;border-color:rgba(255,212,90,.8);background:linear-gradient(135deg,rgba(65,48,14,.92),rgba(22,20,12,.96));text-shadow:0 0 12px rgba(255,212,90,.25);box-shadow:0 0 0 1px rgba(255,212,90,.12) inset,0 0 18px rgba(255,212,90,.18);animation:timerBoxGlowYellow 1.5s ease-in-out infinite alternate}
+.clock.timer-red{color:#ff6575;border-color:rgba(255,79,98,.92);background:linear-gradient(135deg,rgba(69,18,29,.94),rgba(25,9,18,.97));text-shadow:0 0 14px rgba(255,79,98,.35);box-shadow:0 0 0 1px rgba(255,79,98,.16) inset,0 0 20px rgba(255,79,98,.22);animation:timerBoxGlowRed .85s ease-in-out infinite alternate}
+@keyframes timerBoxShine{from{background-position:120% 0}to{background-position:-120% 0}}
+@keyframes timerBoxGlowYellow{from{box-shadow:0 0 0 1px rgba(255,212,90,.10) inset,0 0 10px rgba(255,212,90,.10)}to{box-shadow:0 0 0 1px rgba(255,212,90,.2) inset,0 0 20px rgba(255,212,90,.28)}}
+@keyframes timerBoxGlowRed{from{box-shadow:0 0 0 1px rgba(255,79,98,.12) inset,0 0 12px rgba(255,79,98,.14)}to{box-shadow:0 0 0 1px rgba(255,79,98,.24) inset,0 0 24px rgba(255,79,98,.34)}}
+@media(max-width:700px){.clock{padding:7px 8px;border-radius:8px}}
+@media(max-width:390px){.clock{padding:6px 7px;border-radius:7px}}
+/* Compact motivational notifications directly below the header */
+.session-toast-wrap{position:fixed;top:76px;right:18px;z-index:9999;width:min(390px,calc(100vw - 36px));padding:0;pointer-events:none}
+.session-toast{display:none;width:100%;margin:0;padding:10px 12px;border:1px solid rgba(255,212,90,.38);border-left:3px solid #ffd45a;border-radius:11px;background:linear-gradient(110deg,rgba(14,29,48,.98),rgba(7,17,31,.97));box-shadow:0 10px 28px rgba(0,0,0,.25);color:#eaf1ff;align-items:flex-start;gap:11px;animation:toastSlideIn .22s ease-out}
+.session-toast.show{display:flex}
+.session-toast.toast-yellow{border-color:rgba(255,212,90,.42);border-left-color:#ffd45a}
+.session-toast.toast-orange{border-color:rgba(255,163,74,.42);border-left-color:#ffa34a}
+.session-toast.toast-red{border-color:rgba(255,79,98,.48);border-left-color:#ff4f62}
+.session-toast-emoji{font-size:22px;line-height:1.2;flex:0 0 auto}
+.session-toast-copy{min-width:0;flex:1}
+.session-toast-title{font-size:12px;font-weight:800;letter-spacing:.35px;margin:0 0 4px;color:#f5f8ff}
+.session-toast-message{font-size:12px;line-height:1.5;color:#aebed5;margin:0}
+.session-toast-actions{display:flex;align-items:center;align-self:center;flex:0 0 auto}
+.session-toast-ok{pointer-events:auto;border:1px solid #31547e;border-radius:8px;background:#10243c;color:#dce9ff;font-size:11px;font-weight:800;letter-spacing:.4px;cursor:pointer;padding:8px 13px;white-space:nowrap}
+.session-toast-ok:hover{background:#19385a;border-color:#5e8fff;color:#fff}
+@keyframes toastSlideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:600px){.session-toast-wrap{top:68px;right:10px;width:min(330px,calc(100vw - 20px))}.session-toast{padding:9px 10px;gap:8px}.session-toast-emoji{font-size:18px}.session-toast-title{font-size:10px}.session-toast-message{font-size:10px;line-height:1.4}.session-toast-ok{padding:7px 10px;font-size:10px}}
+@media(max-width:360px){.session-toast-wrap{top:64px;right:7px;width:calc(100vw - 14px)}.session-toast{padding:8px;gap:7px}.session-toast-emoji{font-size:16px}.session-toast-message{font-size:9px}.session-toast-ok{padding:6px 8px}}
+\n</style>\n</head>
 
 <body>
 
 <header class="topbar">
   <a class="back" href="javascript:history.back()">← Back</a>
   <div class="logo">SOIKAT · LIVE TV</div>
-  <div class="clock-stack"><div class="clock" id="clock">07 Oct 2026, 12:44 pm</div><div class="session-timer timer-stage-0" id="sessionTimer" aria-label="Session timer">00:00:00</div></div>
+  <div class="clock timer-normal" id="clock" role="timer" aria-live="polite">00:00:00</div>
 </header>
 
-<div class="session-reminder" id="sessionReminder" role="status" aria-live="assertive">
-  <div class="session-reminder-text" id="sessionReminderText"></div>
-  <button type="button" class="session-reminder-ok" id="sessionReminderOk">OK</button>
+<div class="session-toast-wrap" aria-live="polite" aria-atomic="true">
+  <aside class="session-toast" id="sessionToast" role="status">
+    <span class="session-toast-emoji" id="sessionToastEmoji" aria-hidden="true">💡</span>
+    <div class="session-toast-copy">
+      <div class="session-toast-title" id="sessionToastTitle">সময়টা সচেতনভাবে ব্যবহার করি</div>
+      <p class="session-toast-message" id="sessionToastMessage">সময়টা সচেতনভাবে ব্যবহার করি।</p>
+    </div>
+    <div class="session-toast-actions"><button class="session-toast-ok" type="button" onclick="dismissSessionToast()">OK</button></div>
+  </aside>
 </div>
+
 
 <div class="categories" id="categories"></div>
 
@@ -1694,96 +1691,61 @@ document.addEventListener("change", function(e){
   scheduleAutoSave();
 });
 
-/* ===== SESSION TIMER REMINDERS ===== */
-(function initSessionTimer(){
-  const timerEl=document.getElementById("sessionTimer");
-  const reminder=document.getElementById("sessionReminder");
-  const reminderText=document.getElementById("sessionReminderText");
-  const reminderOk=document.getElementById("sessionReminderOk");
-  if(!timerEl||!reminder||!reminderText||!reminderOk)return;
-
-  const START_KEY="SOIKAT_LIVE_TV_SESSION_START";
-  const NOTICE_KEY="SOIKAT_LIVE_TV_LAST_NOTICE";
-  let startedAt=0;
-  try{
-    startedAt=Number(sessionStorage.getItem(START_KEY)||0);
-    if(!startedAt || !Number.isFinite(startedAt)){
-      startedAt=Date.now();
-      sessionStorage.setItem(START_KEY,String(startedAt));
-      sessionStorage.setItem(NOTICE_KEY,"-1");
-    }
-  }catch(e){startedAt=Date.now()}
-
-  const notices=[
-    {at:15*60*1000,stage:1,color:"reminder-yellow",text:"🟡 ১৫ মিনিট: 💡 সময়টা সচেতনভাবে ব্যবহার করি।"},
-    {at:30*60*1000,stage:1,color:"reminder-yellow",text:"🟡 ৩০ মিনিট: 🧐 ফোকাসটা ঠিক আছে তো?"},
-    {at:45*60*1000,stage:2,color:"reminder-orange",text:"🟠 ৪৫ মিনিট: 😐 সময়ও একটা সম্পদ।"},
-    {at:60*60*1000,stage:3,color:"reminder-orange",text:"🟠 ১ ঘন্টা: 😠 এবার থামো, উদ্দেশ্যটা মনে করো।"},
-    {at:90*60*1000,stage:4,color:"reminder-red",text:"🔴 ১ ঘন্টা ৩০ মিনিট: 😡 যথেষ্ট হয়েছে—এবার কাজে ফেরো!"},
-    {at:120*60*1000,stage:5,color:"reminder-red",text:"🔴 ২ ঘন্টা: 😡 যথেষ্ট হয়েছে—এবার কাজে ফেরো!"}
-  ];
-  let activeNotice=-1;
-  let elapsedMs=0;
-
-  function formatDuration(ms){
-    const total=Math.floor(ms/1000);
-    const h=Math.floor(total/3600);
-    const m=Math.floor((total%3600)/60);
-    const sec=total%60;
-    return [h,m,sec].map(n=>String(n).padStart(2,"0")).join(":");
-  }
-  function showNotice(index){
-    const notice=notices[index];
-    if(!notice)return;
-    activeNotice=index;
-    reminderText.textContent=notice.text;
-    reminder.className="session-reminder show "+notice.color;
-  }
-  reminderOk.addEventListener("click",()=>{
-    reminder.classList.remove("show");
-    activeNotice=-1;
-  });
-
-  function tick(){
-    elapsedMs=Math.max(0,Date.now()-startedAt);
-    timerEl.textContent=formatDuration(elapsedMs);
-    let stage=0;
-    for(let i=0;i<notices.length;i++){
-      if(elapsedMs>=notices[i].at)stage=notices[i].stage;
-    }
-    // After two hours, repeat the red reminder every 30 minutes.
-    if(elapsedMs>=120*60*1000){
-      stage=5;
-      const repeatIndex=Math.floor((elapsedMs-120*60*1000)/(30*60*1000));
-      const currentNoticeIndex=5+repeatIndex;
-      let lastNotice=-1;
-      try{lastNotice=Number(sessionStorage.getItem(NOTICE_KEY)||"-1")}catch(e){}
-      if(currentNoticeIndex>lastNotice){
-        showNotice(5);
-        try{sessionStorage.setItem(NOTICE_KEY,String(currentNoticeIndex))}catch(e){}
-      }
-    }else{
-      const dueIndex=notices.reduce((found,item,index)=>elapsedMs>=item.at?index:found,-1);
-      let lastNotice=-1;
-      try{lastNotice=Number(sessionStorage.getItem(NOTICE_KEY)||"-1")}catch(e){}
-      if(dueIndex>=0 && dueIndex>lastNotice){
-        showNotice(dueIndex);
-        try{sessionStorage.setItem(NOTICE_KEY,String(dueIndex))}catch(e){}
-      }
-    }
-    timerEl.className="session-timer timer-stage-"+stage;
-  }
-  tick();
-  setInterval(tick,1000);
-})();
-
+// QUICK TEST TIMER: yellow after 5 seconds; red after 15 seconds.
+ // Motivational notices appear at 5, 10, 15, 20 and 25 seconds.
+ // The timer persists across refreshes in this tab session.
+const sessionTimerEl = document.getElementById("clock");
+const TIMER_START_KEY = "SOIKAT_LIVE_TV_QUICK_TEST_START";
+const TIMER_NOTICE_KEY = "SOIKAT_LIVE_TV_QUICK_TEST_LAST_NOTICE";
+let timerStartedAt = Number(sessionStorage.getItem(TIMER_START_KEY));
+if (!Number.isFinite(timerStartedAt) || timerStartedAt <= 0) {
+  timerStartedAt = Date.now();
+  sessionStorage.setItem(TIMER_START_KEY, String(timerStartedAt));
+}
+function formatSessionTime(totalSeconds){
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return [hours, minutes, seconds].map(n => String(n).padStart(2, "0")).join(":");
+}
+const sessionNotices = [
+  {at:5, emoji:"💡", tone:"toast-yellow", title:"সময়টা সচেতনভাবে ব্যবহার করি", message:"মাত্র ৫ সেকেন্ড কেটে গেছে—নিজেকে জিজ্ঞেস করো, তুমি কি যা করতে এসেছিলে সেটাই করছ?"},
+  {at:10, emoji:"🧐", tone:"toast-yellow", title:"ফোকাসটা ঠিক আছে তো?", message:"অকারণে স্ক্রল করতে করতে সময় চলে যায়। লক্ষ্য ঠিক রাখো, দরকারি কাজটাই আগে করো।"},
+  {at:15, emoji:"😐", tone:"toast-orange", title:"সময়ও একটা সম্পদ", message:"আরও একটু সচেতন হও—এখানে কাটানো সময় যেন তোমার কাজ বা পড়াশোনার সময় কেড়ে না নেয়।"},
+  {at:20, emoji:"😠", tone:"toast-orange", title:"এবার থামো, উদ্দেশ্যটা মনে করো", message:"শুধু পেজে পড়ে থাকা প্রোডাক্টিভিটি নয়। প্রয়োজন শেষ হলে বেরিয়ে গিয়ে নিজের কাজে ফিরো।"},
+  {at:25, emoji:"😡", tone:"toast-red", title:"যথেষ্ট হয়েছে—এবার কাজে ফেরো!", message:"অকারণে আর সময় নষ্ট কোরো না। পেজটি বন্ধ করো এবং তোমার গুরুত্বপূর্ণ কাজটিতে মন দাও।"}
+];
+function showSessionNotice(notice){
+  const toast = document.getElementById("sessionToast");
+  if(!toast) return;
+  document.getElementById("sessionToastEmoji").textContent = notice.emoji;
+  document.getElementById("sessionToastTitle").textContent = notice.title;
+  document.getElementById("sessionToastMessage").textContent = notice.message;
+  toast.classList.remove("toast-yellow","toast-orange","toast-red","show");
+  toast.classList.add(notice.tone);
+  void toast.offsetWidth;
+  toast.classList.add("show");
+}
+function dismissSessionToast(){
+  const toast = document.getElementById("sessionToast");
+  if(toast) toast.classList.remove("show");
+}
 function updateClock(){
-  document.getElementById("clock").textContent=new Date().toLocaleString("en-GB",{
-    day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true
-  });
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - timerStartedAt) / 1000));
+  sessionTimerEl.textContent = formatSessionTime(elapsedSeconds);
+  sessionTimerEl.classList.toggle("timer-yellow", elapsedSeconds >= 5 && elapsedSeconds < 15);
+  sessionTimerEl.classList.toggle("timer-red", elapsedSeconds >= 15);
+  sessionTimerEl.classList.toggle("timer-normal", elapsedSeconds < 5);
+  const dueNotices = sessionNotices.filter(notice => elapsedSeconds >= notice.at);
+  const lastNoticeAt = Number(sessionStorage.getItem(TIMER_NOTICE_KEY) || 0);
+  const latestDueNotice = dueNotices[dueNotices.length - 1];
+  if(latestDueNotice && latestDueNotice.at > lastNoticeAt){
+    sessionStorage.setItem(TIMER_NOTICE_KEY, String(latestDueNotice.at));
+    showSessionNotice(latestDueNotice);
+  }
 }
 updateClock();
-setInterval(updateClock,1000);
+setInterval(updateClock, 1000);
 </script>
 
 
