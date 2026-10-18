@@ -1818,15 +1818,16 @@ function saveEntries(e){
 
 }
 
+// A date may contain a legacy single amount or multiple amounts.
+function entryTotal(value){
+ return Array.isArray(value)
+  ? value.reduce((sum,amount)=>sum+Number(amount||0),0)
+  : Number(value||0);
+}
 
 function totalIncome(e){
-
  return Object.values(e)
-  .reduce(
-   (s,v)=>s+Number(v||0),
-   0
-  );
-
+  .reduce((sum,value)=>sum+entryTotal(value),0);
 }
 
 
@@ -1841,7 +1842,7 @@ function rangeTotal(e,a,b){
 
    if(d>=a&&d<=b){
 
-    total+=Number(v||0);
+    total+=entryTotal(v);
 
    }
 
@@ -1864,7 +1865,7 @@ function cumulativeNoteTotal(note,throughDate,entries=getEntries(),notes=getEntr
 function updateEntryPreview(){
  const date=document.getElementById("entryDate").value, raw=document.getElementById("profit").value, entries=getEntries();
  const saved=Object.prototype.hasOwnProperty.call(entries,date), draft=raw.trim()!=="", has=draft||saved;
- const net=draft?Number(raw):Number(entries[date]||0), valid=has&&Number.isFinite(net)&&net>=0, diff=net-DAILY_TARGET;
+ const net=draft?Number(raw):entryTotal(entries[date]), valid=has&&Number.isFinite(net)&&net>=0, diff=net-DAILY_TARGET;
  document.getElementById("todayNet").textContent=valid?money(net):"—";
  document.getElementById("difference").textContent=valid?(diff>=0?"+":"−")+money(Math.abs(diff)):"—";
  document.getElementById("achievement").textContent=valid?percent(net/DAILY_TARGET*100):"—";
@@ -2454,10 +2455,7 @@ function renderCalendar(){
    );
 
 
-  const value=
-   Number(
-    entries[key]||0
-   );
+  const value=entryTotal(entries[key]);
 
 
   let cls="day";
@@ -2611,8 +2609,7 @@ function renderTable(entries){
   .map(
    ([date,value])=>{
 
-    const net=
-     Number(value||0);
+    const net=entryTotal(value);
 
     const diff=
      net-DAILY_TARGET;
@@ -2963,7 +2960,7 @@ function openMonthlyReport(){
   .map(
    ([date,value])=>({
     date,
-    value:Number(value||0),
+    value:entryTotal(value),
     d:parseDate(date)
    })
   )
@@ -3000,17 +2997,10 @@ function openMonthlyReport(){
 
 
  const today=new Date();
- const averageDays=
-  start.getFullYear()===today.getFullYear() &&
-  start.getMonth()===today.getMonth() ?
-  today.getDate() :
-  end<new Date(today.getFullYear(),today.getMonth(),today.getDate()) ?
-  days :
-  0;
- const average=
-  averageDays?
-  total/averageDays:
-  0;
+ const reportEnd = calendarDate.getFullYear()===today.getFullYear() && calendarDate.getMonth()===today.getMonth()
+  ? Math.min(today.getDate(), days)
+  : (calendarDate > today ? 0 : days);
+ const average=reportEnd>0 ? total/reportEnd : 0;
 
 
  document.getElementById(
@@ -3302,7 +3292,8 @@ function addEntry(){
   getEntries();
 
 
- entries[date]=profit;
+ const existing=entries[date];
+ entries[date]=existing===undefined ? [profit] : (Array.isArray(existing) ? [...existing,profit] : [Number(existing),profit]);
  saveEntries(entries);
  const notes=getEntryNotes();
  const note=document.getElementById("entryNote").value.trim();
