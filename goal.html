@@ -2540,7 +2540,7 @@ function renderCalendar(){
       <span class="dot"></span>
 
       <span class="day-income">
-       ${Array.isArray(entries[key]) ? entries[key].map(amount=>money(Number(amount||0))).join(", ") : money(value)}
+       ${money(value)}
       </span>
      `:
      ""
