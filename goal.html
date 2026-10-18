@@ -2540,7 +2540,7 @@ function renderCalendar(){
       <span class="dot"></span>
 
       <span class="day-income">
-       ${money(value)}
+       ${Array.isArray(entries[key]) ? entries[key].map(amount=>money(Number(amount||0))).join(", ") : money(value)}
       </span>
      `:
      ""
@@ -2727,11 +2727,23 @@ function showDayTooltip(
 
 
  const notes=getEntryNotes();
- const note=notes[key];
- if(normalizedNote(note)){
-  const cumulative=cumulativeNoteTotal(note,key);
-  const safeNote=String(note).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  tooltip.innerHTML+=`<div style="margin-top:6px;padding-top:6px;border-top:1px solid #26384e;color:#9db0c6">${safeNote} · ${money(cumulative)} cumulative</div>`;
+ const allEntries=getEntries();
+ const dayAmounts=Array.isArray(allEntries[key])?allEntries[key]:(allEntries[key]!==undefined?[allEntries[key]]:[]);
+ const noteValue=notes[key];
+ const dayNotes=Array.isArray(noteValue)?noteValue:(noteValue!==undefined?[noteValue]:[]);
+ const noteGroups=new Map();
+ dayAmounts.forEach((amount,index)=>{
+  const label=String(dayNotes[index]||"").trim();
+  const normalized=normalizedNote(label);
+  if(!normalized)return;
+  if(!noteGroups.has(normalized))noteGroups.set(normalized,label);
+ });
+ if(noteGroups.size){
+  tooltip.innerHTML+='<div style="margin-top:7px;padding-top:7px;border-top:1px solid #26384e;color:#9db0c6">'+
+   [...noteGroups.values()].map(label=>{
+    const safeLabel=label.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return `<div style="margin-top:4px;line-height:1.5">${safeLabel} • ${money(cumulativeNoteTotal(label,key))} cumulative</div>`;
+   }).join("")+'</div>';
  }
  if(touchMode){
   tooltip.classList.add("touch-mode");
