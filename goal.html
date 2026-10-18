@@ -1873,7 +1873,7 @@ function cumulativeNoteTotal(note,throughDate,entries=getEntries(),notes=getEntr
 function updateEntryPreview(){
  const date=document.getElementById("entryDate").value, raw=document.getElementById("profit").value, entries=getEntries();
  const saved=Object.prototype.hasOwnProperty.call(entries,date), draft=raw.trim()!=="", has=draft||saved;
- const net=draft?Number(raw):entryTotal(entries[date]), valid=has&&Number.isFinite(net)&&net>=0, diff=net-DAILY_TARGET;
+ const net=(saved?entryTotal(entries[date]):0)+(draft?Number(raw):0), valid=has&&Number.isFinite(net)&&net>=0, diff=net-DAILY_TARGET;
  document.getElementById("todayNet").textContent=valid?money(net):"—";
  document.getElementById("difference").textContent=valid?(diff>=0?"+":"−")+money(Math.abs(diff)):"—";
  document.getElementById("achievement").textContent=valid?percent(net/DAILY_TARGET*100):"—";
@@ -2283,9 +2283,7 @@ function render(){
 
 
  const net=
-  Number(
-   entries[key]||0
-  );
+  entryTotal(entries[key]);
 
 
  const diff=
