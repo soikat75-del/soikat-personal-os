@@ -1860,7 +1860,15 @@ function saveEntryNotes(notes){localStorage.setItem(NOTES_STORAGE_KEY,JSON.strin
 function normalizedNote(value){return String(value||"").trim().toLocaleLowerCase();}
 function cumulativeNoteTotal(note,throughDate,entries=getEntries(),notes=getEntryNotes()){
  const target=normalizedNote(note); if(!target)return 0;
- return Object.entries(entries).reduce((sum,[date,amount])=>date<=throughDate&&normalizedNote(notes[date])===target?sum+Number(amount||0):sum,0);
+ return Object.entries(entries).reduce((sum,[date,value])=>{
+  if(date>throughDate)return sum;
+  const amounts=Array.isArray(value)?value:[value];
+  const noteValue=notes[date];
+  return sum+amounts.reduce((sub,amount,index)=>{
+   const entryNote=Array.isArray(noteValue)?noteValue[index]:(index===0?noteValue:"");
+   return sub+(normalizedNote(entryNote)===target?Number(amount||0):0);
+  },0);
+ },0);
 }
 function updateEntryPreview(){
  const date=document.getElementById("entryDate").value, raw=document.getElementById("profit").value, entries=getEntries();
@@ -2566,139 +2574,29 @@ const desktopHover=window.matchMedia("(hover: hover) and (pointer: fine)").match
 /* ================= TABLE ================= */
 
 function renderTable(entries){
-
- const body=
-  document.getElementById(
-   "recentEntriesBody"
-  );
-
-
- const rows=
-  Object.entries(entries)
-  .sort(
-   (a,b)=>
-    b[0].localeCompare(
-     a[0]
-    )
-  );
-
-
+ const body=document.getElementById("recentEntriesBody");
+ const rows=[];
+ Object.entries(entries).forEach(([date,value])=>{
+  const amounts=Array.isArray(value)?value:[value];
+  amounts.forEach((amount,index)=>rows.push({date,amount:Number(amount||0),index}));
+ });
+ rows.sort((a,b)=>b.date.localeCompare(a.date)||b.index-a.index);
  if(!rows.length){
-
-  body.innerHTML=`
-   <tr>
-    <td
-     colspan="7"
-     style="
-      text-align:center;
-      color:#596a7f;
-      padding:35px 10px">
-     No entries yet
-    </td>
-   </tr>
-  `;
-
+  body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:#596a7f;padding:35px 10px">No entries yet</td></tr>`;
   return;
-
  }
-
-
- body.innerHTML=
-  rows
-  .slice(0,10)
-  .map(
-   ([date,value])=>{
-
-    const net=entryTotal(value);
-
-    const diff=
-     net-DAILY_TARGET;
-
-    const achievement=
-     net/
-     DAILY_TARGET*
-     100;
-
-
-    const status=
-     achievement>=100?
-     ["GOOD","status"]:
-     achievement>=80?
-     ["PARTIAL","status status-partial"]:
-     ["BELOW","status status-below"];
-
-
-    const formatted=
-     parseDate(date)
-     .toLocaleDateString(
-      "en-GB",
-      {
-       day:"2-digit",
-       month:"short",
-       year:"numeric"
-      }
-     );
-
-
-    return `
-     <tr>
-
-      <td>
-       ${formatted}
-      </td>
-
-      <td class="net">
-       ${money(net)}
-      </td>
-
-      <td>
-       ${money(DAILY_TARGET)}
-      </td>
-
-      <td
-       class="${
-        diff>=0?
-        "positive":
-        "negative"
-       }">
-
-       ${
-        diff>=0?
-        "+":
-        "−"
-       }${money(
-        Math.abs(diff)
-       )}
-
-      </td>
-
-      <td>
-       ${percent(achievement)}
-      </td>
-
-      <td>
-       <span class="${status[1]}">
-        ${status[0]}
-       </span>
-      </td>
-
-      <td>
-       <button
-        class="delete-btn"
-        onclick="deleteEntry('${date}')">
-        Delete
-       </button>
-      </td>
-
-     </tr>
-    `;
-
-   }
-  )
-  .join("");
-
+ const notes=getEntryNotes();
+ body.innerHTML=rows.slice(0,10).map(({date,amount,index})=>{
+  const diff=amount-DAILY_TARGET;
+  const achievement=amount/DAILY_TARGET*100;
+  const status=achievement>=100?["GOOD","status"]:achievement>=80?["PARTIAL","status status-partial"]:["BELOW","status status-below"];
+  const formatted=parseDate(date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+  const noteValue=notes[date];
+  const note=Array.isArray(noteValue)?(noteValue[index]||""):(index===0?(noteValue||""):"");
+  const safeNote=String(note).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return `<tr><td>${formatted}${safeNote?`<div style="color:#8191a7;font-size:10px;margin-top:3px">${safeNote}</div>`:""}</td><td class="net">${money(amount)}</td><td>${money(DAILY_TARGET)}</td><td class="${diff>=0?"positive":"negative"}">${diff>=0?"+":"−"}${money(Math.abs(diff))}</td><td>${percent(achievement)}</td><td><span class="${status[1]}">${status[0]}</span></td><td><button class="delete-btn" onclick="deleteEntry('${date}',${index})">Delete</button></td></tr>`;
+ }).join("");
 }
-
 
 /* ================= TOOLTIP ================= */
 
@@ -3213,7 +3111,7 @@ document
 function selectCalendarDate(key){
  document.getElementById("entryDate").value=key;
  document.getElementById("profit").value="";
- document.getElementById("entryNote").value=getEntryNotes()[key]||"";
+ document.getElementById("entryNote").value="";
 
  calendarDate=
   parseDate(key);
@@ -3297,7 +3195,10 @@ function addEntry(){
  saveEntries(entries);
  const notes=getEntryNotes();
  const note=document.getElementById("entryNote").value.trim();
- if(note) notes[date]=note; else delete notes[date];
+ const existingNotes=notes[date];
+ const noteList=Array.isArray(existingNotes)?existingNotes:(existingNotes!==undefined?[existingNotes]:[]);
+ noteList.push(note);
+ notes[date]=noteList;
  saveEntryNotes(notes);
  document.getElementById("profit").value="";
  document.getElementById("entryNote").value="";
@@ -3317,24 +3218,22 @@ function addEntry(){
 }
 
 
-function deleteEntry(date){
-
- const entries=
-  getEntries();
-
-
- delete entries[date];
+function deleteEntry(date,index=0){
+ const entries=getEntries();
+ if(!Object.prototype.hasOwnProperty.call(entries,date))return;
+ const amounts=Array.isArray(entries[date])?[...entries[date]]:[entries[date]];
+ amounts.splice(index,1);
+ if(amounts.length)entries[date]=amounts; else delete entries[date];
  saveEntries(entries);
  const notes=getEntryNotes();
- delete notes[date];
- saveEntryNotes(notes);
+ if(Object.prototype.hasOwnProperty.call(notes,date)){
+  const noteList=Array.isArray(notes[date])?[...notes[date]]:[notes[date]];
+  noteList.splice(index,1);
+  if(amounts.length)notes[date]=noteList; else delete notes[date];
+  saveEntryNotes(notes);
+ }
  render();
-
-
- showToast(
-  "Entry deleted"
- );
-
+ showToast("Entry deleted");
 }
 
 
@@ -3379,7 +3278,7 @@ document
 
    const selectedKey=document.getElementById("entryDate").value;
    document.getElementById("profit").value="";
-   document.getElementById("entryNote").value=getEntryNotes()[selectedKey]||"";
+   document.getElementById("entryNote").value="";
    calendarDate=
     parseDate(
      document.getElementById(
