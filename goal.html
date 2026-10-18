@@ -2999,9 +2999,17 @@ function openMonthlyReport(){
   0;
 
 
+ const today=new Date();
+ const averageDays=
+  start.getFullYear()===today.getFullYear() &&
+  start.getMonth()===today.getMonth() ?
+  today.getDate() :
+  end<new Date(today.getFullYear(),today.getMonth(),today.getDate()) ?
+  days :
+  0;
  const average=
-  rows.length?
-  total/rows.length:
+  averageDays?
+  total/averageDays:
   0;
 
 
