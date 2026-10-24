@@ -957,6 +957,32 @@ footer{
  transform:translateX(-50%) translateY(0);
 }
 
+
+/* Animated amount editor */
+.amount-modal-overlay{
+ position:fixed;inset:0;z-index:10001;display:flex;align-items:center;
+ justify-content:center;padding:18px;background:rgba(0,0,0,.68);
+ backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+ animation:amountFadeIn .18s ease both;
+}
+.amount-modal{
+ width:min(420px,100%);padding:24px;background:#101923;
+ border:1px solid #344254;border-radius:16px;
+ box-shadow:0 20px 60px rgba(0,0,0,.45);
+ animation:amountSlideIn .22s ease both;
+}
+.amount-modal-title{margin:0 0 18px;color:#fff;font-size:17px;font-weight:650;}
+.amount-modal-input{
+ display:block;width:100%;margin:0;padding:12px;color:#fff;background:#08121d;
+ border:1px solid #64748b;border-radius:10px;outline:none;font-size:16px;
+}
+.amount-modal-input:focus{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.12);}
+.amount-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+.amount-modal-actions button{width:auto;min-width:84px;padding:10px 17px;border:1px solid #344254;border-radius:24px;background:transparent;color:#dce6f4;font-size:13px;font-weight:600;}
+.amount-modal-actions .amount-save{background:#fff;color:#101923;border-color:#fff;}
+@keyframes amountFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes amountSlideIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
 /* ================= TABLET ================= */
 
 @media(max-width:1000px){
@@ -3300,16 +3326,52 @@ function editEntryAmount(date,index=0){
  const amounts=Array.isArray(entries[date])?[...entries[date]]:[entries[date]];
  if(index<0||index>=amounts.length)return;
  const current=Number(amounts[index]||0);
- const input=prompt("Enter the new net amount:",String(current));
- if(input===null)return;
- const cleaned=input.trim().replace(/,/g,"");
- const next=Number(cleaned);
- if(cleaned===""||!Number.isFinite(next)||next<0){showToast("Enter a valid amount");return;}
- amounts[index]=next;
- entries[date]=amounts.length===1&&!Array.isArray(entries[date])?next:amounts;
- saveEntries(entries);
- render();
- showToast("Entry updated");
+
+ const overlay=document.createElement("div");
+ overlay.className="amount-modal-overlay";
+ overlay.innerHTML=`
+  <div class="amount-modal" role="dialog" aria-modal="true" aria-label="Edit net amount">
+   <h3 class="amount-modal-title">Edit Net Amount</h3>
+   <input class="amount-modal-input" type="number" min="0" step="any" aria-label="New net amount">
+   <div class="amount-modal-actions">
+    <button type="button" class="amount-cancel">Cancel</button>
+    <button type="button" class="amount-save">Save</button>
+   </div>
+  </div>`;
+ document.body.appendChild(overlay);
+
+ const input=overlay.querySelector(".amount-modal-input");
+ const saveButton=overlay.querySelector(".amount-save");
+ const cancelButton=overlay.querySelector(".amount-cancel");
+ input.value=String(current);
+ input.focus();
+ input.select();
+
+ function closeModal(){overlay.remove();}
+ function saveAmount(){
+  const cleaned=input.value.trim().replace(/,/g,"");
+  const next=Number(cleaned);
+  if(cleaned===""||!Number.isFinite(next)||next<0){
+   showToast("Enter a valid amount");
+   input.focus();
+   return;
+  }
+  amounts[index]=next;
+  entries[date]=amounts.length===1&&!Array.isArray(entries[date])?next:amounts;
+  saveEntries(entries);
+  closeModal();
+  render();
+  showToast("Entry updated");
+ }
+ saveButton.addEventListener("click",saveAmount);
+ cancelButton.addEventListener("click",closeModal);
+ overlay.addEventListener("click",function(event){
+  if(event.target===overlay)closeModal();
+ });
+ input.addEventListener("keydown",function(event){
+  if(event.key==="Enter")saveAmount();
+  if(event.key==="Escape")closeModal();
+ });
 }
 
 function deleteEntry(date,index=0){
