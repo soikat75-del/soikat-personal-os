@@ -2596,8 +2596,10 @@ function renderTable(entries){
  }
  const notes=getEntryNotes();
  body.innerHTML=rows.slice(0,10).map(({date,amount,index})=>{
-  const diff=amount-DAILY_TARGET;
-  const achievement=amount/DAILY_TARGET*100;
+  // Diff and Achievement are based on the combined total for that date.
+  const dailyTotal=entryTotal(entries[date]);
+  const diff=dailyTotal-DAILY_TARGET;
+  const achievement=dailyTotal/DAILY_TARGET*100;
   const status=achievement>=100?["GOOD","status"]:achievement>=80?["PARTIAL","status status-partial"]:["BELOW","status status-below"];
   const formatted=parseDate(date).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
   const noteValue=notes[date];
