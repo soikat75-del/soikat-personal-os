@@ -2657,7 +2657,7 @@ function renderTable(entries){
   const noteValue=notes[date];
   const note=Array.isArray(noteValue)?(noteValue[index]||""):(index===0?(noteValue||""):"");
   const safeNote=String(note).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  return `<tr><td>${formatted}${safeNote?`<div style="color:#8191a7;font-size:10px;margin-top:3px">${safeNote}</div>`:""}</td><td class="net">${money(amount)}</td><td>${money(DAILY_TARGET)}</td><td class="${diff>=0?"positive":"negative"}">${diff>=0?"+":"−"}${money(Math.abs(diff))}</td><td>${percent(achievement)}</td><td><span class="${status[1]}">${status[0]}</span></td><td><button class="delete-btn" onclick="deleteEntry('${date}',${index})">Delete</button></td></tr>`;
+  return `<tr><td>${formatted}${safeNote?`<div style="color:#8191a7;font-size:10px;margin-top:3px">${safeNote}</div>`:""}</td><td class="net">${money(amount)}${recentEntriesDateFilter?` <button type="button" title="Edit net amount" aria-label="Edit net amount" onclick="editEntryAmount('${date}',${index})" style="border:0;background:transparent;color:inherit;cursor:pointer;font-size:14px;padding:2px 4px">✎</button>`:""}</td><td>${money(DAILY_TARGET)}</td><td class="${diff>=0?"positive":"negative"}">${diff>=0?"+":"−"}${money(Math.abs(diff))}</td><td>${percent(achievement)}</td><td><span class="${status[1]}">${status[0]}</span></td><td><button class="delete-btn" onclick="deleteEntry('${date}',${index})">Delete</button></td></tr>`;
  }).join("");
 }
 
@@ -3293,6 +3293,24 @@ function addEntry(){
 
 }
 
+
+function editEntryAmount(date,index=0){
+ const entries=getEntries();
+ if(!Object.prototype.hasOwnProperty.call(entries,date))return;
+ const amounts=Array.isArray(entries[date])?[...entries[date]]:[entries[date]];
+ if(index<0||index>=amounts.length)return;
+ const current=Number(amounts[index]||0);
+ const input=prompt("Enter the new net amount:",String(current));
+ if(input===null)return;
+ const cleaned=input.trim().replace(/,/g,"");
+ const next=Number(cleaned);
+ if(cleaned===""||!Number.isFinite(next)||next<0){showToast("Enter a valid amount");return;}
+ amounts[index]=next;
+ entries[date]=amounts.length===1&&!Array.isArray(entries[date])?next:amounts;
+ saveEntries(entries);
+ render();
+ showToast("Entry updated");
+}
 
 function deleteEntry(date,index=0){
  const entries=getEntries();
