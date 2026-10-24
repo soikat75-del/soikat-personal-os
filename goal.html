@@ -2382,7 +2382,7 @@ function render(){
 
 function latestAccountDates(entries=getEntries(), notes=getEntryNotes()){
  const latest={};
- const accountCodes={bkash:"B",cash:"C",nagad:"N",rocket:"R"};
+ const accountCodes={bkash:"B",cash:"C",nagad:"N",rocket:"R",dbbl:"D",dutchbanglabank:"D",ibbl:"I",islamibank:"I",islamibankbangladesh:"I"};
  Object.keys(entries).sort().forEach(date=>{
   const amounts=Array.isArray(entries[date])?entries[date]:[entries[date]];
   const noteValue=notes[date];
@@ -2575,7 +2575,7 @@ function renderCalendar(){
      has?
      `
       <span class="account-markers">
-       ${["B","C","N","R"].filter(code=>latestAccounts[code]===key).map(code=>`<span class="account-marker" title="Latest update: ${{B:"bKash",C:"Cash",N:"Nagad",R:"Rocket"}[code]}">${code}</span>`).join("")}
+       ${["B","C","N","R","D","I"].filter(code=>latestAccounts[code]===key).map(code=>{const accounts={B:{name:"bKash",src:"https://primepng.com/images/all_img/1770827249_bkash%20White%20Logo%20PNG%20Transparent.png"},C:{name:"Cash",src:"https://img.magnific.com/premium-vector/flat-vector-illustration-stacked-dollar-bills-with-dollar-symbol-green-cash-money-icon-simple_1127111-1523.jpg?semt=ais_hybrid&w=740&q=80"},N:{name:"Nagad",src:"https://play-lh.googleusercontent.com/tFk8R3Fkav7fZEY8e7VJtMwtRCowaWU2Us-AmWaKnTOWBer427fPjWetoOnhrUM4nWeZb0AOEJ6lnlwJ9HRu"},R:{name:"Rocket",src:"https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRFCZPaMgRY3DQ44evR92U7qF6FiEmMQWbvtYbQme3ka1J9kTgG"},D:{name:"DBBL",src:"https://images.seeklogo.com/logo-png/31/1/dutch-bangla-bank-ltd-logo-png_seeklogo-310356.png"},I:{name:"IBBL",src:"https://play-lh.googleusercontent.com/1sUa2zFA4STlUFUp3aptH0ZWxf0VsO60qEqKWKafhd8TNG7gJ0CDRxFCyb1wvFMhGrJs"}}[code];return `<span class="account-marker" title="Latest update: ${accounts.name}"><img src="${accounts.src}" alt="${accounts.name}" loading="lazy"></span>`}).join("")}
       </span>
 
       <span class="day-income">
