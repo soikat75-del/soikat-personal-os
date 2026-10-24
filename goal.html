@@ -1623,8 +1623,11 @@ if ('serviceWorker' in navigator) {
  <div class="panel recent-panel">
 
   <div class="panel-head">
-   <div class="panel-title">Recent Entries</div>
-   <div class="panel-tag">LATEST 10</div>
+   <div>
+    <div class="panel-title">Recent Entries</div>
+    <div id="recentEntriesDateLabel" style="display:none;color:#8191a7;font-size:11px;margin-top:4px"></div>
+   </div>
+   <button type="button" id="recentEntriesSortToggle" class="panel-tag" onclick="toggleRecentEntriesDateFilter()" style="background:transparent;font-family:inherit;cursor:pointer">LATEST 10</button>
   </div>
 
   <div class="table-wrap">
@@ -2582,14 +2585,33 @@ const desktopHover=window.matchMedia("(hover: hover) and (pointer: fine)").match
 
 /* ================= TABLE ================= */
 
+let recentEntriesDateFilter = null;
+
+function toggleRecentEntriesDateFilter(){
+ recentEntriesDateFilter = null;
+ renderTable(getEntries());
+}
+
 function renderTable(entries){
  const body=document.getElementById("recentEntriesBody");
  const rows=[];
  Object.entries(entries).forEach(([date,value])=>{
+  if(recentEntriesDateFilter && date!==recentEntriesDateFilter) return;
   const amounts=Array.isArray(value)?value:[value];
   amounts.forEach((amount,index)=>rows.push({date,amount:Number(amount||0),index}));
  });
  rows.sort((a,b)=>b.date.localeCompare(a.date)||b.index-a.index);
+ const label=document.getElementById("recentEntriesDateLabel");
+ const toggle=document.getElementById("recentEntriesSortToggle");
+ if(recentEntriesDateFilter){
+  label.style.display="block";
+  label.textContent="Showing result for the date "+parseDate(recentEntriesDateFilter).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+  toggle.textContent="CLOSE ×";
+ }else{
+  label.style.display="none";
+  label.textContent="";
+  toggle.textContent="LATEST 10";
+ }
  if(!rows.length){
   body.innerHTML=`<tr><td colspan="7" style="text-align:center;color:#596a7f;padding:35px 10px">No entries yet</td></tr>`;
   return;
@@ -3133,6 +3155,7 @@ document
 /* ================= CALENDAR DATE ================= */
 
 function selectCalendarDate(key){
+ recentEntriesDateFilter=key;
  document.getElementById("entryDate").value=key;
  document.getElementById("profit").value="";
  document.getElementById("entryNote").value="";
