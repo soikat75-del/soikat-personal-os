@@ -368,14 +368,16 @@ h1{
  box-shadow:inset 0 0 0 1px #d9e7ff;
 }
 
-.day .dot{
- position:absolute;
- width:4px;
- height:4px;
- border-radius:50%;
- right:5px;
- top:5px;
- background:currentColor;
+.day .account-markers{
+ position:absolute; top:3px; left:2px; right:2px;
+ display:flex; justify-content:center; align-items:center;
+ gap:2px; min-height:9px; pointer-events:none;
+}
+.day .account-marker{
+ width:9px; height:9px; border:1px solid currentColor;
+ border-radius:50%; display:inline-flex; align-items:center;
+ justify-content:center; font-size:5.5px; line-height:1;
+ font-weight:800; background:#071321; color:#dce8f8;
 }
 
 .day .day-number{
@@ -1142,12 +1144,8 @@ footer{
   font-size:7px;
  }
 
- .day .dot{
-  width:3px;
-  height:3px;
-  right:3px;
-  top:3px;
- }
+ .day .account-markers{ top:2px; gap:1px; }
+ .day .account-marker{ width:7px; height:7px; font-size:4.5px; border-width:1px; }
 
  .day:not(.empty):hover{
   transform:none;
@@ -2382,6 +2380,22 @@ function render(){
 
 /* ================= CALENDAR ================= */
 
+function latestAccountDates(entries=getEntries(), notes=getEntryNotes()){
+ const latest={};
+ const accountCodes={bkash:"B",cash:"C",nagad:"N",rocket:"R"};
+ Object.keys(entries).sort().forEach(date=>{
+  const amounts=Array.isArray(entries[date])?entries[date]:[entries[date]];
+  const noteValue=notes[date];
+  amounts.forEach((_,index)=>{
+   const rawNote=Array.isArray(noteValue)?noteValue[index]:(index===0?noteValue:"");
+   const normalized=normalizedNote(rawNote).replace(/[^a-z]/g,"");
+   const code=accountCodes[normalized];
+   if(code)latest[code]=date;
+  });
+ });
+ return latest;
+}
+
 function renderCalendar(){
 
  const grid=
@@ -2438,6 +2452,7 @@ function renderCalendar(){
 
  const entries=
   getEntries();
+ const latestAccounts=latestAccountDates(entries);
 
 
  let html="";
@@ -2559,7 +2574,9 @@ function renderCalendar(){
     ${
      has?
      `
-      <span class="dot"></span>
+      <span class="account-markers">
+       ${["B","C","N","R"].filter(code=>latestAccounts[code]===key).map(code=>`<span class="account-marker" title="Latest update: ${{B:"bKash",C:"Cash",N:"Nagad",R:"Rocket"}[code]}">${code}</span>`).join("")}
+      </span>
 
       <span class="day-income">
        ${money(value)}
