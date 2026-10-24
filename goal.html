@@ -2596,8 +2596,9 @@ function renderTable(entries){
  }
  const notes=getEntryNotes();
  body.innerHTML=rows.slice(0,10).map(({date,amount,index})=>{
-  // Diff and Achievement are based on the combined total for that date.
-  const dailyTotal=entryTotal(entries[date]);
+  // Diff and Achievement use the running total through this entry on that date.
+  const dayAmounts=Array.isArray(entries[date])?entries[date]:[entries[date]];
+  const dailyTotal=dayAmounts.slice(0,index+1).reduce((sum,item)=>sum+Number(item||0),0);
   const diff=dailyTotal-DAILY_TARGET;
   const achievement=dailyTotal/DAILY_TARGET*100;
   const status=achievement>=100?["GOOD","status"]:achievement>=80?["PARTIAL","status status-partial"]:["BELOW","status status-below"];
