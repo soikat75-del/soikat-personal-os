@@ -642,6 +642,12 @@ footer{
   .session-timer{min-width:78px;padding:4px 5px;font-size:10px}
   .session-reminder{top:62px}
 }
+/* Sleep timer control — added without changing existing player or session timer behavior. */
+.header-timer-controls{display:flex;align-items:center;gap:7px}
+.sleep-timer-button{height:30px;padding:0 9px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;font-size:10px;font-weight:800;letter-spacing:.04em;white-space:nowrap;cursor:pointer}
+.sleep-timer-button:hover{border-color:#5e8fff;color:#fff}
+.sleep-timer-button.active{border-color:#e8bd4a;color:#ffe08a;background:#211c0c}
+@media(max-width:700px){.header-timer-controls{gap:4px}.sleep-timer-button{height:27px;padding:0 6px;font-size:9px}.clock-stack{max-width:100%}}
 </style>
 
 <style>
@@ -882,7 +888,7 @@ if ('serviceWorker' in navigator) {
 <header class="topbar">
   <a class="back" href="javascript:history.back()">← Back</a>
   <div class="logo">SOIKAT · LIVE TV</div>
-  <div class="clock-stack"><div class="session-timer timer-stage-0" id="sessionTimer" aria-label="Session timer">00:00:00</div></div>
+  <div class="clock-stack"><div class="header-timer-controls"><div class="session-timer timer-stage-0" id="sessionTimer" aria-label="Session timer">00:00:00</div><button type="button" id="sleepTimerButton" class="sleep-timer-button" aria-label="Set sleep timer">SLEEP</button></div></div>
 </header>
 
 <div class="container" id="tvPlayerContainer">
@@ -1845,7 +1851,69 @@ document.addEventListener("change", function(e){
   scheduleAutoSave();
 });
 
-/* ===== SESSION TIMER REMINDERS ===== */
+
+
+/* ===== SLEEP TIMER ===== */
+(function initSleepTimer(){
+  const button=document.getElementById("sleepTimerButton");
+  if(!button)return;
+  let sleepDeadline=0;
+  let sleepInterval=null;
+
+  function stopPlayback(){
+    const video=document.getElementById("livePlayer");
+    if(video){try{video.pause();video.removeAttribute("src");video.load()}catch(e){}}
+    const wrap=document.querySelector(".player-wrap");
+    const youtube=wrap&&wrap.querySelector(".youtube-frame");
+    if(youtube)youtube.remove();
+    const message=document.getElementById("playerMessage");
+    if(message){
+      message.style.display="flex";
+      message.innerHTML="<strong>Sleep timer ended</strong><span>Playback stopped</span>";
+    }
+    if(typeof liveHlsInstance!=="undefined"&&liveHlsInstance){
+      try{liveHlsInstance.destroy()}catch(e){}
+      liveHlsInstance=null;
+    }
+  }
+  function clearSleepTimer(){
+    sleepDeadline=0;
+    if(sleepInterval){clearInterval(sleepInterval);sleepInterval=null;}
+    button.classList.remove("active");
+    button.textContent="SLEEP";
+    button.title="Set sleep timer";
+  }
+  function updateSleepTimer(){
+    const remaining=Math.max(0,Math.ceil((sleepDeadline-Date.now())/1000));
+    if(remaining<=0){
+      clearSleepTimer();
+      stopPlayback();
+      return;
+    }
+    const minutes=Math.floor(remaining/60);
+    const seconds=remaining%60;
+    button.textContent="SLEEP "+minutes+":"+String(seconds).padStart(2,"0");
+  }
+  button.addEventListener("click",()=>{
+    if(sleepDeadline){
+      clearSleepTimer();
+      return;
+    }
+    const raw=prompt("Stop playback after how many minutes? (1–240)","30");
+    if(raw===null)return;
+    const minutes=Number(raw);
+    if(!Number.isInteger(minutes)||minutes<1||minutes>240){
+      alert("Enter a whole number from 1 to 240 minutes.");
+      return;
+    }
+    sleepDeadline=Date.now()+minutes*60*1000;
+    button.classList.add("active");
+    button.title="Click to cancel sleep timer";
+    updateSleepTimer();
+    sleepInterval=setInterval(updateSleepTimer,1000);
+  });
+})();
+\n/* ===== SESSION TIMER REMINDERS ===== */
 (function initSessionTimer(){
   const timerEl=document.getElementById("sessionTimer");
   const reminder=document.getElementById("sessionReminder");
