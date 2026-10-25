@@ -1085,7 +1085,7 @@ function playChannelInPage(channel){
     message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Loading stream…</span>`;
   }
   const url=String(channel.url).trim();
-  if(window.Hls && window.Hls.isSupported() && /\\.m3u8(?:$|\\?)/i.test(url)){
+  if(window.Hls && window.Hls.isSupported() && /\.m3u8(?:$|[?#])/i.test(url)){
     liveHlsInstance=new Hls({enableWorker:true});
     liveHlsInstance.loadSource(url);
     liveHlsInstance.attachMedia(video);
