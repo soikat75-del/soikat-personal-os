@@ -830,6 +830,30 @@ footer{
   }
 }
 </style>
+<style>
+/* Sleep timer: compact digital popup; controls appear only on player interaction */
+#sleepTimerButton{position:absolute;top:10px;right:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(145,170,205,.55);border-radius:9px;background:rgba(3,9,20,.88);color:#e9f0ff;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
+.player-wrap:hover #sleepTimerButton,.player-wrap.controls-visible #sleepTimerButton,#sleepTimerButton:focus-visible{opacity:1;visibility:visible;pointer-events:auto}
+#sleepTimerButton:hover{border-color:#e8bd4a;color:#ffe08a}
+#sleepTimerLabel{font-variant-numeric:tabular-nums}
+.sleep-timer-popup{position:fixed;inset:0;z-index:10020;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,5,14,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.sleep-timer-popup[hidden]{display:none}
+.sleep-timer-card{width:min(320px,100%);padding:18px;border:1px solid #29476e;border-radius:16px;background:linear-gradient(145deg,#0c1c31,#050d19);box-shadow:0 24px 80px rgba(0,0,0,.6);color:#e9f0ff}
+.sleep-timer-heading{display:flex;align-items:center;gap:9px;font-size:14px;letter-spacing:.04em}
+.sleep-timer-heading-icon{color:#ffd34d;font-size:24px;line-height:1}
+.sleep-timer-close{margin-left:auto;width:30px;height:30px;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#9db8dc;font-size:21px;cursor:pointer}
+.sleep-timer-display{display:flex;align-items:center;justify-content:center;gap:10px;margin:22px 0 10px}
+.sleep-timer-display input{width:112px;height:64px;border:1px solid #31547e;border-radius:10px;background:#020914;color:#ffe08a;text-align:center;font:700 32px/1 Arial,Helvetica,sans-serif;font-variant-numeric:tabular-nums;outline:none}
+.sleep-timer-display input:focus{border-color:#e8bd4a;box-shadow:0 0 0 3px rgba(232,189,74,.12)}
+.sleep-timer-display span{font-size:10px;font-weight:800;letter-spacing:.15em;color:#8299bb}
+.sleep-timer-hint{text-align:center;color:#8299bb;font-size:11px;line-height:1.5}
+.sleep-timer-actions{display:flex;gap:8px;margin-top:20px}
+.sleep-timer-actions button,.sleep-timer-stop{height:40px;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer}
+.sleep-timer-secondary{flex:1;border:1px solid #31547e;background:#0b1b2e;color:#c5d5ed}
+.sleep-timer-primary{flex:1.3;border:1px solid #d9ae3d;background:linear-gradient(135deg,#f5ca58,#d99a24);color:#15120a}
+.sleep-timer-stop{width:100%;margin-top:9px;border:1px solid #6b3038;background:#35151a;color:#ff9aa2}
+@media(max-width:700px){#sleepTimerButton{top:6px;right:6px;padding:6px 7px;font-size:11px}.sleep-timer-card{padding:16px}}
+</style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -889,7 +913,7 @@ if ('serviceWorker' in navigator) {
   <section class="player-panel">
     <div class="player-wrap">
       <video id="livePlayer" controls playsinline autoplay></video>
-      <button type="button" id="sleepTimerButton" aria-label="Sleep timer" title="Sleep timer" style="position:absolute;top:10px;right:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(145,170,205,.55);border-radius:9px;background:rgba(3,9,20,.82);color:#e9f0ff;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)">
+      <button type="button" id="sleepTimerButton" aria-label="Sleep timer" title="Sleep timer" aria-haspopup="dialog" aria-controls="sleepTimerPopup">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
         <span id="sleepTimerLabel">SLEEP</span>
       </button>
@@ -899,6 +923,16 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
   </section>
+</div>
+
+<div id="sleepTimerPopup" class="sleep-timer-popup" role="dialog" aria-modal="true" aria-labelledby="sleepTimerTitle" hidden>
+  <div class="sleep-timer-card">
+    <div class="sleep-timer-heading"><span class="sleep-timer-heading-icon">◷</span><strong id="sleepTimerTitle">Sleep Timer</strong><button type="button" id="sleepTimerClose" class="sleep-timer-close" aria-label="Close">×</button></div>
+    <div class="sleep-timer-display"><input id="sleepTimerMinutes" type="number" min="1" max="240" step="1" value="30" inputmode="numeric" aria-label="Minutes"><span>MINUTES</span></div>
+    <div class="sleep-timer-hint">Playback will stop when the timer ends.</div>
+    <div class="sleep-timer-actions"><button type="button" id="sleepTimerCancel" class="sleep-timer-secondary">Cancel</button><button type="button" id="sleepTimerStart" class="sleep-timer-primary">Start Timer</button></div>
+    <button type="button" id="sleepTimerStop" class="sleep-timer-stop" hidden>Turn Off Timer</button>
+  </div>
 </div>
 
 <div class="session-reminder" id="sessionReminder" role="status" aria-live="assertive">
@@ -2098,55 +2132,72 @@ document.addEventListener("change", function(e){
   const button=document.getElementById("sleepTimerButton");
   const label=document.getElementById("sleepTimerLabel");
   const video=document.getElementById("livePlayer");
-  if(!button||!label||!video)return;
-  let deadline=0, interval=null;
-  const originalLabel="SLEEP";
+  const popup=document.getElementById("sleepTimerPopup");
+  const minutesInput=document.getElementById("sleepTimerMinutes");
+  const startButton=document.getElementById("sleepTimerStart");
+  const cancelButton=document.getElementById("sleepTimerCancel");
+  const closeButton=document.getElementById("sleepTimerClose");
+  const stopButton=document.getElementById("sleepTimerStop");
+  const playerWrap=document.querySelector(".player-wrap");
+  if(!button||!label||!video||!popup||!minutesInput||!startButton)return;
+  let deadline=0, interval=null, hideControlsTimer=null;
+  function showControls(){
+    if(!playerWrap)return;
+    playerWrap.classList.add("controls-visible");
+    clearTimeout(hideControlsTimer);
+    hideControlsTimer=setTimeout(()=>playerWrap.classList.remove("controls-visible"),3500);
+  }
+  playerWrap?.addEventListener("click",showControls);
+  playerWrap?.addEventListener("touchstart",showControls,{passive:true});
+  function openPopup(){
+    popup.hidden=false;
+    stopButton.hidden=!deadline;
+    startButton.textContent=deadline?"Update Timer":"Start Timer";
+    minutesInput.value=deadline?String(Math.max(1,Math.ceil((deadline-Date.now())/60000))):"30";
+    setTimeout(()=>{minutesInput.focus();minutesInput.select()},30);
+  }
+  function closePopup(){popup.hidden=true;button.focus({preventScroll:true})}
   function stopTimer(){
     if(interval)clearInterval(interval);
     interval=null;deadline=0;
-    label.textContent=originalLabel;
+    label.textContent="SLEEP";
     button.style.borderColor="rgba(145,170,205,.55)";
     button.style.color="#e9f0ff";
     button.title="Sleep timer";
+    stopButton.hidden=true;
   }
   function stopPlayback(){
     video.pause();
     try{video.removeAttribute("src");video.load()}catch(e){}
-    if(typeof liveHlsInstance!=="undefined"&&liveHlsInstance){
-      try{liveHlsInstance.destroy()}catch(e){}
-      liveHlsInstance=null;
-    }
-    const frame=document.querySelector(".player-wrap .youtube-frame");
-    if(frame)frame.remove();
+    if(typeof liveHlsInstance!=="undefined"&&liveHlsInstance){try{liveHlsInstance.destroy()}catch(e){}liveHlsInstance=null}
+    const frame=document.querySelector(".player-wrap .youtube-frame");if(frame)frame.remove();
     video.style.display="";
     const message=document.getElementById("playerMessage");
-    if(message){
-      message.style.display="flex";
-      message.innerHTML="<strong>Sleep timer ended</strong><span>Playback stopped</span>";
-    }
+    if(message){message.style.display="flex";message.innerHTML="<strong>Sleep timer ended</strong><span>Playback stopped</span>"}
   }
   function tick(){
     const remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
-    const mins=Math.floor(remaining/60),secs=remaining%60;
-    label.textContent=""+mins+":"+String(secs).padStart(2,"0");
-    button.title="Cancel sleep timer";
-    if(remaining<=0){stopTimer();stopPlayback();}
+    label.textContent=Math.floor(remaining/60)+":"+String(remaining%60).padStart(2,"0");
+    button.title="Sleep timer active — click to edit or cancel";
+    if(remaining<=0){stopTimer();stopPlayback()}
   }
-  button.addEventListener("click",()=>{
-    if(deadline){stopTimer();return;}
-    const answer=window.prompt("Stop playback after how many minutes? (1–240)","30");
-    if(answer===null)return;
-    const minutes=Number(answer);
+  button.addEventListener("click",openPopup);
+  [cancelButton,closeButton].forEach(el=>el?.addEventListener("click",closePopup));
+  popup.addEventListener("click",e=>{if(e.target===popup)closePopup()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!popup.hidden)closePopup()});
+  stopButton.addEventListener("click",()=>{stopTimer();closePopup()});
+  startButton.addEventListener("click",()=>{
+    const minutes=Number(minutesInput.value);
     if(!Number.isInteger(minutes)||minutes<1||minutes>240){
-      window.alert("Enter a whole number from 1 to 240.");
-      return;
+      minutesInput.setCustomValidity("Enter a whole number from 1 to 240.");minutesInput.reportValidity();return;
     }
+    minutesInput.setCustomValidity("");
+    if(interval)clearInterval(interval);
     deadline=Date.now()+minutes*60000;
-    button.style.borderColor="#e8bd4a";
-    button.style.color="#ffe08a";
-    tick();
-    interval=setInterval(tick,1000);
+    button.style.borderColor="#e8bd4a";button.style.color="#ffe08a";
+    stopButton.hidden=false;closePopup();tick();interval=setInterval(tick,1000);
   });
+  minutesInput.addEventListener("input",()=>minutesInput.setCustomValidity(""));
 })();
 </script>
 </body>
