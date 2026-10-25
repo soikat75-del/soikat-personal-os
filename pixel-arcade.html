@@ -11,27 +11,30 @@
 body{min-height:100vh;background:#030914;color:#f4f7ff;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 5% 0%,rgba(20,75,210,.28),transparent 32%),radial-gradient(circle at 100% 100%,rgba(120,35,220,.22),transparent 32%),linear-gradient(135deg,#020812,#050c18 55%,#080412)}
 body::after{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(70,120,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(70,120,255,.045) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
-.wrap{width:min(1120px,90%);margin:auto;padding:52px 0 30px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:44px}
+.wrap{width:min(1200px,92%);margin:auto;padding:28px 0 24px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
 .back{color:#a9c9ff;text-decoration:none;border:1px solid rgba(80,145,255,.38);background:rgba(10,24,43,.72);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:700;letter-spacing:.04em}
-.back:hover{border-color:#729fff}
-.brand{font-size:12px;letter-spacing:4px;color:#8292b2;text-align:right}
-header{text-align:center;margin-bottom:38px}
-h1{font-size:clamp(35px,7vw,68px);letter-spacing:clamp(2px,1vw,9px);font-weight:900;background:linear-gradient(110deg,#72a9ff,#fff 35%,#a9baff 60%,#41ebcf);-webkit-background-clip:text;background-clip:text;color:transparent}
-header p{margin-top:13px;color:#91a6c9;font-size:14px;line-height:1.6}
-.rule{width:150px;height:1px;margin:22px auto 0;background:linear-gradient(90deg,transparent,#367fff,#41ebcf,transparent)}
-.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.game-card{position:relative;min-height:174px;padding:24px;border-radius:16px;text-decoration:none;color:#f4f7ff;background:linear-gradient(135deg,rgba(11,24,44,.96),rgba(8,12,28,.96));border:1px solid rgba(90,145,255,.36);display:flex;flex-direction:column;align-items:flex-start;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;overflow:hidden}
-.game-card::after{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-55px;border-radius:50%;border:1px solid rgba(65,235,207,.16);box-shadow:0 0 0 18px rgba(65,235,207,.025),0 0 0 38px rgba(65,235,207,.02);pointer-events:none}
-.game-card:hover{transform:translateY(-4px);border-color:rgba(65,235,207,.7);box-shadow:0 16px 45px rgba(0,0,0,.3)}
-.game-type{font-size:9px;letter-spacing:2px;font-weight:800;color:#41ebcf;margin-bottom:14px}
-.game-card h2{font-size:clamp(18px,2.3vw,24px);letter-spacing:-.4px;margin-bottom:8px}
-.game-card p{font-size:12px;line-height:1.55;color:#8fa5c9;max-width:92%}
-.play{margin-top:auto;padding-top:18px;font-size:10px;letter-spacing:1.5px;font-weight:800;color:#a9c9ff}
-.play span{color:#41ebcf;margin-left:5px}
-footer{margin-top:34px;text-align:center;color:#657796;font-size:10px;letter-spacing:2px}
-@media(max-width:600px){.wrap{width:88%;padding-top:28px}.top{margin-bottom:34px}.brand{font-size:9px;letter-spacing:2px}.games{grid-template-columns:1fr;gap:12px}.game-card{min-height:158px;padding:21px}header{margin-bottom:28px}header p{font-size:12px}}
-@media(prefers-reduced-motion:reduce){.game-card{transition:none}}
+.brand{font-size:11px;letter-spacing:3px;color:#8292b2;text-align:right}
+header{text-align:center;margin-bottom:24px}
+h1{font-size:clamp(32px,6vw,58px);letter-spacing:clamp(2px,1vw,8px);font-weight:900;background:linear-gradient(110deg,#72a9ff,#fff 35%,#a9baff 60%,#41ebcf);-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{margin-top:10px;color:#91a6c9;font-size:13px;line-height:1.6}
+.rule{width:130px;height:1px;margin:18px auto 0;background:linear-gradient(90deg,transparent,#367fff,#41ebcf,transparent)}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:16px;align-items:stretch}
+.choices{display:flex;flex-direction:column;gap:9px}
+.game-choice{width:100%;text-align:left;display:flex;flex-direction:column;gap:7px;padding:15px;border:1px solid rgba(90,145,255,.3);border-radius:12px;background:rgba(7,16,31,.86);color:#f4f7ff;cursor:pointer;transition:.2s}
+.game-choice span{font-size:8px;letter-spacing:1.6px;color:#41ebcf;font-weight:800}
+.game-choice strong{font-size:13px;line-height:1.3}
+.game-choice:hover,.game-choice.active{border-color:#41ebcf;background:rgba(19,44,57,.82);box-shadow:0 0 20px rgba(65,235,207,.07)}
+.game-panel{min-width:0;border:1px solid rgba(65,235,207,.35);border-radius:15px;overflow:hidden;background:#050b15;box-shadow:0 18px 55px rgba(0,0,0,.3)}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;border-bottom:1px solid rgba(90,145,255,.2);background:rgba(8,18,33,.95)}
+#currentName{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#d9e6ff}
+#gameStatus{font-size:10px;color:#8fa5c9;text-align:right}
+.frame-wrap{position:relative;width:100%;height:min(70vh,680px);min-height:380px;background:#050811}
+iframe{display:block;width:100%;height:100%;border:0;background:#050811}
+.note{padding:11px 14px;font-size:11px;line-height:1.5;color:#8fa5c9;border-top:1px solid rgba(90,145,255,.2)}
+footer{margin-top:24px;text-align:center;color:#657796;font-size:10px;letter-spacing:2px}
+@media(max-width:760px){.wrap{width:94%;padding-top:18px}.top{margin-bottom:20px}.brand{font-size:8px;letter-spacing:1.5px}header{margin-bottom:20px}.layout{grid-template-columns:1fr}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.game-choice{padding:11px;min-height:66px}.game-choice strong{font-size:11px}.frame-wrap{height:68vh;min-height:360px}.panel-head{padding:11px}}
+@media(max-width:370px){.choices{grid-template-columns:1fr 1fr}.game-choice{padding:9px}.frame-wrap{min-height:330px}}
 </style>
 </head>
 <body>
@@ -42,60 +45,47 @@ footer{margin-top:34px;text-align:center;color:#657796;font-size:10px;letter-spa
   </div>
   <header>
     <h1>PIXEL ARCADE</h1>
-    <p>A little collection of fun, strange and addictive games from around the web.</p>
+    <p>Choose a game. Play it right here without opening another tab.</p>
     <div class="rule"></div>
   </header>
-  <section class="games" aria-label="Online game collection">
-      <a class="game-card" href="https://play2048.co/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">PUZZLE</span>
-        <h2>2048</h2>
-        <p>Slide, combine and reach the 2048 tile.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://littlealchemy2.com/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">DISCOVERY</span>
-        <h2>Little Alchemy 2</h2>
-        <p>Combine simple elements to discover surprising creations.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://neal.fun/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">ODDLY FUN</span>
-        <h2>Neal.fun</h2>
-        <p>A collection of unusual, playful internet experiments.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://quickdraw.withgoogle.com/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">CHALLENGE</span>
-        <h2>Quick, Draw!</h2>
-        <p>See if an AI can guess what you are sketching.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://theuselessweb.com/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">RANDOM</span>
-        <h2>The Useless Web</h2>
-        <p>Jump to a random corner of the wonderfully weird web.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://slither.io/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">ARCADE</span>
-        <h2>Slither.io</h2>
-        <p>Grow your snake and outmaneuver other players.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://agar.io/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">MULTIPLAYER</span>
-        <h2>Agar.io</h2>
-        <p>Grow bigger by collecting pellets and avoiding larger cells.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
-      <a class="game-card" href="https://chromedino.com/" target="_blank" rel="noopener noreferrer">
-        <span class="game-type">ENDLESS RUNNER</span>
-        <h2>Chrome Dino</h2>
-        <p>A classic endless runner—playable in supported browsers.</p>
-        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
-      </a>
+  <section class="layout" aria-label="Embedded online games">
+    <nav class="choices" aria-label="Choose a game">
+      <button class="game-choice active" type="button" data-url="https://shunneklabs.app/games/pen-fight/" data-name="PEN FIGHT"><span>DUEL · SKILL</span><strong>PEN FIGHT</strong></button>
+<button class="game-choice" type="button" data-url="https://baper-rasta.pages.dev/" data-name="বাপের রাস্তা"><span>DRIVING · CHAOS</span><strong>বাপের রাস্তা</strong></button>
+<button class="game-choice" type="button" data-url="https://yahya.bd/tesla/" data-name="বাংলা টেসলা"><span>RACING · DHAKA</span><strong>বাংলা টেসলা</strong></button>
+<button class="game-choice" type="button" data-url="https://man-zero.com/BD-Tesla-Slapper/" data-name="BD TESLA SLAPPER"><span>ARCADE · SLAPPER</span><strong>BD TESLA SLAPPER</strong></button>
+<button class="game-choice" type="button" data-url="https://pixel-train-journey.vercel.app/" data-name="INTERCITY PIXEL TRAIN"><span>PIXEL · TRAIN</span><strong>INTERCITY PIXEL TRAIN</strong></button>
+    </nav>
+    <div class="game-panel">
+      <div class="panel-head">
+        <div id="currentName">PEN FIGHT</div>
+        <div id="gameStatus">Loading game…</div>
+      </div>
+      <div class="frame-wrap">
+        <iframe id="gameFrame" src="https://shunneklabs.app/games/pen-fight/" title="Pen Fight game" allow="fullscreen; autoplay; gamepad" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+      <div class="note">If a game shows a blank screen or “refused to connect,” its owner may block embedding. That cannot be fixed from this page; the game site must allow iframe embedding.</div>
+    </div>
   </section>
-  <footer>EXTERNAL GAMES · OPEN IN A NEW TAB</footer>
+  <footer>GAMES RUN INSIDE THIS PAGE WHEN EMBEDDING IS ALLOWED</footer>
 </main>
+<script>
+(function(){
+  const frame=document.getElementById('gameFrame');
+  const name=document.getElementById('currentName');
+  const status=document.getElementById('gameStatus');
+  document.querySelectorAll('.game-choice').forEach(function(button){
+    button.addEventListener('click',function(){
+      document.querySelectorAll('.game-choice').forEach(function(item){item.classList.remove('active')});
+      button.classList.add('active');
+      name.textContent=button.dataset.name;
+      status.textContent='Loading game…';
+      frame.title=button.dataset.name+' game';
+      frame.src=button.dataset.url;
+    });
+  });
+  frame.addEventListener('load',function(){status.textContent='Game frame loaded';});
+})();
+</script>
 </body>
 </html>
