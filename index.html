@@ -1494,6 +1494,34 @@ body::after{
 }
 @media(prefers-reduced-motion:reduce){.backup-dialog{animation:none}.backup-btn,.backup-status{transition:none}}
 
+
+/* ================= PIXEL ARCADE CARD ================= */
+.arcade-card{border-color:rgba(65,235,207,.62)}
+.arcade-card .card-icon{border-color:rgba(65,235,207,.78)}
+.arcade-card .card-icon svg{stroke:#41ebcf}
+.arcade-art{
+    background:
+        radial-gradient(circle at 73% 42%,rgba(77,75,255,.32),transparent 32%),
+        radial-gradient(circle at 65% 78%,rgba(65,235,207,.18),transparent 28%),
+        linear-gradient(135deg,#071322,#101037 58%,#092a30);
+}
+.pixel-grid{
+    position:absolute;right:8%;top:14%;width:48%;height:68%;
+    display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(6,1fr);
+    gap:5px;transform:rotate(-7deg);filter:drop-shadow(0 0 14px rgba(65,235,207,.22));
+}
+.pixel-grid i{display:block;border-radius:3px;background:#41ebcf;opacity:.9}
+.pixel-grid i:nth-child(2),.pixel-grid i:nth-child(6),.pixel-grid i:nth-child(8),
+.pixel-grid i:nth-child(14),.pixel-grid i:nth-child(16),.pixel-grid i:nth-child(22),
+.pixel-grid i:nth-child(24),.pixel-grid i:nth-child(28),.pixel-grid i:nth-child(30),
+.pixel-grid i:nth-child(35),.pixel-grid i:nth-child(37),.pixel-grid i:nth-child(42){opacity:0}
+.pixel-grid i:nth-child(3n){background:#8e7bff}
+.pixel-grid i:nth-child(4n){background:#ffcf5c}
+.pixel-orbit{
+    position:absolute;right:13%;top:21%;width:38%;aspect-ratio:1;border:1px solid rgba(142,123,255,.55);
+    border-radius:50%;transform:rotate(-25deg);box-shadow:0 0 24px rgba(142,123,255,.12);
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -1821,6 +1849,39 @@ if ('serviceWorker' in navigator) {
 
 </a>
 
+
+
+<!-- =====================================================
+     PIXEL ARCADE
+===================================================== -->
+
+<a href="pixel-arcade.html" class="card arcade-card">
+
+    <div class="art arcade-art">
+        <div class="pixel-orbit"></div>
+        <div class="pixel-grid" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+    </div>
+
+    <div class="card-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 8h12a4 4 0 0 1 3.7 5.5l-1 2.3a2 2 0 0 1-3.1.7L15 14H9l-2.6 2.5a2 2 0 0 1-3.1-.7l-1-2.3A4 4 0 0 1 6 8Z"/>
+            <path d="M7 10v4M5 12h4M16 11h.01M19 13h.01"/>
+        </svg>
+    </div>
+
+    <div class="card-content">
+        <div class="card-title">PIXEL ARCADE</div>
+        <div class="card-description">Discover fun &amp; unique web games</div>
+    </div>
+
+</a>
 
 </section>
 
