@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#030914">
+<title>PIXEL ARCADE — SOIKAT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{color-scheme:dark}
+body{min-height:100vh;background:#030914;color:#f4f7ff;font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 5% 0%,rgba(20,75,210,.28),transparent 32%),radial-gradient(circle at 100% 100%,rgba(120,35,220,.22),transparent 32%),linear-gradient(135deg,#020812,#050c18 55%,#080412)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(70,120,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(70,120,255,.045) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
+.wrap{width:min(1120px,90%);margin:auto;padding:52px 0 30px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:44px}
+.back{color:#a9c9ff;text-decoration:none;border:1px solid rgba(80,145,255,.38);background:rgba(10,24,43,.72);padding:10px 14px;border-radius:9px;font-size:12px;font-weight:700;letter-spacing:.04em}
+.back:hover{border-color:#729fff}
+.brand{font-size:12px;letter-spacing:4px;color:#8292b2;text-align:right}
+header{text-align:center;margin-bottom:38px}
+h1{font-size:clamp(35px,7vw,68px);letter-spacing:clamp(2px,1vw,9px);font-weight:900;background:linear-gradient(110deg,#72a9ff,#fff 35%,#a9baff 60%,#41ebcf);-webkit-background-clip:text;background-clip:text;color:transparent}
+header p{margin-top:13px;color:#91a6c9;font-size:14px;line-height:1.6}
+.rule{width:150px;height:1px;margin:22px auto 0;background:linear-gradient(90deg,transparent,#367fff,#41ebcf,transparent)}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.game-card{position:relative;min-height:174px;padding:24px;border-radius:16px;text-decoration:none;color:#f4f7ff;background:linear-gradient(135deg,rgba(11,24,44,.96),rgba(8,12,28,.96));border:1px solid rgba(90,145,255,.36);display:flex;flex-direction:column;align-items:flex-start;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;overflow:hidden}
+.game-card::after{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-55px;border-radius:50%;border:1px solid rgba(65,235,207,.16);box-shadow:0 0 0 18px rgba(65,235,207,.025),0 0 0 38px rgba(65,235,207,.02);pointer-events:none}
+.game-card:hover{transform:translateY(-4px);border-color:rgba(65,235,207,.7);box-shadow:0 16px 45px rgba(0,0,0,.3)}
+.game-type{font-size:9px;letter-spacing:2px;font-weight:800;color:#41ebcf;margin-bottom:14px}
+.game-card h2{font-size:clamp(18px,2.3vw,24px);letter-spacing:-.4px;margin-bottom:8px}
+.game-card p{font-size:12px;line-height:1.55;color:#8fa5c9;max-width:92%}
+.play{margin-top:auto;padding-top:18px;font-size:10px;letter-spacing:1.5px;font-weight:800;color:#a9c9ff}
+.play span{color:#41ebcf;margin-left:5px}
+footer{margin-top:34px;text-align:center;color:#657796;font-size:10px;letter-spacing:2px}
+@media(max-width:600px){.wrap{width:88%;padding-top:28px}.top{margin-bottom:34px}.brand{font-size:9px;letter-spacing:2px}.games{grid-template-columns:1fr;gap:12px}.game-card{min-height:158px;padding:21px}header{margin-bottom:28px}header p{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.game-card{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <a class="back" href="index.html">← BACK TO HOME</a>
+    <div class="brand">SOIKAT · PERSONAL OS</div>
+  </div>
+  <header>
+    <h1>PIXEL ARCADE</h1>
+    <p>A little collection of fun, strange and addictive games from around the web.</p>
+    <div class="rule"></div>
+  </header>
+  <section class="games" aria-label="Online game collection">
+      <a class="game-card" href="https://play2048.co/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">PUZZLE</span>
+        <h2>2048</h2>
+        <p>Slide, combine and reach the 2048 tile.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://littlealchemy2.com/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">DISCOVERY</span>
+        <h2>Little Alchemy 2</h2>
+        <p>Combine simple elements to discover surprising creations.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://neal.fun/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">ODDLY FUN</span>
+        <h2>Neal.fun</h2>
+        <p>A collection of unusual, playful internet experiments.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://quickdraw.withgoogle.com/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">CHALLENGE</span>
+        <h2>Quick, Draw!</h2>
+        <p>See if an AI can guess what you are sketching.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://theuselessweb.com/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">RANDOM</span>
+        <h2>The Useless Web</h2>
+        <p>Jump to a random corner of the wonderfully weird web.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://slither.io/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">ARCADE</span>
+        <h2>Slither.io</h2>
+        <p>Grow your snake and outmaneuver other players.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://agar.io/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">MULTIPLAYER</span>
+        <h2>Agar.io</h2>
+        <p>Grow bigger by collecting pellets and avoiding larger cells.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+      <a class="game-card" href="https://chromedino.com/" target="_blank" rel="noopener noreferrer">
+        <span class="game-type">ENDLESS RUNNER</span>
+        <h2>Chrome Dino</h2>
+        <p>A classic endless runner—playable in supported browsers.</p>
+        <span class="play">PLAY GAME <span aria-hidden="true">↗</span></span>
+      </a>
+  </section>
+  <footer>EXTERNAL GAMES · OPEN IN A NEW TAB</footer>
+</main>
+</body>
+</html>
