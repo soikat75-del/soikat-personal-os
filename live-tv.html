@@ -731,8 +731,9 @@ footer{
 .channel-favorite.is-favorite{color:#ffd34d;border-color:#8e7330;background:#211c0c}
 .channel-card.currently-playing{border-color:#3d96ff;background:rgba(49,120,220,.13);box-shadow:0 0 0 1px rgba(61,150,255,.28) inset}
 .playing-label{display:block;margin-top:4px;color:#54d99a;font-size:9px;font-weight:800;letter-spacing:.08em}
-.admin-serial{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
-.admin-serial:active{cursor:grabbing}
+.admin-serial{cursor:text;touch-action:manipulation;user-select:text;-webkit-user-select:text;text-align:center;padding:0;outline:none;font-family:inherit;border-radius:8px}
+.admin-serial:focus{border-color:#5e8fff;box-shadow:0 0 0 2px rgba(94,143,255,.18)}
+.admin-serial::-webkit-inner-spin-button,.admin-serial::-webkit-outer-spin-button{opacity:1}
 .admin-row.drag-target{border-color:#3d96ff;box-shadow:0 0 0 2px rgba(61,150,255,.25)}
 
 
@@ -1546,7 +1547,7 @@ function renderAdmin(){
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <div class="admin-left">
-          <span class="admin-serial" data-drag-index="${i}" title="Drag to reorder" aria-label="Drag to reorder channels">${i + 1}</span>
+          <input class="admin-serial" type="number" min="1" max="${CHANNELS.length}" step="1" value="${i + 1}" title="Type serial number to change channel position" aria-label="Channel serial number" onchange="setChannelPosition(${i},this.value)" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}" onpointerdown="event.stopPropagation()">
           <input class="admin-name" data-key="name" value="${escapeAttr(c.name || "")}" placeholder="Channel name">
           <select class="admin-category" data-key="category" data-previous="${escapeAttr(String(c.category || "").toUpperCase())}" onchange="this.dataset.previous=this.value">
             ${categoryOptions(c.category)}
@@ -1582,7 +1583,7 @@ function renderAdmin(){
   let dragState=null;
   document.addEventListener("pointerdown",event=>{
     const handle=event.target.closest(".admin-serial");
-    if(!handle || !handle.closest("#adminRows")) return;
+    if(!handle || !handle.closest("#adminRows") || handle.tagName === "INPUT") return;
     if(event.pointerType==="mouse" && event.button!==0) return;
     const row=handle.closest(".admin-row");
     if(!row) return;
@@ -1625,6 +1626,27 @@ function toggleAdminStatus(index){
   CHANNELS[index].status = String(CHANNELS[index].status||"LIVE").toUpperCase()==="DEAD" ? "LIVE" : "DEAD";
   renderAdmin();
   renderChannels();
+  scheduleAutoSave();
+}
+
+function setChannelPosition(index, rawPosition){
+  if(index < 0 || index >= CHANNELS.length) return;
+  const position = Number.parseInt(rawPosition, 10);
+  if(!Number.isInteger(position) || position < 1 || position > CHANNELS.length){
+    renderAdmin();
+    setAdminMessage(`Enter a serial number from 1 to ${CHANNELS.length}.`, "err");
+    return;
+  }
+  const targetIndex = position - 1;
+  if(index === targetIndex){
+    renderAdmin();
+    return;
+  }
+  const moved = CHANNELS.splice(index, 1)[0];
+  CHANNELS.splice(targetIndex, 0, moved);
+  renderAdmin();
+  renderChannels();
+  setAdminMessage(`Channel moved to serial ${position}. Saving automatically…`, "ok");
   scheduleAutoSave();
 }
 
