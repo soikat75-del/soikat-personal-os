@@ -716,7 +716,8 @@ footer{
 @media(max-width:700px){.channels{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-section{padding:18px 14px 30px}}
 @media(max-width:430px){.channels{grid-template-columns:1fr}}
 /* User-panel favorites and selected channel */
-.channel-card{position:relative}
+.channel-card{position:relative;cursor:pointer;font:inherit;text-align:left;width:100%;box-sizing:border-box}
+.channel-card:focus-visible{outline:2px solid #3d96ff;outline-offset:2px}
 .channel-name{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .channel-favorite{flex:0 0 28px;width:28px;height:32px;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#8ea6c7;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0}
 .channel-favorite:hover{border-color:#e8bd4a;color:#ffe08a}
@@ -876,6 +877,18 @@ if ('serviceWorker' in navigator) {
   <div class="logo">SOIKAT · LIVE TV</div>
   <div class="clock-stack"><div class="session-timer timer-stage-0" id="sessionTimer" aria-label="Session timer">00:00:00</div></div>
 </header>
+
+<div class="container" id="tvPlayerContainer">
+  <section class="player-panel">
+    <div class="player-wrap">
+      <video id="livePlayer" controls playsinline autoplay></video>
+      <div class="player-message" id="playerMessage">
+        <strong>Select a channel to watch</strong>
+        <span>Choose any channel below</span>
+      </div>
+    </div>
+  </section>
+</div>
 
 <div class="session-reminder" id="sessionReminder" role="status" aria-live="assertive">
   <div class="session-reminder-text" id="sessionReminderText"></div>
@@ -1058,6 +1071,50 @@ async function loadCentralData(){
   }
 }
 
+let liveHlsInstance = null;
+function playChannelInPage(channel){
+  const video=document.getElementById("livePlayer");
+  const message=document.getElementById("playerMessage");
+  if(!video || !channel || !channel.url) return;
+  if(liveHlsInstance){try{liveHlsInstance.destroy()}catch(e){} liveHlsInstance=null;}
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
+  if(message){
+    message.style.display="flex";
+    message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Loading stream…</span>`;
+  }
+  const url=String(channel.url).trim();
+  if(window.Hls && window.Hls.isSupported() && /\\.m3u8(?:$|\\?)/i.test(url)){
+    liveHlsInstance=new Hls({enableWorker:true});
+    liveHlsInstance.loadSource(url);
+    liveHlsInstance.attachMedia(video);
+    liveHlsInstance.on(Hls.Events.MANIFEST_PARSED,()=>{
+      if(message) message.style.display="none";
+      video.play().catch(()=>{if(message){message.style.display="flex";message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Press Play to start the stream</span>`;}});
+    });
+    liveHlsInstance.on(Hls.Events.ERROR,(_event,data)=>{
+      if(data && data.fatal && message){
+        message.style.display="flex";
+        message.innerHTML=`<strong>Stream unavailable</strong><span>This channel may block playback or its stream may be offline.</span>`;
+      }
+    });
+  }else{
+    video.src=url;
+    video.load();
+    video.play().then(()=>{
+      if(message) message.style.display="none";
+    }).catch(()=>{
+      if(message){message.style.display="flex";message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Press Play, or this stream may not support in-page playback.</span>`;}
+    });
+    video.onplaying=()=>{if(message) message.style.display="none";};
+    video.onerror=()=>{
+      if(message){message.style.display="flex";message.innerHTML=`<strong>Unable to play this stream</strong><span>The channel may be offline or blocked by its provider.</span>`;}
+    };
+  }
+  document.getElementById("tvPlayerContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
 function renderChannels(){
   const term = channelSearchTerm.trim().toLowerCase();
   const list = CHANNELS.filter(channel => {
@@ -1083,7 +1140,7 @@ function renderChannels(){
     const playing=currentlyPlayingKey===key;
     const favorite=favoriteChannels.has(key);
     return `
-    <a class="channel-card ${playing?"currently-playing":""}" data-channel-key="${escapeAttr(key)}" href="${escapeAttr(channel.url)}" target="_blank" rel="noopener noreferrer">
+    <div class="channel-card ${playing?"currently-playing":""}" data-channel-key="${escapeAttr(key)}" role="button" tabindex="0" aria-label="Play ${escapeAttr(channel.name)}">
       <div class="channel-logo">
         ${channel.logo
           ? `<img src="${escapeAttr(channel.logo)}" alt="" referrerpolicy="no-referrer">`
@@ -1091,8 +1148,8 @@ function renderChannels(){
       </div>
       <div class="channel-name">${escapeHtml(channel.name)}${playing?`<span class="playing-label">CURRENTLY PLAYING</span>`:""}</div>
       <button type="button" class="channel-favorite ${favorite?"is-favorite":""}" data-favorite-key="${escapeAttr(key)}" aria-label="${favorite?"Remove from favorites":"Add to favorites"}" title="${favorite?"Remove favorite":"Add favorite"}">${favorite?"★":"☆"}</button>
-      <div class="channel-open ${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"channel-dead":""}">${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"DEAD":"OPEN"}</div>
-    </a>`;
+      <div class="channel-open ${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"channel-dead":""}">${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"DEAD":"PLAY"}</div>
+    </div>`;
   }).join("");
 
   channelsEl.querySelectorAll(".channel-favorite").forEach(button=>{
@@ -1108,21 +1165,18 @@ function renderChannels(){
     });
   });
   channelsEl.querySelectorAll(".channel-card").forEach(card=>{
-    card.addEventListener("click",event=>{
-      if(event.target.closest(".channel-favorite")) return;
-      document.querySelectorAll(".channel-card.currently-playing").forEach(oldCard=>{
-        oldCard.classList.remove("currently-playing");
-        oldCard.querySelector(".playing-label")?.remove();
-      });
-      currentlyPlayingKey=card.dataset.channelKey||"";
-      card.classList.add("currently-playing");
-      const name=card.querySelector(".channel-name");
-      if(name && !name.querySelector(".playing-label")){
-        const label=document.createElement("span");
-        label.className="playing-label";
-        label.textContent="CURRENTLY PLAYING";
-        name.appendChild(label);
-      }
+    const playSelectedChannel = event => {
+      if(event && event.target.closest(".channel-favorite")) return;
+      const key=card.dataset.channelKey||"";
+      const channel=CHANNELS.find(ch=>channelFavoriteKey(ch)===key);
+      if(!channel) return;
+      currentlyPlayingKey=key;
+      playChannelInPage(channel);
+      renderChannels();
+    };
+    card.addEventListener("click",playSelectedChannel);
+    card.addEventListener("keydown",event=>{
+      if(event.key==="Enter"||event.key===" "){event.preventDefault();playSelectedChannel(event);}
     });
   });
 }
