@@ -109,10 +109,15 @@ body{
   padding:28px 0 40px;
 }
 
-/* Player stays visible while scrolling, and remains hidden until a channel is chosen. */
-#tvPlayerContainer{display:none;position:sticky;top:66px;z-index:45;padding-top:10px;padding-bottom:10px;scroll-margin-top:66px;background:#020812;box-shadow:0 12px 18px rgba(0,0,0,.22)}
+/* Player is hidden until a channel is chosen; while scrolling it becomes a compact floating player. */
+#tvPlayerContainer{display:none;position:relative;z-index:45;padding-top:10px;padding-bottom:10px;scroll-margin-top:66px}
 #tvPlayerContainer.player-visible{display:block}
-@media(max-width:700px){#tvPlayerContainer{top:58px;padding-top:6px;padding-bottom:6px}}
+#tvPlayerContainer.mini-mode{position:fixed;right:18px;bottom:18px;top:auto;width:min(340px,42vw);padding:0;background:#020812;border:1px solid #31547e;border-radius:12px;box-shadow:0 12px 36px rgba(0,0,0,.6);overflow:hidden}
+#tvPlayerContainer.mini-mode .player-panel{width:100%;max-width:none;border:0;border-radius:0;box-shadow:none}
+#tvPlayerContainer.mini-mode .player-wrap{aspect-ratio:16/9}
+#tvPlayerContainer.mini-mode .player-expand{display:flex}
+.player-expand{display:none;position:absolute;right:8px;top:8px;z-index:3;width:32px;height:32px;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.35);border-radius:8px;background:rgba(3,12,24,.88);color:#fff;font-size:19px;cursor:pointer}
+@media(max-width:700px){#tvPlayerContainer{padding-top:6px;padding-bottom:6px}#tvPlayerContainer.mini-mode{right:10px;bottom:10px;width:min(52vw,260px);border-radius:10px}#tvPlayerContainer.mini-mode .player-expand{width:28px;height:28px;right:5px;top:5px}}
 
 .player-panel{
   width:100%;
@@ -888,6 +893,7 @@ if ('serviceWorker' in navigator) {
 <div class="container" id="tvPlayerContainer">
   <section class="player-panel">
     <div class="player-wrap">
+      <button type="button" class="player-expand" id="playerExpand" aria-label="Expand player" title="Expand player">↗</button>
       <video id="livePlayer" controls playsinline autoplay></video>
       <div class="player-message" id="playerMessage">
         <strong>Select a channel to watch</strong>
@@ -1079,6 +1085,24 @@ async function loadCentralData(){
 }
 
 let liveHlsInstance = null;
+const tvPlayerContainer = document.getElementById("tvPlayerContainer");
+let playerMiniMode = false;
+function setPlayerMiniMode(mini){
+  if(!tvPlayerContainer || !tvPlayerContainer.classList.contains("player-visible")) return;
+  playerMiniMode = mini;
+  tvPlayerContainer.classList.toggle("mini-mode", mini);
+}
+window.addEventListener("scroll",()=>{
+  if(!tvPlayerContainer || !tvPlayerContainer.classList.contains("player-visible")) return;
+  const playerTop = tvPlayerContainer.getBoundingClientRect().top + window.scrollY;
+  const playerBottom = playerTop + tvPlayerContainer.offsetHeight;
+  if(window.scrollY > playerBottom + 30) setPlayerMiniMode(true);
+  else setPlayerMiniMode(false);
+},{passive:true});
+document.getElementById("playerExpand")?.addEventListener("click",()=>{
+  setPlayerMiniMode(false);
+  tvPlayerContainer?.scrollIntoView({behavior:"smooth",block:"start"});
+});
 function playChannelInPage(channel){
   const video=document.getElementById("livePlayer");
   const message=document.getElementById("playerMessage");
