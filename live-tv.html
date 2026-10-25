@@ -1082,6 +1082,7 @@ let liveHlsInstance = null;
 function playChannelInPage(channel){
   const video=document.getElementById("livePlayer");
   const message=document.getElementById("playerMessage");
+  const playerWrap=document.querySelector(".player-wrap");
   if(!video || !channel || !channel.url) return;
   const playerContainer=document.getElementById("tvPlayerContainer");
   if(playerContainer) playerContainer.classList.add("player-visible");
@@ -1089,11 +1090,42 @@ function playChannelInPage(channel){
   video.pause();
   video.removeAttribute("src");
   video.load();
+  const url=String(channel.url).trim();
+  let youtubeId="";
+  try{
+    const parsed=new URL(url);
+    if(parsed.hostname==="youtu.be" || parsed.hostname.endsWith(".youtu.be")){
+      youtubeId=parsed.pathname.split("/").filter(Boolean)[0]||"";
+    }else if(parsed.hostname.includes("youtube.com") || parsed.hostname.includes("youtube-nocookie.com")){
+      youtubeId=parsed.searchParams.get("v")||"";
+      if(!youtubeId){
+        const parts=parsed.pathname.split("/").filter(Boolean);
+        if(["embed","shorts","live","v"].includes(parts[0])) youtubeId=parts[1]||"";
+      }
+    }
+  }catch(e){}
+  const oldYoutube=playerWrap?.querySelector(".youtube-frame");
+  if(oldYoutube) oldYoutube.remove();
+  video.style.display="";
+  if(youtubeId){
+    video.style.display="none";
+    if(message) message.style.display="none";
+    const iframe=document.createElement("iframe");
+    iframe.className="youtube-frame";
+    iframe.src="https://www.youtube.com/embed/"+encodeURIComponent(youtubeId)+"?autoplay=1&playsinline=1&rel=0";
+    iframe.title=(channel.name||"YouTube video");
+    iframe.allow="autoplay; encrypted-media; picture-in-picture; web-share";
+    iframe.allowFullscreen=true;
+    iframe.referrerPolicy="strict-origin-when-cross-origin";
+    iframe.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:0;background:#000";
+    playerWrap?.appendChild(iframe);
+    document.getElementById("tvPlayerContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
   if(message){
     message.style.display="flex";
     message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Loading stream…</span>`;
   }
-  const url=String(channel.url).trim();
   if(window.Hls && window.Hls.isSupported() && /\.m3u8(?:$|[?#])/i.test(url)){
     liveHlsInstance=new Hls({enableWorker:true});
     liveHlsInstance.loadSource(url);
