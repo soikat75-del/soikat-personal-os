@@ -112,11 +112,7 @@ body{
 /* Player stays visible while scrolling, and remains hidden until a channel is chosen. */
 #tvPlayerContainer{display:none;position:sticky;top:66px;z-index:45;padding-top:10px;padding-bottom:10px;scroll-margin-top:66px}
 #tvPlayerContainer.player-visible{display:block}
-.player-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;background:#071321;border-bottom:1px solid #1c3555}
-.player-lock-label{font-size:11px;color:#8fa8d0;letter-spacing:.04em}
-.player-tool-btn{height:32px;padding:0 11px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#dfeaff;font-size:11px;font-weight:700;cursor:pointer}
-.player-tool-btn:hover{border-color:#3d96ff}
-@media(max-width:700px){#tvPlayerContainer{top:58px;padding-top:6px;padding-bottom:6px}.player-tools{padding:6px 8px}.player-tool-btn{height:30px;padding:0 9px}}
+@media(max-width:700px){#tvPlayerContainer{top:58px;padding-top:6px;padding-bottom:6px}}
 
 .player-panel{
   width:100%;
@@ -889,10 +885,6 @@ if ('serviceWorker' in navigator) {
 
 <div class="container" id="tvPlayerContainer">
   <section class="player-panel">
-    <div class="player-tools">
-      <span class="player-lock-label">▣ PLAYER LOCKED · STAYS VISIBLE WHILE SCROLLING</span>
-      <button type="button" class="player-tool-btn" id="pipButton">PIP ↗</button>
-    </div>
     <div class="player-wrap">
       <video id="livePlayer" controls playsinline autoplay></video>
       <div class="player-message" id="playerMessage">
@@ -1130,22 +1122,30 @@ function playChannelInPage(channel){
   document.getElementById("tvPlayerContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
-// Picture-in-Picture: supported by the browser/device when available.
-const pipButton=document.getElementById("pipButton");
-if(pipButton){
-  const pipSupported=()=>!!(document.pictureInPictureEnabled || (document.getElementById("livePlayer") && typeof document.getElementById("livePlayer").webkitSetPresentationMode==="function"));
-  if(!pipSupported()) pipButton.title="Picture-in-Picture is not supported by this browser";
-  pipButton.addEventListener("click",async()=>{
-    const video=document.getElementById("livePlayer");
-    if(!video || !video.currentSrc){return;}
-    try{
-      if(document.pictureInPictureElement){await document.exitPictureInPicture();}
-      else if(document.pictureInPictureEnabled && video.readyState>=1){await video.requestPictureInPicture();}
-      else if(typeof video.webkitSetPresentationMode==="function"){video.webkitSetPresentationMode(video.webkitPresentationMode==="picture-in-picture"?"inline":"picture-in-picture");}
-      else {pipButton.textContent="PIP UNSUPPORTED";setTimeout(()=>pipButton.textContent="PIP ↗",1800);}
-    }catch(error){pipButton.textContent="PIP UNAVAILABLE";setTimeout(()=>pipButton.textContent="PIP ↗",1800);}
-  });
+// Try to enter Picture-in-Picture automatically when the app is backgrounded.
+// iOS may block automatic PiP in Home Screen web apps; this depends on iOS/browser support.
+let autoPipAttempted = false;
+async function tryAutomaticPiP(){
+  const video = document.getElementById("livePlayer");
+  if(!video || video.paused || video.readyState < 1 || autoPipAttempted) return;
+  try{
+    if(document.pictureInPictureEnabled && !document.pictureInPictureElement){
+      autoPipAttempted = true;
+      await video.requestPictureInPicture();
+    } else if(typeof video.webkitSetPresentationMode === "function" && video.webkitPresentationMode !== "picture-in-picture"){
+      autoPipAttempted = true;
+      video.webkitSetPresentationMode("picture-in-picture");
+    }
+  }catch(error){
+    // iOS can require a user gesture and reject automatic PiP; allow another attempt later.
+    autoPipAttempted = false;
+  }
 }
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState === "hidden") tryAutomaticPiP();
+  else autoPipAttempted = false;
+});
+window.addEventListener("pagehide",tryAutomaticPiP);
 
 function renderChannels(){
   const term = channelSearchTerm.trim().toLowerCase();
