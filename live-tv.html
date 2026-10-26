@@ -1512,6 +1512,7 @@ async function confirmYes(){
   }
 }
 let adminCategoryFilter = "ALL";
+let adminSearchTerm = "";
 
 function renderAdminCategoryFilter(){
   const select = document.getElementById("adminCategoryFilter");
@@ -1534,14 +1535,30 @@ function setAdminCategoryFilter(category){
   renderAdmin();
 }
 
+function toggleAdminSearch(){
+  const input=document.getElementById("adminSearchInput");
+  if(!input)return;
+  const opening=input.style.display==="none";
+  input.style.display=opening?"block":"none";
+  if(opening){input.focus();}
+  else{input.value="";adminSearchTerm="";renderAdmin();}
+}
+function setAdminSearchTerm(value){
+  adminSearchTerm=String(value||"").trim().toLowerCase();
+  renderAdmin();
+  const input=document.getElementById("adminSearchInput");
+  if(input){input.style.display="block";input.focus();input.setSelectionRange(input.value.length,input.value.length);}
+}
+
 function renderAdmin(){
   renderAdminCategoryFilter();
 
   const filter = adminCategoryFilter || "ALL";
   const indexedChannels = CHANNELS.map((c,i)=>({c,i}));
-  const filteredChannels = filter === "ALL"
-    ? indexedChannels
-    : indexedChannels.filter(({c}) => String(c.category || "").toUpperCase() === filter);
+  const filteredChannels = indexedChannels.filter(({c}) =>
+    (filter === "ALL" || String(c.category || "").toUpperCase() === filter) &&
+    (!adminSearchTerm || [c.name,c.category,c.url,c.source,c.logo].some(v => String(v||"").toLowerCase().includes(adminSearchTerm)))
+  );
 
   const list = filteredChannels.map(({c,i})=>`
     <div class="admin-row" data-row="${i}">
@@ -1703,13 +1720,20 @@ function collectAdminChannels(){
 }
 
 function addStream(){
-  CHANNELS.push({name:"New Channel",category:"MUSIC",logo:"",url:"",source:"",status:"LIVE"});
+  const targetCategory = adminCategoryFilter !== "ALL"
+    ? adminCategoryFilter
+    : (selectedCategory !== "ALL" && selectedCategory !== "FAVORITES" && CATEGORIES.some(c=>String(c).toUpperCase()===selectedCategory) ? selectedCategory : "MUSIC");
+  const newChannel = {name:"New Channel",category:targetCategory,logo:"",url:"",source:"",status:"LIVE"};
+  CHANNELS.push(newChannel);
+  adminCategoryFilter = targetCategory;
+  adminSearchTerm = "";
+  const searchInput=document.getElementById("adminSearchInput");
+  if(searchInput) searchInput.value="";
   renderAdmin();
-  const rows = document.querySelectorAll("#adminRows .admin-row");
-  const last = rows[rows.length-1];
-  if(last){
-    last.scrollIntoView({behavior:"auto",block:"nearest"});
-    const name = last.querySelector('[data-key="name"]');
+  const row = document.querySelector(`#adminRows .admin-row[data-row="${CHANNELS.length-1}"]`);
+  if(row){
+    row.scrollIntoView({behavior:"auto",block:"nearest"});
+    const name = row.querySelector('[data-key="name"]');
     if(name){ name.focus(); name.select(); }
   }
   setAdminMessage("New stream added. Saving automatically…","ok");
@@ -2111,10 +2135,12 @@ document.addEventListener("change", function(e){
       <button class="admin-close" onclick="closeAdmin()" aria-label="Close">×</button>
     </div>
     <div class="admin-content">
-      <div class="admin-filter-wrap">
+      <div class="admin-filter-wrap" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
         <select id="adminCategoryFilter" class="admin-category-filter" onchange="setAdminCategoryFilter(this.value)">
           <option value="ALL">ALL</option>
         </select>
+        <button type="button" class="admin-btn secondary" id="adminSearchToggle" onclick="toggleAdminSearch()" title="Search channels" aria-label="Search channels" style="height:40px;padding:0 12px">⌕ Search</button>
+        <input id="adminSearchInput" type="search" placeholder="Search channels..." autocomplete="off" oninput="setAdminSearchTerm(this.value)" style="display:none;flex:1;min-width:140px;max-width:300px;height:40px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0">
       </div>
       <div id="adminRows"></div>
       <div id="adminMessage" class="admin-message"></div>
