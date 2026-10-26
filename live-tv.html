@@ -1536,15 +1536,16 @@ function setAdminCategoryFilter(category){
 }
 
 function toggleAdminSearch(){
-  const current=window.prompt("Search channels:", adminSearchTerm || "");
-  if(current===null)return;
-  setAdminSearchTerm(current);
+  const input=document.getElementById("adminSearchInput");
+  if(!input)return;
+  const opening=input.style.display==="none" || !input.style.display;
+  input.style.display=opening?"block":"none";
+  if(opening){input.focus();input.setSelectionRange(input.value.length,input.value.length);}
+  else if(input.value){input.value="";setAdminSearchTerm("");}
 }
 function setAdminSearchTerm(value){
   adminSearchTerm=String(value||"").trim().toLowerCase();
   renderAdmin();
-  const input=document.getElementById("adminSearchInput");
-  if(input){input.style.display="block";input.focus();input.setSelectionRange(input.value.length,input.value.length);}
 }
 
 function renderAdmin(){
@@ -2137,7 +2138,7 @@ document.addEventListener("change", function(e){
           <option value="ALL">ALL</option>
         </select>
         <button type="button" class="admin-btn secondary" id="adminSearchToggle" onclick="toggleAdminSearch()" title="Search channels" aria-label="Search channels" style="height:40px;padding:0 12px">⌕ Search</button>
-
+        <input id="adminSearchInput" type="search" placeholder="Search channels..." autocomplete="off" aria-label="Search admin channels" value="" oninput="setAdminSearchTerm(this.value)" style="display:none;height:40px;flex:1 1 180px;min-width:120px;max-width:300px;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0">
       </div>
       <div id="adminRows"></div>
       <div id="adminMessage" class="admin-message"></div>
