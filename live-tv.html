@@ -1129,10 +1129,12 @@ function playChannelInPage(channel){
   video.pause();
   video.removeAttribute("src");
   video.load();
-  const url=String(channel.url).trim();
+  const rawUrl=String(channel.url).trim();
+  let url=rawUrl;
   let youtubeId="";
+  let parsed=null;
   try{
-    const parsed=new URL(url);
+    parsed=new URL(rawUrl);
     if(parsed.hostname==="youtu.be" || parsed.hostname.endsWith(".youtu.be")){
       youtubeId=parsed.pathname.split("/").filter(Boolean)[0]||"";
     }else if(parsed.hostname.includes("youtube.com") || parsed.hostname.includes("youtube-nocookie.com")){
@@ -1143,17 +1145,22 @@ function playChannelInPage(channel){
       }
     }
   }catch(e){}
-  const oldYoutube=playerWrap?.querySelector(".youtube-frame");
-  if(oldYoutube) oldYoutube.remove();
+  const oldFrames=playerWrap?.querySelectorAll(".youtube-frame,.external-embed-frame");
+  oldFrames?.forEach(frame=>frame.remove());
   video.style.display="";
-  if(youtubeId){
+
+  // Embedded player pages (not raw .m3u8 streams) need an iframe rather than HLS.js.
+  const isEmbedPage=!!(parsed && /\/embed\//i.test(parsed.pathname) && !/\.m3u8(?:$|[?#])/i.test(parsed.pathname));
+  if(youtubeId || isEmbedPage){
     video.style.display="none";
     if(message) message.style.display="none";
     const iframe=document.createElement("iframe");
-    iframe.className="youtube-frame";
-    iframe.src="https://www.youtube.com/embed/"+encodeURIComponent(youtubeId)+"?autoplay=1&playsinline=1&rel=0";
-    iframe.title=(channel.name||"YouTube video");
-    iframe.allow="autoplay; encrypted-media; picture-in-picture; web-share";
+    iframe.className=youtubeId?"youtube-frame":"external-embed-frame";
+    iframe.src=youtubeId
+      ? "https://www.youtube.com/embed/"+encodeURIComponent(youtubeId)+"?autoplay=1&playsinline=1&rel=0"
+      : rawUrl;
+    iframe.title=(channel.name||"Live TV");
+    iframe.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";
     iframe.allowFullscreen=true;
     iframe.referrerPolicy="strict-origin-when-cross-origin";
     iframe.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:0;background:#000";
@@ -1161,9 +1168,17 @@ function playChannelInPage(channel){
     document.getElementById("tvPlayerContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
+
+  // HTTPS pages cannot request HTTP media. Try the same URL over HTTPS where supported;
+  // this does not bypass browser security and will fail if the source has no HTTPS endpoint.
+  if(location.protocol==="https:" && /^http:\/\//i.test(url)){
+    url=url.replace(/^http:\/\//i,"https://");
+  }
+
   if(message){
     message.style.display="flex";
-    message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Loading stream…</span>`;
+    const wasHttp=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
+    message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>${wasHttp?"Trying secure HTTPS stream…":"Loading stream…"}</span>`;
   }
   if(window.Hls && window.Hls.isSupported() && /\.m3u8(?:$|[?#])/i.test(url)){
     liveHlsInstance=new Hls({enableWorker:true});
@@ -1176,7 +1191,8 @@ function playChannelInPage(channel){
     liveHlsInstance.on(Hls.Events.ERROR,(_event,data)=>{
       if(data && data.fatal && message){
         message.style.display="flex";
-        message.innerHTML=`<strong>Stream unavailable</strong><span>This channel may block playback or its stream may be offline.</span>`;
+        const insecureBlocked=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
+        message.innerHTML=`<strong>Stream unavailable</strong><span>${insecureBlocked?"The HTTPS version could not be played. This source may not support HTTPS; the player cannot bypass browser Mixed Content security.":"This channel may block playback or its stream may be offline."}</span>`;
       }
     });
   }else{
@@ -1185,11 +1201,19 @@ function playChannelInPage(channel){
     video.play().then(()=>{
       if(message) message.style.display="none";
     }).catch(()=>{
-      if(message){message.style.display="flex";message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Press Play, or this stream may not support in-page playback.</span>`;}
+      if(message){
+        message.style.display="flex";
+        const insecureBlocked=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
+        message.innerHTML=`<strong>Unable to play this stream</strong><span>${insecureBlocked?"HTTPS playback failed. The source needs an HTTPS stream or a permitted HTTPS proxy.":"Press Play, or this stream may not support in-page playback."}</span>`;
+      }
     });
     video.onplaying=()=>{if(message) message.style.display="none";};
     video.onerror=()=>{
-      if(message){message.style.display="flex";message.innerHTML=`<strong>Unable to play this stream</strong><span>The channel may be offline or blocked by its provider.</span>`;}
+      if(message){
+        message.style.display="flex";
+        const insecureBlocked=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
+        message.innerHTML=`<strong>Unable to play this stream</strong><span>${insecureBlocked?"This source may not support HTTPS. A player-code change cannot bypass Mixed Content blocking.":"The channel may be offline or blocked by its provider."}</span>`;
+      }
     };
   }
   document.getElementById("tvPlayerContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
@@ -1799,7 +1823,8 @@ async function saveCentralPost(payload){
     method:"POST",
     mode:"no-cors",
     headers:{"Content-Type":"text/plain;charset=UTF-8"},
-    body:JSON.stringify(payload)
+    body:JSON.stringify(payload),
+    keepalive:true
   });
 }
 
