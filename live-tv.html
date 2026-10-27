@@ -988,6 +988,13 @@ if ('serviceWorker' in navigator) {
 }
 </style>
 
+
+<style id="recording-label-timer-and-save-toast-fix">
+/* Keep the timer hidden while the RECORDING label is shown. */
+#recordButton.show-recording-label #recordTimer{display:none!important}
+/* The saved label already contains one checkmark; hide the separate dot. */
+#recordButton.record-saved .record-live-dot{display:none!important}
+</style>
 </head>
 
 <body>
@@ -2457,7 +2464,7 @@ document.addEventListener("change", function(e){
         try{
           const type=savedRecorder?.mimeType||mimeType||"video/mp4";
           const blob=new Blob(chunks,{type});
-          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration);recordButton.classList.remove("show-recording-label","show-recording-time","is-recording");recordButton.classList.add("record-saved");document.querySelector(".player-wrap")?.classList.add("recording-overlay-active");recordButtonLabel.textContent="✓ RECORD SAVED";recordTimer.classList.remove("visible");recordButton.querySelector(".record-live-dot").textContent="✓";showChangeToast("Recording saved: "+item.name);await refreshLibrary();setTimeout(()=>{if(!window.__soikatRecordingActive){recordButton.classList.remove("record-saved");document.querySelector(".player-wrap")?.classList.remove("recording-overlay-active");recordButtonLabel.textContent="RECORD";recordButton.querySelector(".record-live-dot").textContent="●"}},3200)}
+          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration);recordButton.classList.remove("show-recording-label","show-recording-time","is-recording");recordButton.classList.add("record-saved");document.querySelector(".player-wrap")?.classList.add("recording-overlay-active");recordButtonLabel.textContent="✓ RECORD SAVED";recordTimer.classList.remove("visible");recordButton.querySelector(".record-live-dot").textContent="";await refreshLibrary();setTimeout(()=>{if(!window.__soikatRecordingActive){recordButton.classList.remove("record-saved");document.querySelector(".player-wrap")?.classList.remove("recording-overlay-active");recordButtonLabel.textContent="RECORD";recordButton.querySelector(".record-live-dot").textContent="●"}},3200)}
           else status.textContent="No recording data received. This channel may not support capture.";
         }catch(e){status.textContent="Could not save recording. Check available device storage."}
         finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;window.__soikatRecordingActive=false;recordButton.classList.remove("is-recording","show-recording-label","show-recording-time");if(!recordButton.classList.contains("record-saved")){recordButtonLabel.textContent="RECORD";recordButton.querySelector(".record-live-dot").textContent="●"}recordButton.setAttribute("aria-label","Start recording");if(recordTimer){recordTimer.classList.remove("visible");recordTimer.textContent="00:00"}if(recordingLabelTimer){clearInterval(recordingLabelTimer);recordingLabelTimer=null}}
