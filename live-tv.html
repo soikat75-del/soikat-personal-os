@@ -1017,6 +1017,23 @@ if ('serviceWorker' in navigator) {
 /* Align the blinking recording dot with the RECORDING label. */
 #recordButton .record-live-dot{position:relative!important;top:-2px!important;vertical-align:middle!important;line-height:1!important}
 </style>
+
+<style id="mobile-position-and-saved-label-final-fix">
+/* Mobile: nudge both controls slightly right without altering laptop placement. */
+@media(max-width:700px){
+  #recordButton{left:34px!important}
+  #sleepTimerButton{left:64px!important}
+  /* Keep the sleep icon clear of the full-width RECORD SAVED label. */
+  #recordButton.record-saved + #sleepTimerButton{left:176px!important}
+  .player-wrap.recording-overlay-active #sleepTimerButton{left:176px!important}
+}
+/* On laptop, reserve enough room for RECORD SAVED so it cannot collide with SLEEP. */
+@media(min-width:701px){
+  #recordButton.record-saved + #sleepTimerButton{left:168px!important}
+  .player-wrap.recording-overlay-active #sleepTimerButton{left:168px!important}
+}
+</style>
+
 </head>
 
 <body>
