@@ -2642,3 +2642,17 @@ document.addEventListener("change", function(e){
 @media (min-width:701px){#recordButton .record-live-dot{font-size:22px!important;line-height:20px!important}#sleepTimerButton{left:42px!important;top:8px!important}.player-wrap.recording-overlay-active #sleepTimerButton{left:116px!important;top:8px!important}#recordButton.record-saved + #sleepTimerButton{left:126px!important}}
 @media (max-width:700px){#recordButton{left:12px!important;top:6px!important}#recordButton .record-live-dot{font-size:15px!important;line-height:16px!important}#sleepTimerButton{left:38px!important;top:6px!important}.player-wrap.recording-overlay-active #sleepTimerButton{left:116px!important;top:6px!important}#recordButton.record-saved + #sleepTimerButton{left:126px!important}}
 </style>
+
+<style id="laptop-recording-saved-no-overlap">
+/* Laptop only: reserve enough room for the status label so SLEEP never overlaps it. */
+@media (min-width: 701px) {
+  .player-wrap.recording-overlay-active:not(:has(#recordButton.record-saved)) #sleepTimerButton {
+    left: 154px !important;
+    top: 8px !important;
+  }
+  #recordButton.record-saved + #sleepTimerButton {
+    left: 166px !important;
+    top: 8px !important;
+  }
+}
+</style>
