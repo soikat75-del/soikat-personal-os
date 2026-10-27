@@ -2584,6 +2584,17 @@ document.addEventListener("change", function(e){
   minutesInput.addEventListener("input",()=>minutesInput.setCustomValidity(""));
 })();
 </script>
+
+<style id="final-laptop-dot-sleep-alignment">
+/* Laptop: align the dot and sleep icon on one center line and tighten their gap. */
+@media (min-width: 701px) {
+  #recordButton { left:10px!important; top:10px!important; width:22px!important; height:22px!important; display:flex!important; align-items:center!important; justify-content:center!important; }
+  #recordButton .record-live-dot { font-size:22px!important; line-height:22px!important; transform:translateY(-1px)!important; }
+  #sleepTimerButton { left:39px!important; top:12px!important; }
+  .player-wrap.recording-overlay-active #sleepTimerButton { left:164px!important; top:12px!important; }
+}
+</style>
+
 </body>
 </html>
 
