@@ -856,7 +856,14 @@ footer{
 @media(max-width:700px){#sleepTimerButton{top:6px;right:6px;padding:6px 7px;font-size:11px}.sleep-timer-card{padding:16px}}
 #recordButton{position:absolute;top:10px;left:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(255,95,105,.7);border-radius:9px;background:rgba(35,8,15,.9);color:#ff9aa2;font-size:12px;font-weight:800;cursor:pointer;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
 .player-wrap:hover #recordButton,.player-wrap.controls-visible #recordButton,#recordButton:focus-visible{opacity:1;visibility:visible;pointer-events:auto}
-#recordButton.is-recording{background:#5b101b;color:#fff;border-color:#ff354d;animation:recordPulse 1.4s ease-in-out infinite}
+#recordButton.is-recording{background:#5b101b;color:#fff;border-color:#ff354d}
+#recordButton.is-recording .record-live-dot{animation:recordDotBlink .85s steps(2,start) infinite}
+.record-live-dot{display:inline-block}
+@keyframes recordDotBlink{to{visibility:hidden}}
+#recordTimer{position:absolute;top:10px;left:126px;z-index:5;display:none;padding:7px 9px;border:1px solid rgba(255,95,105,.45);border-radius:9px;background:rgba(35,8,15,.82);color:#ffb3ba;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+#recordTimer.visible{display:block}
+.recording-tools{display:none!important}
+@media(max-width:700px){#recordTimer{top:6px;left:105px;padding:6px 7px;font-size:10px}}
 @keyframes recordPulse{50%{box-shadow:0 0 14px rgba(255,53,77,.4)}}
 .recording-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(820px,calc(100% - 32px));margin:10px auto 0;color:#8299bb;font-size:11px}
 #openRecordingsButton{border:1px solid #29476e;border-radius:8px;background:#071321;color:#b9c9e3;padding:8px 10px;font-size:10px;font-weight:800;letter-spacing:.06em;cursor:pointer}
@@ -924,7 +931,8 @@ if ('serviceWorker' in navigator) {
   <section class="player-panel">
     <div class="player-wrap">
       <video id="livePlayer" controls playsinline autoplay></video>
-      <button type="button" id="recordButton" aria-label="Start recording" title="Record this stream">● <span id="recordButtonLabel">RECORD</span></button>
+      <button type="button" id="recordButton" aria-label="Start recording" title="Record this stream"><span class="record-live-dot">●</span> <span id="recordButtonLabel">RECORD</span></button>
+      <span id="recordTimer" aria-live="off">00:00</span>
       <button type="button" id="sleepTimerButton" aria-label="Sleep timer" title="Sleep timer" aria-haspopup="dialog" aria-controls="sleepTimerPopup">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
         <span id="sleepTimerLabel">SLEEP</span>
@@ -938,7 +946,7 @@ if ('serviceWorker' in navigator) {
 </div>
 <div class="recording-tools">
   <div id="recordingStatus" role="status" aria-live="polite">Recording is off</div>
-  <button type="button" id="openRecordingsButton">MY RECORDINGS <span id="recordingsCount">(0)</span></button>
+  <button type="button" id="openRecordingsButton" hidden>MY RECORDINGS <span id="recordingsCount" hidden>(0)</span></button>
 </div>
 <div id="recordingsPopup" class="sleep-timer-popup" role="dialog" aria-modal="true" aria-labelledby="recordingsTitle" hidden>
   <div class="recordings-card">
@@ -1078,10 +1086,17 @@ function renderPublicCategories(){
       const name = String(cat).toUpperCase();
       const count = CHANNELS.filter(ch => String(ch.category || "").toUpperCase() === name).length;
       return `<button class="category ${active===name?"active":""}" data-category="${escapeAttr(name)}">${escapeHtml(name)}${active===name ? ` (${count})` : ""}</button>`;
-    }).join("");
+    }).join("") +
+    (window.__soikatHasRecordings ? `<button class="category ${active==="MY RECORDINGS"?"active":""}" data-category="MY RECORDINGS">MY RECORDINGS</button>` : "");
   wrap.querySelectorAll(".category").forEach(button => {
     button.addEventListener("click", function(){
-      selectedCategory = String(this.dataset.category || "ALL").toUpperCase();
+      const category = String(this.dataset.category || "ALL").toUpperCase();
+      if(category === "MY RECORDINGS"){
+        const popup=document.getElementById("recordingsPopup");
+        if(popup){popup.hidden=false;const playback=document.getElementById("recordingPlayback");if(playback){playback.pause();playback.removeAttribute("src");playback.load();playback.hidden=true;}const refresh=window.__soikatRefreshRecordings;if(refresh)refresh();}
+        return;
+      }
+      selectedCategory = category;
       try{sessionStorage.setItem(SELECTED_CATEGORY_KEY,selectedCategory)}catch(e){}
       renderPublicCategories();
       renderChannels();
@@ -2239,7 +2254,7 @@ document.addEventListener("change", function(e){
   function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE))req.result.createObjectStore(STORE,{keyPath:"id"})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
   async function dbAction(mode,fn){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);const store=tx.objectStore(STORE);let result;try{result=fn(store)}catch(e){db.close();reject(e);return}tx.oncomplete=()=>{db.close();resolve(result?.result)};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error||new Error("Storage transaction failed"))}})}
   function fmtDuration(ms){const sec=Math.max(0,Math.floor(ms/1000));return String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor(sec%3600/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}
-  async function refreshLibrary(){try{const items=await dbAction("readonly",s=>s.getAll());count.textContent="("+(items||[]).length+")";if(!items||!items.length){list.innerHTML='<div class="recordings-empty">No recordings yet.</div>';return}items.sort((a,b)=>b.createdAt-a.createdAt);list.innerHTML=items.map(item=>`<div class="recording-item"><div class="recording-meta"><div class="recording-name">${escapeHtml(item.name||"Live TV recording")}</div><div class="recording-detail">${new Date(item.createdAt).toLocaleString()} · ${fmtDuration(item.duration)} · ${(item.size/1048576).toFixed(1)} MB</div></div><button type="button" data-play-recording="${item.id}">PLAY</button><button type="button" data-download-recording="${item.id}">DOWNLOAD</button><button type="button" class="recording-delete" data-delete-recording="${item.id}">DELETE</button></div>`).join("")}catch(e){list.innerHTML='<div class="recordings-empty">Browser storage is unavailable.</div>'}}
+  async function refreshLibrary(){try{const items=await dbAction("readonly",s=>s.getAll());count.textContent="";const hasItems=!!(items&&items.length);window.__soikatHasRecordings=hasItems;openLibrary.hidden=!hasItems;if(typeof renderPublicCategories==="function")renderPublicCategories();if(!hasItems){list.innerHTML='<div class="recordings-empty">No recordings yet.</div>';return}items.sort((a,b)=>b.createdAt-a.createdAt);list.innerHTML=items.map(item=>`<div class="recording-item"><div class="recording-meta"><div class="recording-name">${escapeHtml(item.name||"Live TV recording")}</div><div class="recording-detail">${new Date(item.createdAt).toLocaleString()} · ${fmtDuration(item.duration)} · ${(item.size/1048576).toFixed(1)} MB</div></div><button type="button" data-play-recording="${item.id}">PLAY</button><button type="button" data-download-recording="${item.id}">DOWNLOAD</button><button type="button" class="recording-delete" data-delete-recording="${item.id}">DELETE</button></div>`).join("")}catch(e){list.innerHTML='<div class="recordings-empty">Browser storage is unavailable.</div>'}}
   async function getRecording(id){return await dbAction("readonly",s=>s.get(id))}
   function resetPlayback(){if(currentPlaybackUrl)URL.revokeObjectURL(currentPlaybackUrl);currentPlaybackUrl="";playback.pause();playback.removeAttribute("src");playback.load();playback.hidden=true}
   function stopCanvasFrames(){if(drawFrameId)cancelAnimationFrame(drawFrameId);drawFrameId=0;recordingCanvas=null;canvasContext=null;}
@@ -2321,8 +2336,9 @@ document.addEventListener("change", function(e){
       // This captures speaker sound acoustically, so the iPhone must play audio aloud
       // (not through headphones) and microphone permission must be granted.
       try{
+        const isIOSDevice=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
         const AudioCtx=window.AudioContext||window.webkitAudioContext;
-        if(AudioCtx&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+        if(isIOSDevice&&AudioCtx&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
           if(!recordingAudioContext){recordingAudioContext=new AudioCtx();recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();}
           if(!recordingMicStream){
             recordingMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
@@ -2352,7 +2368,7 @@ document.addEventListener("change", function(e){
           if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio mixed in (verify playback)":recordingMode==="canvas-video-only"?" · video only (audio unavailable)":recordingMode==="canvas-video-audio-attempt"?" · video + audio track attempted (verify playback)":"");await refreshLibrary()}
           else status.textContent="No recording data received. This channel may not support capture.";
         }catch(e){status.textContent="Could not save recording. Check available device storage."}
-        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording")}
+        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording");if(recordTimer){recordTimer.classList.remove("visible");recordTimer.textContent="00:00"}}
       };
       recorder.start(1000);if(recordingMode.includes("canvas-video"))startCanvasFrames();
       recordButton.classList.add("is-recording");recordButtonLabel.textContent="STOP";recordButton.setAttribute("aria-label","Stop recording");status.textContent="Recording… 00:00:00"+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
