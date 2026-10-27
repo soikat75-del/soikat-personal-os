@@ -2595,6 +2595,23 @@ document.addEventListener("change", function(e){
 }
 </style>
 
+
+<style id="final-record-sleep-alignment-adjustment">
+/* Keep both controls on one shared top line; match dot size to the sleep icon. */
+#recordButton, #sleepTimerButton { top: 8px !important; bottom: auto !important; transform: none !important; align-self: flex-start !important; vertical-align: top !important; }
+#recordButton { left: 8px !important; line-height: 16px !important; }
+#recordButton .record-live-dot { display: inline-block !important; font-size: 15px !important; line-height: 16px !important; vertical-align: top !important; }
+#sleepTimerButton { left: 34px !important; line-height: 16px !important; }
+#sleepTimerButton svg { width: 16px !important; height: 16px !important; }
+@media (max-width: 700px) {
+  #recordButton, #sleepTimerButton { top: 6px !important; }
+  #recordButton { left: 6px !important; }
+  #recordButton .record-live-dot { font-size: 15px !important; line-height: 16px !important; }
+  #sleepTimerButton { left: 30px !important; }
+  #sleepTimerButton svg { width: 16px !important; height: 16px !important; }
+}
+</style>
+
 </body>
 </html>
 
