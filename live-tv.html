@@ -2298,6 +2298,9 @@ document.addEventListener("change", function(e){
 #scrollToTopBtn.visible{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
 #scrollToTopBtn:hover{border-color:#5e8fff;background:#102845}
 @media(max-width:600px){#scrollToTopBtn{right:14px;bottom:16px;width:34px;height:34px}#scrollToTopBtn svg{width:19px;height:19px}}
+/* Keep the SLEEP control clear of the longer RECORD SAVED label. */
+#recordButton.record-saved + #sleepTimerButton{left:178px!important}
+@media(max-width:700px){#recordButton.record-saved + #sleepTimerButton{left:178px!important}}
 </style>
 <script>
 (()=>{
