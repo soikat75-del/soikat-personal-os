@@ -2290,28 +2290,35 @@ document.addEventListener("change", function(e){
         try{
           stream=recordingCanvas.captureStream(25);
           recordingMode="canvas-video-only";
-          // Best-effort iOS audio capture: route the playing media element through Web Audio,
-          // then combine its audio track with the canvas video track. Cross-origin sources may
-          // intentionally produce silence; the browser does not permit bypassing that restriction.
-          try{
-            const AudioCtx=window.AudioContext||window.webkitAudioContext;
-            if(AudioCtx){
-              if(!recordingAudioContext){
-                recordingAudioContext=new AudioCtx();
-                recordingAudioSource=recordingAudioContext.createMediaElementSource(video);
-                recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();
-                recordingAudioSource.connect(recordingAudioDestination);
-                recordingAudioSource.connect(recordingAudioContext.destination);
-              }
-              if(recordingAudioContext.state==="suspended")await recordingAudioContext.resume();
-              recordingAudioDestination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
-              if(stream.getAudioTracks().length)recordingMode="canvas-video-audio-attempt";
-            }
-          }catch(audioErr){console.warn("iPhone audio capture unavailable for this stream:",audioErr)}
+          // Audio is attached below for both direct and canvas video capture modes.
         }
         catch(err){stopCanvasFrames();status.textContent="Safari blocked canvas capture for this stream (possibly CORS protected).";return;}
       }
       if(!stream||!stream.getTracks().some(t=>t.kind==="video")){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="No video track available. This channel cannot be recorded by the browser.";return;}
+
+      // Add audio for BOTH capture paths. Some Safari versions expose a video-only
+      // captureStream(), so do not assume the direct stream already contains audio.
+      if(stream.getAudioTracks().length===0){
+        try{
+          const AudioCtx=window.AudioContext||window.webkitAudioContext;
+          if(AudioCtx){
+            if(!recordingAudioContext){
+              recordingAudioContext=new AudioCtx();
+              recordingAudioSource=recordingAudioContext.createMediaElementSource(video);
+              recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();
+              recordingAudioSource.connect(recordingAudioDestination);
+              recordingAudioSource.connect(recordingAudioContext.destination);
+            }
+            if(recordingAudioContext.state!=="running")await recordingAudioContext.resume();
+            const audioTracks=recordingAudioDestination.stream.getAudioTracks();
+            audioTracks.forEach(track=>{if(!stream.getAudioTracks().some(t=>t.id===track.id))stream.addTrack(track)});
+            if(stream.getAudioTracks().length)recordingMode=recordingMode==="direct"?"direct+web-audio":"canvas-video-audio-attempt";
+          }
+        }catch(audioErr){console.warn("Audio track capture unavailable for this stream:",audioErr)}
+      }
+      status.textContent=stream.getAudioTracks().length
+        ? "Recording video + audio…"
+        : "Recording video; audio track unavailable for this channel/browser.";
       const mimeCandidates=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp8,opus","video/webm"];
       const mimeType=mimeCandidates.find(t=>MediaRecorder.isTypeSupported(t));
       recorder=new MediaRecorder(stream,mimeType?{mimeType}:undefined);startedAt=Date.now();
