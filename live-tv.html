@@ -2296,11 +2296,14 @@ document.addEventListener("change", function(e){
       }
       if(!stream||!stream.getTracks().some(t=>t.kind==="video")){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="No video track available. This channel cannot be recorded by the browser.";return;}
 
-      // Add audio for BOTH capture paths. Some Safari versions expose a video-only
-      // captureStream(), so do not assume the direct stream already contains audio.
-      if(stream.getAudioTracks().length===0){
+      // Safari on iPhone can silence cross-origin media when it is routed through
+      // createMediaElementSource(). Keep its normal playback path untouched and use
+      // the microphone to capture the speaker acoustically instead. Chrome/other
+      // browsers keep the direct Web Audio capture path.
+      const isIPhoneSafari=/iPhone|iPad|iPod/i.test(navigator.userAgent)&&/Safari/i.test(navigator.userAgent)&&!/CriOS|FxiOS|EdgiOS|OPiOS/i.test(navigator.userAgent);
+      const AudioCtx=window.AudioContext||window.webkitAudioContext;
+      if(stream.getAudioTracks().length===0&&!isIPhoneSafari){
         try{
-          const AudioCtx=window.AudioContext||window.webkitAudioContext;
           if(AudioCtx){
             if(!recordingAudioContext){
               recordingAudioContext=new AudioCtx();
@@ -2316,28 +2319,27 @@ document.addEventListener("change", function(e){
           }
         }catch(audioErr){console.warn("Audio track capture unavailable for this stream:",audioErr)}
       }
-      // Last-resort iPhone Safari workaround: if the stream's audio track exists but
-      // is silent due to cross-origin media restrictions, mix in the device microphone.
-      // This captures speaker sound acoustically, so the iPhone must play audio aloud
-      // (not through headphones) and microphone permission must be granted.
-      try{
-        const AudioCtx=window.AudioContext||window.webkitAudioContext;
-        if(AudioCtx&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-          if(!recordingAudioContext){recordingAudioContext=new AudioCtx();recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();}
-          if(!recordingMicStream){
-            recordingMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
-            recordingMicSource=recordingAudioContext.createMediaStreamSource(recordingMicStream);
-            recordingMicSource.connect(recordingAudioDestination);
+      // iPhone Safari fallback: record the sound acoustically from the device mic.
+      // Play through the iPhone speaker; headphones/Bluetooth output will not be captured.
+      if(stream.getAudioTracks().length===0||isIPhoneSafari){
+        try{
+          if(AudioCtx&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+            if(!recordingAudioContext){recordingAudioContext=new AudioCtx();recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();}
+            if(!recordingMicStream){
+              recordingMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
+              recordingMicSource=recordingAudioContext.createMediaStreamSource(recordingMicStream);
+              recordingMicSource.connect(recordingAudioDestination);
+            }
+            if(recordingAudioContext.state!=="running")await recordingAudioContext.resume();
+            const mixedAudioTracks=recordingAudioDestination.stream.getAudioTracks();
+            mixedAudioTracks.forEach(track=>{if(!stream.getAudioTracks().some(t=>t.id===track.id))stream.addTrack(track)});
+            if(mixedAudioTracks.length)recordingMode+=(recordingMode?"+":"")+"mic-audio-fallback";
           }
-          if(recordingAudioContext.state!=="running")await recordingAudioContext.resume();
-          const mixedAudioTracks=recordingAudioDestination.stream.getAudioTracks();
-          mixedAudioTracks.forEach(track=>{if(!stream.getAudioTracks().some(t=>t.id===track.id))stream.addTrack(track)});
-          if(mixedAudioTracks.length)recordingMode+=(recordingMode?"+":"")+"mic-audio-fallback";
-        }
-      }catch(micErr){console.warn("Microphone audio fallback unavailable:",micErr)}
+        }catch(micErr){console.warn("Microphone audio fallback unavailable:",micErr)}
+      }
       status.textContent=stream.getAudioTracks().length
-        ? "Recording video + audio attempt. For iPhone fallback, allow microphone and play sound on speaker."
-        : "Recording video; audio unavailable. Microphone permission may be required.";
+        ? (recordingMode.includes("mic-audio-fallback")?"Recording video + microphone audio. Play channel through speaker; verify playback.":"Recording video + audio attempt. Verify playback.")
+        : "Recording video; audio unavailable. Allow microphone permission and retry.";
       const mimeCandidates=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp8,opus","video/webm"];
       const mimeType=mimeCandidates.find(t=>MediaRecorder.isTypeSupported(t));
       recorder=new MediaRecorder(stream,mimeType?{mimeType}:undefined);startedAt=Date.now();
