@@ -2612,6 +2612,24 @@ document.addEventListener("change", function(e){
 }
 </style>
 
+
+<style id="targeted-record-sleep-position-fix">
+/* Only requested alignment corrections: larger laptop dot, slightly right-shifted phone controls, and a shorter active-state gap. */
+@media (min-width: 701px) {
+  #recordButton .record-live-dot { font-size: 22px !important; line-height: 20px !important; }
+  #sleepTimerButton { left: 42px !important; top: 8px !important; }
+  .player-wrap.recording-overlay-active #sleepTimerButton { left: 116px !important; top: 8px !important; }
+  #recordButton.record-saved + #sleepTimerButton { left: 126px !important; }
+}
+@media (max-width: 700px) {
+  #recordButton { left: 12px !important; top: 6px !important; }
+  #recordButton .record-live-dot { font-size: 15px !important; line-height: 16px !important; }
+  #sleepTimerButton { left: 38px !important; top: 6px !important; }
+  .player-wrap.recording-overlay-active #sleepTimerButton { left: 116px !important; top: 6px !important; }
+  #recordButton.record-saved + #sleepTimerButton { left: 126px !important; }
+}
+</style>
+
 </body>
 </html>
 
@@ -2619,4 +2637,8 @@ document.addEventListener("change", function(e){
 /* Keep SLEEP just after the full saved confirmation without overlap. */
 #recordButton.record-saved + #sleepTimerButton{left:166px!important}
 @media(max-width:700px){#recordButton.record-saved + #sleepTimerButton{left:166px!important}}
+</style>
+<style id="final-override-record-sleep-gap">
+@media (min-width:701px){#recordButton .record-live-dot{font-size:22px!important;line-height:20px!important}#sleepTimerButton{left:42px!important;top:8px!important}.player-wrap.recording-overlay-active #sleepTimerButton{left:116px!important;top:8px!important}#recordButton.record-saved + #sleepTimerButton{left:126px!important}}
+@media (max-width:700px){#recordButton{left:12px!important;top:6px!important}#recordButton .record-live-dot{font-size:15px!important;line-height:16px!important}#sleepTimerButton{left:38px!important;top:6px!important}.player-wrap.recording-overlay-active #sleepTimerButton{left:116px!important;top:6px!important}#recordButton.record-saved + #sleepTimerButton{left:126px!important}}
 </style>
