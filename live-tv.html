@@ -833,7 +833,7 @@ footer{
 </style>
 <style>
 /* Sleep timer: compact digital popup; controls appear only on player interaction */
-#sleepTimerButton{position:absolute;top:10px;right:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(145,170,205,.55);border-radius:9px;background:rgba(3,9,20,.88);color:#e9f0ff;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
+#sleepTimerButton{position:absolute;top:10px;right:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid rgba(145,170,205,.55);border-radius:7px;background:rgba(3,9,20,.88);color:#e9f0ff;font-size:10px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
 .player-wrap:hover #sleepTimerButton,.player-wrap.controls-visible #sleepTimerButton,#sleepTimerButton:focus-visible{opacity:1;visibility:visible;pointer-events:auto}
 #sleepTimerButton:hover{border-color:#e8bd4a;color:#ffe08a}
 #sleepTimerLabel{font-variant-numeric:tabular-nums}
@@ -853,11 +853,12 @@ footer{
 .sleep-timer-secondary{flex:1;border:1px solid #31547e;background:#0b1b2e;color:#c5d5ed}
 .sleep-timer-primary{flex:1.3;border:1px solid #d9ae3d;background:linear-gradient(135deg,#f5ca58,#d99a24);color:#15120a}
 .sleep-timer-stop{width:100%;margin-top:9px;border:1px solid #6b3038;background:#35151a;color:#ff9aa2}
-@media(max-width:700px){#sleepTimerButton{top:6px;right:6px;padding:6px 7px;font-size:11px}.sleep-timer-card{padding:16px}}
-#recordButton{position:absolute;top:10px;left:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(255,95,105,.7);border-radius:9px;background:rgba(35,8,15,.9);color:#ff9aa2;font-size:12px;font-weight:800;cursor:pointer;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
+@media(max-width:700px){#sleepTimerButton{top:6px;right:6px;padding:3px 5px;font-size:9px}.sleep-timer-card{padding:16px}}
+#recordButton{position:absolute;bottom:10px;left:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:4px 6px;border:1px solid rgba(255,95,105,.7);border-radius:7px;background:rgba(35,8,15,.9);color:#ff9aa2;font-size:10px;font-weight:800;cursor:pointer;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
 .player-wrap:hover #recordButton,.player-wrap.controls-visible #recordButton,#recordButton:focus-visible,#recordButton.is-recording{opacity:1;visibility:visible;pointer-events:auto}
 #recordButton.is-recording{background:#5b101b;color:#fff;border-color:#ff354d}
 #recordButton.is-recording .record-live-dot{animation:recordDotBlink .85s steps(2,start) infinite}
+#recordButton.is-recording #recordButtonLabel{display:none}
 .record-live-dot{display:inline-block}
 @keyframes recordDotBlink{to{visibility:hidden}}
 #recordTimer{display:none;color:#ffd4d8;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.04em;margin-left:3px;padding-left:8px;border-left:1px solid rgba(255,179,186,.45)}
@@ -869,8 +870,8 @@ footer{
 #openRecordingsButton{border:1px solid #29476e;border-radius:8px;background:#071321;color:#b9c9e3;padding:8px 10px;font-size:10px;font-weight:800;letter-spacing:.06em;cursor:pointer}
 #openRecordingsButton:hover{border-color:#3d96ff;color:#fff}
 .recordings-card{width:min(560px,100%);max-height:85vh;overflow:auto;padding:18px;border:1px solid #29476e;border-radius:16px;background:linear-gradient(145deg,#0c1c31,#050d19);box-shadow:0 24px 80px rgba(0,0,0,.6);color:#e9f0ff}
-.recordings-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}.recording-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #203b5d;border-radius:10px;background:#071525}.recording-meta{flex:1;min-width:0}.recording-name{font-size:12px;font-weight:800;overflow-wrap:anywhere}.recording-detail{margin-top:4px;color:#8299bb;font-size:10px}.recording-item button{border:1px solid #31547e;border-radius:7px;background:#0b1b2e;color:#dfeaff;padding:7px 9px;font-size:10px;font-weight:700;cursor:pointer}.recording-item .recording-delete{border-color:#6b3038;color:#ff9aa2}.recordings-empty{padding:24px;text-align:center;color:#8299bb;font-size:12px}#recordingPlayback{width:100%;max-height:45vh;margin-top:12px;background:#000;border-radius:8px}
-@media(max-width:700px){#recordButton{top:6px;left:6px;padding:6px 7px;font-size:10px}.recording-tools{width:calc(100% - 20px)}.recordings-card{padding:14px}.recording-item{flex-wrap:wrap}.recording-item button{padding:7px}}
+.recordings-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}.recording-item{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px;border:1px solid #203b5d;border-radius:10px;background:#071525}.recording-meta{flex:1;min-width:0}.recording-name{font-size:12px;font-weight:800;overflow-wrap:anywhere}.recording-detail{margin-top:4px;color:#8299bb;font-size:10px}.recording-item button{border:1px solid #31547e;border-radius:7px;background:#0b1b2e;color:#dfeaff;padding:7px 9px;font-size:10px;font-weight:700;cursor:pointer}.recording-item .recording-delete{border-color:#6b3038;color:#ff9aa2}.recordings-empty{padding:24px;text-align:center;color:#8299bb;font-size:12px}#recordingPlayback{width:100%;max-height:45vh;margin-top:12px;background:#000;border-radius:8px}.recording-inline-player{display:block;flex:0 0 100%;width:100%;max-height:45vh;margin-top:8px;background:#000;border-radius:8px}.recording-inline-player[hidden]{display:none}
+@media(max-width:700px){#recordButton{bottom:6px;left:6px;padding:3px 5px;font-size:9px}.recording-tools{width:calc(100% - 20px)}.recordings-card{padding:14px}.recording-item{flex-wrap:wrap}.recording-item button{padding:7px}}
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -922,7 +923,7 @@ if ('serviceWorker' in navigator) {
 <body>
 
 <header class="topbar">
-  <a class="back" href="javascript:history.back()">← Back</a>
+  <a class="back" id="pageBackLink" href="javascript:history.back()">← Back</a>
   <div class="logo">SOIKAT · LIVE TV</div>
   <div class="clock-stack"><div class="session-timer timer-stage-0" id="sessionTimer" aria-label="Session timer">00:00:00</div></div>
 </header>
@@ -1330,12 +1331,14 @@ function renderChannels(){
     });
   });
   channelsEl.querySelectorAll(".channel-card").forEach(card=>{
-    const playSelectedChannel = event => {
+    const playSelectedChannel = async event => {
       if(event && event.target.closest(".channel-favorite")) return;
       const key=card.dataset.channelKey||"";
       const channel=CHANNELS.find(ch=>channelFavoriteKey(ch)===key);
       if(!channel) return;
+      if(window.__soikatRecordingActive && !(await window.__soikatConfirmRecordingInterruption("Changing channels"))) return;
       currentlyPlayingKey=key;
+      window.__soikatCurrentChannelName=channel.name||"Live TV";
       playChannelInPage(channel);
       renderChannels();
     };
@@ -2233,6 +2236,14 @@ document.addEventListener("change", function(e){
  update();
 })();
 </script>
+<div id="recordingActionDialog" class="sleep-timer-popup" role="dialog" aria-modal="true" aria-labelledby="recordingActionTitle" hidden>
+  <div class="sleep-timer-card">
+    <div class="sleep-timer-heading"><strong id="recordingActionTitle">Confirm action</strong><button type="button" id="recordingActionClose" class="sleep-timer-close" aria-label="Close">×</button></div>
+    <p id="recordingActionMessage" class="sleep-timer-hint" style="margin:14px 0"></p>
+    <input id="recordingActionInput" type="text" maxlength="120" style="display:none;width:100%;box-sizing:border-box;height:42px;border:1px solid #31547e;border-radius:8px;background:#071525;color:#e9f0ff;padding:0 10px;margin:8px 0" />
+    <div class="sleep-timer-actions"><button type="button" id="recordingActionCancel" class="sleep-timer-secondary">CANCEL</button><button type="button" id="recordingActionConfirm" class="sleep-timer-primary">CONTINUE</button></div>
+  </div>
+</div>
 <script>
 (()=>{
   const recordButton=document.getElementById("recordButton");
@@ -2250,11 +2261,20 @@ document.addEventListener("change", function(e){
   const DB_NAME="SoikatLiveTVRecordings", STORE="recordings";
   let recorder=null,chunks=[],startedAt=0,activeName="Live TV",stream=null,recordingCanvas=null,canvasContext=null,drawFrameId=0,recordingMode="";
   let currentPlaybackUrl="";
+  const actionDialog=document.getElementById("recordingActionDialog"), actionTitle=document.getElementById("recordingActionTitle"), actionMessage=document.getElementById("recordingActionMessage"), actionInput=document.getElementById("recordingActionInput"), actionConfirm=document.getElementById("recordingActionConfirm"), actionCancel=document.getElementById("recordingActionCancel"), actionClose=document.getElementById("recordingActionClose");
+  let actionResolve=null;
+  function askAction(title,message,confirmLabel="CONTINUE",inputValue=null){return new Promise(resolve=>{actionResolve=resolve;actionTitle.textContent=title;actionMessage.textContent=message;actionConfirm.textContent=confirmLabel;actionInput.style.display=inputValue===null?"none":"block";actionInput.value=inputValue===null?"":inputValue;actionDialog.hidden=false;if(inputValue!==null){actionInput.focus();actionInput.select()}else actionConfirm.focus()})}
+  function finishAction(value){actionDialog.hidden=true;const resolve=actionResolve;actionResolve=null;if(resolve)resolve(value)}
+  actionConfirm.addEventListener("click",()=>finishAction(actionInput.style.display!=="none"?actionInput.value.trim():true));
+  actionCancel.addEventListener("click",()=>finishAction(false));actionClose.addEventListener("click",()=>finishAction(false));
+  actionDialog.addEventListener("click",e=>{if(e.target===actionDialog)finishAction(false)});
+  window.__soikatRecordingActive=false;
+  window.__soikatConfirmRecordingInterruption=async reason=>{if(!window.__soikatRecordingActive)return true;return await askAction("Recording is in progress",`Recording is active. ${reason} may interrupt or damage this recording. Continue anyway?`,"CONTINUE")===true};
   let recordingAudioContext=null,recordingAudioSource=null,recordingAudioDestination=null,recordingMicStream=null,recordingMicSource=null;
   function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE))req.result.createObjectStore(STORE,{keyPath:"id"})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
   async function dbAction(mode,fn){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);const store=tx.objectStore(STORE);let result;try{result=fn(store)}catch(e){db.close();reject(e);return}tx.oncomplete=()=>{db.close();resolve(result?.result)};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error||new Error("Storage transaction failed"))}})}
   function fmtDuration(ms){const sec=Math.max(0,Math.floor(ms/1000));return String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor(sec%3600/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}
-  async function refreshLibrary(){try{const items=await dbAction("readonly",s=>s.getAll());count.textContent="";const hasItems=!!(items&&items.length);window.__soikatHasRecordings=hasItems;openLibrary.hidden=!hasItems;if(typeof renderPublicCategories==="function")renderPublicCategories();if(!hasItems){list.innerHTML='<div class="recordings-empty">No recordings yet.</div>';return}items.sort((a,b)=>b.createdAt-a.createdAt);list.innerHTML=items.map(item=>`<div class="recording-item"><div class="recording-meta"><div class="recording-name">${escapeHtml(item.name||"Live TV recording")}</div><div class="recording-detail">${new Date(item.createdAt).toLocaleString()} · ${fmtDuration(item.duration)} · ${(item.size/1048576).toFixed(1)} MB</div></div><button type="button" data-play-recording="${item.id}">PLAY</button><button type="button" data-download-recording="${item.id}">DOWNLOAD</button><button type="button" class="recording-delete" data-delete-recording="${item.id}">DELETE</button></div>`).join("")}catch(e){list.innerHTML='<div class="recordings-empty">Browser storage is unavailable.</div>'}}
+  async function refreshLibrary(){try{const items=await dbAction("readonly",s=>s.getAll());count.textContent="";const hasItems=!!(items&&items.length);window.__soikatHasRecordings=hasItems;openLibrary.hidden=!hasItems;if(typeof renderPublicCategories==="function")renderPublicCategories();if(!hasItems){list.innerHTML='<div class="recordings-empty">No recordings yet.</div>';return}items.sort((a,b)=>b.createdAt-a.createdAt);list.innerHTML=items.map(item=>`<div class="recording-item" data-recording-item="${item.id}"><div class="recording-meta"><div class="recording-name">${escapeHtml(item.name||"Live TV recording")}</div><div class="recording-detail">${new Date(item.createdAt).toLocaleString()} · ${fmtDuration(item.duration)} · ${(item.size/1048576).toFixed(1)} MB</div></div><button type="button" data-play-recording="${item.id}">PLAY</button><button type="button" data-rename-recording="${item.id}">EDIT</button><button type="button" data-download-recording="${item.id}">DOWNLOAD</button><button type="button" class="recording-delete" data-delete-recording="${item.id}">DELETE</button><video class="recording-inline-player" data-inline-player="${item.id}" controls playsinline hidden></video></div>`).join("")}catch(e){list.innerHTML='<div class="recordings-empty">Browser storage is unavailable.</div>'}}
   async function getRecording(id){return await dbAction("readonly",s=>s.get(id))}
   function resetPlayback(){if(currentPlaybackUrl)URL.revokeObjectURL(currentPlaybackUrl);currentPlaybackUrl="";playback.pause();playback.removeAttribute("src");playback.load();playback.hidden=true}
   function stopCanvasFrames(){if(drawFrameId)cancelAnimationFrame(drawFrameId);drawFrameId=0;recordingCanvas=null;canvasContext=null;}
@@ -2357,7 +2377,7 @@ document.addEventListener("change", function(e){
       const mimeCandidates=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp8,opus","video/webm"];
       const mimeType=mimeCandidates.find(t=>MediaRecorder.isTypeSupported(t));
       recorder=new MediaRecorder(stream,mimeType?{mimeType}:undefined);startedAt=Date.now();
-      const playingCard=document.querySelector(".channel-card.currently-playing");activeName=playingCard?.innerText?.trim().split("\n")[0]||"Live TV";
+      const playingCard=document.querySelector(".channel-card.currently-playing");activeName=playingCard?.querySelector(".channel-name")?.childNodes?.[0]?.textContent?.trim()||playingCard?.innerText?.trim().split("\n")[0]||window.__soikatCurrentChannelName||"Live TV";
       recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
       recorder.onerror=()=>{status.textContent="Recording failed. This channel or browser may block capture.";recordButton.disabled=false};
       recorder.onstop=async()=>{
@@ -2368,17 +2388,18 @@ document.addEventListener("change", function(e){
           if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio mixed in (verify playback)":recordingMode==="canvas-video-only"?" · video only (audio unavailable)":recordingMode==="canvas-video-audio-attempt"?" · video + audio track attempted (verify playback)":"");await refreshLibrary()}
           else status.textContent="No recording data received. This channel may not support capture.";
         }catch(e){status.textContent="Could not save recording. Check available device storage."}
-        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording");if(recordTimer){recordTimer.classList.remove("visible");recordTimer.textContent="00:00"}}
+        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;window.__soikatRecordingActive=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording");if(recordTimer){recordTimer.classList.remove("visible");recordTimer.textContent="00:00"}}
       };
       recorder.start(1000);if(recordingMode.includes("canvas-video"))startCanvasFrames();
-      recordButton.classList.add("is-recording");recordButtonLabel.textContent="RECORDING";recordButton.setAttribute("aria-label","Stop recording");if(recordTimer){recordTimer.classList.add("visible");recordTimer.textContent="00:00"}status.textContent="Recording… 00:00:00"+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
+      window.__soikatRecordingActive=true;recordButton.classList.add("is-recording");recordButtonLabel.textContent="RECORDING";recordButton.setAttribute("aria-label","Stop recording");if(recordTimer){recordTimer.classList.add("visible");recordTimer.textContent="00:00"}status.textContent="Recording… 00:00:00"+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
       const update=()=>{if(recorder&&recorder.state==="recording"){if(recordTimer)recordTimer.textContent=fmtDuration(Date.now()-startedAt).slice(3);status.textContent="Recording… "+fmtDuration(Date.now()-startedAt)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · audio track included if permitted":"");setTimeout(update,250)}};requestAnimationFrame(update);
     }catch(e){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="Could not start recording. This browser or stream may block capture.";recordButton.disabled=false;}
   });
   openLibrary.addEventListener("click",()=>{library.hidden=false;resetPlayback();refreshLibrary()});
   closeLibrary.addEventListener("click",()=>{library.hidden=true;resetPlayback()});
   library.addEventListener("click",e=>{if(e.target===library){library.hidden=true;resetPlayback()}});
-  list.addEventListener("click",async e=>{const playBtn=e.target.closest("[data-play-recording]"),downloadBtn=e.target.closest("[data-download-recording]"),deleteBtn=e.target.closest("[data-delete-recording]");const btn=playBtn||downloadBtn||deleteBtn;if(!btn)return;try{const id=btn.dataset.playRecording||btn.dataset.downloadRecording||btn.dataset.deleteRecording;const item=await getRecording(id);if(!item)return;if(playBtn){resetPlayback();currentPlaybackUrl=URL.createObjectURL(item.blob);playback.src=currentPlaybackUrl;playback.hidden=false;playback.play().catch(()=>{});}else if(downloadBtn){const url=URL.createObjectURL(item.blob);const a=document.createElement("a");a.href=url;a.download=(item.name||"live-tv-recording").replace(/[^a-z0-9-_]+/gi,"_")+(item.mimeType&&item.mimeType.includes("mp4")?".mp4":".webm");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(confirm("Delete this recording?")){await dbAction("readwrite",s=>s.delete(id));resetPlayback();await refreshLibrary()}}catch(err){status.textContent="Unable to access this recording."}});
+  list.addEventListener("click",async e=>{const playBtn=e.target.closest("[data-play-recording]"),downloadBtn=e.target.closest("[data-download-recording]"),deleteBtn=e.target.closest("[data-delete-recording]"),renameBtn=e.target.closest("[data-rename-recording]");const btn=playBtn||downloadBtn||deleteBtn||renameBtn;if(!btn)return;try{const id=btn.dataset.playRecording||btn.dataset.downloadRecording||btn.dataset.deleteRecording||btn.dataset.renameRecording;const item=await getRecording(id);if(!item)return;if(playBtn){const row=btn.closest("[data-recording-item]");const player=row?.querySelector("[data-inline-player]");if(!player)return;document.querySelectorAll(".recording-inline-player").forEach(v=>{if(v!==player){v.pause();v.hidden=true;v.removeAttribute("src");v.load()}});if(player.hidden){player.src=URL.createObjectURL(item.blob);player.hidden=false;player.play().catch(()=>{});btn.textContent="CLOSE"}else{player.pause();player.hidden=true;player.removeAttribute("src");player.load();btn.textContent="PLAY"}}else if(downloadBtn){const url=URL.createObjectURL(item.blob);const a=document.createElement("a");a.href=url;a.download=(item.name||"Live TV recording").replace(/[^a-z0-9-_]+/gi,"_")+(item.mimeType&&item.mimeType.includes("mp4")?".mp4":".webm");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(renameBtn){const nextName=await askAction("Rename recording","Enter a new name for this recording:","SAVE",item.name||"Live TV recording");if(nextName&&nextName.trim()&&nextName.trim()!==(item.name||"")){item.name=nextName.trim();await dbAction("readwrite",s=>s.put(item));await refreshLibrary()}}else if(await askAction("Delete recording","This recording will be permanently deleted. Are you sure?","DELETE")===true){await dbAction("readwrite",s=>s.delete(id));await refreshLibrary()}}catch(err){status.textContent="Unable to access this recording."}});
+  document.getElementById("pageBackLink")?.addEventListener("click",async e=>{if(window.__soikatRecordingActive){e.preventDefault();if(await window.__soikatConfirmRecordingInterruption("Going back") )history.back();}});
   window.addEventListener("beforeunload",e=>{if(recorder&&recorder.state==="recording"){e.preventDefault();e.returnValue="Recording is in progress."}});
   refreshLibrary();
 })();
