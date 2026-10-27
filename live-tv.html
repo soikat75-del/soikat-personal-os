@@ -1034,6 +1034,20 @@ if ('serviceWorker' in navigator) {
 }
 </style>
 
+
+<style id="latest-mobile-record-saved-spacing-fix">
+/* iPhone: nudge the RECORD control a little further right. */
+@media(max-width:700px){
+  #recordButton{left:40px!important}
+  /* Compact saved label so it stays clear of the SLEEP control. */
+  #recordButton.record-saved #recordButtonLabel{left:22px!important;font-size:9px!important;padding:3px 4px!important;letter-spacing:0!important}
+  #recordButton.show-recording-label #recordButtonLabel,
+  #recordButton.show-recording-time #recordTimer{left:22px!important}
+  .player-wrap.recording-overlay-active #sleepTimerButton,
+  #recordButton.record-saved + #sleepTimerButton{left:154px!important}
+}
+</style>
+
 </head>
 
 <body>
