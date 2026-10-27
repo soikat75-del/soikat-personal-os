@@ -2233,7 +2233,7 @@ document.addEventListener("change", function(e){
   const playback=document.getElementById("recordingPlayback");
   if(!recordButton||!video||!status||!list)return;
   const DB_NAME="SoikatLiveTVRecordings", STORE="recordings";
-  let recorder=null,chunks=[],startedAt=0,activeName="Live TV",stream=null;
+  let recorder=null,chunks=[],startedAt=0,activeName="Live TV",stream=null,recordingCanvas=null,canvasContext=null,drawFrameId=0,recordingMode="";
   let currentPlaybackUrl="";
   function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE))req.result.createObjectStore(STORE,{keyPath:"id"})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
   async function dbAction(mode,fn){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);const store=tx.objectStore(STORE);let result;try{result=fn(store)}catch(e){db.close();reject(e);return}tx.oncomplete=()=>{db.close();resolve(result?.result)};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error||new Error("Storage transaction failed"))}})}
@@ -2241,37 +2241,80 @@ document.addEventListener("change", function(e){
   async function refreshLibrary(){try{const items=await dbAction("readonly",s=>s.getAll());count.textContent="("+(items||[]).length+")";if(!items||!items.length){list.innerHTML='<div class="recordings-empty">No recordings yet.</div>';return}items.sort((a,b)=>b.createdAt-a.createdAt);list.innerHTML=items.map(item=>`<div class="recording-item"><div class="recording-meta"><div class="recording-name">${escapeHtml(item.name||"Live TV recording")}</div><div class="recording-detail">${new Date(item.createdAt).toLocaleString()} · ${fmtDuration(item.duration)} · ${(item.size/1048576).toFixed(1)} MB</div></div><button type="button" data-play-recording="${item.id}">PLAY</button><button type="button" data-download-recording="${item.id}">DOWNLOAD</button><button type="button" class="recording-delete" data-delete-recording="${item.id}">DELETE</button></div>`).join("")}catch(e){list.innerHTML='<div class="recordings-empty">Browser storage is unavailable.</div>'}}
   async function getRecording(id){return await dbAction("readonly",s=>s.get(id))}
   function resetPlayback(){if(currentPlaybackUrl)URL.revokeObjectURL(currentPlaybackUrl);currentPlaybackUrl="";playback.pause();playback.removeAttribute("src");playback.load();playback.hidden=true}
-  async function stopRecording(){if(!recorder||recorder.state==="inactive")return;recordButton.disabled=true;recorder.stop()}
+  function stopCanvasFrames(){if(drawFrameId)cancelAnimationFrame(drawFrameId);drawFrameId=0;recordingCanvas=null;canvasContext=null;}
+  function startCanvasFrames(){
+    if(!recordingCanvas||!canvasContext)return;
+    const draw=()=>{
+      if(!recordingCanvas||!canvasContext||!recorder||recorder.state!=="recording")return;
+      try{
+        if(video.readyState>=2 && video.videoWidth && video.videoHeight){
+          const cw=recordingCanvas.width,ch=recordingCanvas.height;
+          const scale=Math.min(cw/video.videoWidth,ch/video.videoHeight);
+          const w=video.videoWidth*scale,h=video.videoHeight*scale;
+          canvasContext.fillStyle="#000";canvasContext.fillRect(0,0,cw,ch);
+          canvasContext.drawImage(video,(cw-w)/2,(ch-h)/2,w,h);
+        }
+      }catch(err){status.textContent="Safari cannot capture this channel's video frames (possibly CORS protected).";return;}
+      drawFrameId=requestAnimationFrame(draw);
+    };
+    drawFrameId=requestAnimationFrame(draw);
+  }
+  async function stopRecording(){if(!recorder||recorder.state==="inactive")return;recordButton.disabled=true;try{recorder.stop()}catch(e){status.textContent="Could not stop recording cleanly.";recordButton.disabled=false}}
   recordButton.addEventListener("click",async()=>{
     if(recorder&&recorder.state==="recording"){await stopRecording();return}
-    if(video.style.display==="none"||!video.src&&!liveHlsInstance){status.textContent="Select a playable video stream before recording.";return}
-    if(typeof video.captureStream!=="function"&&!video.mozCaptureStream){status.textContent="This browser does not support stream recording.";return}
-    if(!window.MediaRecorder){status.textContent="MediaRecorder is not supported by this browser.";return}
+    if(video.style.display==="none"||(!video.currentSrc&&!video.src&&!liveHlsInstance)){status.textContent="Select a playable video stream before recording.";return}
+    if(!window.MediaRecorder){status.textContent="This iPhone browser does not support MediaRecorder. Update iOS/Safari or try a supported browser.";return}
     try{
-      stream=(video.captureStream||video.mozCaptureStream).call(video);
-      if(!stream.getTracks().some(t=>t.kind==="video")){status.textContent="No video track available. This stream may not be recordable.";stream.getTracks().forEach(t=>t.stop());stream=null;return}
-      const mimeCandidates=["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"];
+      chunks=[];recordingMode="";
+      if(typeof video.captureStream==="function"||typeof video.mozCaptureStream==="function"){
+        try{
+          stream=(video.captureStream||video.mozCaptureStream).call(video);
+          if(stream.getTracks().some(t=>t.kind==="video"))recordingMode="direct";
+          else {stream.getTracks().forEach(t=>t.stop());stream=null;}
+        }catch(err){stream=null;}
+      }
+      // iOS Safari fallback: capture rendered video frames through a canvas.
+      // This records video only (not audio); cross-origin/CORS restrictions can still block it.
+      if(!stream){
+        if(typeof HTMLCanvasElement.prototype.captureStream!=="function"){
+          status.textContent="iPhone Safari does not expose video capture or canvas capture for this device. Recording from the site is not available in this browser.";return;
+        }
+        if(!video.videoWidth||!video.videoHeight){status.textContent="Wait until the channel video is playing, then press RECORD again.";return;}
+        recordingCanvas=document.createElement("canvas");
+        const ratio=video.videoWidth/video.videoHeight;
+        recordingCanvas.width=Math.min(1280,Math.max(320,video.videoWidth));
+        recordingCanvas.height=Math.round(recordingCanvas.width/ratio);
+        canvasContext=recordingCanvas.getContext("2d",{alpha:false});
+        canvasContext.fillStyle="#000";canvasContext.fillRect(0,0,recordingCanvas.width,recordingCanvas.height);
+        try{stream=recordingCanvas.captureStream(25);recordingMode="canvas-video-only";}
+        catch(err){stopCanvasFrames();status.textContent="Safari blocked canvas capture for this stream (possibly CORS protected).";return;}
+      }
+      if(!stream||!stream.getTracks().some(t=>t.kind==="video")){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="No video track available. This channel cannot be recorded by the browser.";return;}
+      const mimeCandidates=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp8,opus","video/webm"];
       const mimeType=mimeCandidates.find(t=>MediaRecorder.isTypeSupported(t));
-      recorder=new MediaRecorder(stream,mimeType?{mimeType}:undefined);chunks=[];startedAt=Date.now();
+      recorder=new MediaRecorder(stream,mimeType?{mimeType}:undefined);startedAt=Date.now();
       const playingCard=document.querySelector(".channel-card.currently-playing");activeName=playingCard?.innerText?.trim().split("\n")[0]||"Live TV";
       recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-      recorder.onerror=()=>{status.textContent="Recording failed. The stream may block capture.";recordButton.disabled=false};
+      recorder.onerror=()=>{status.textContent="Recording failed. This channel or browser may block capture.";recordButton.disabled=false};
       recorder.onstop=async()=>{
+        const savedRecorder=recorder;
         try{
-          const blob=new Blob(chunks,{type:recorder.mimeType||"video/webm"});
-          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration);await refreshLibrary()}
-          else status.textContent="No recording data received. This stream may not support capture.";
+          const type=savedRecorder?.mimeType||mimeType||"video/mp4";
+          const blob=new Blob(chunks,{type});
+          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration)+(recordingMode==="canvas-video-only"?" · video only (no audio)":"");await refreshLibrary()}
+          else status.textContent="No recording data received. This channel may not support capture.";
         }catch(e){status.textContent="Could not save recording. Check available device storage."}
-        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;recorder=null;chunks=[];recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording")}
+        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording")}
       };
-      recorder.start(1000);recordButton.classList.add("is-recording");recordButtonLabel.textContent="STOP";recordButton.setAttribute("aria-label","Stop recording");status.textContent="Recording… 0:00";
-      const update=()=>{if(recorder&&recorder.state==="recording"){status.textContent="Recording… "+fmtDuration(Date.now()-startedAt);requestAnimationFrame(update)}};requestAnimationFrame(update);
-    }catch(e){stream?.getTracks().forEach(t=>t.stop());stream=null;status.textContent="Could not start recording. This browser or stream may block capture."}
+      recorder.start(1000);if(recordingMode==="canvas-video-only")startCanvasFrames();
+      recordButton.classList.add("is-recording");recordButtonLabel.textContent="STOP";recordButton.setAttribute("aria-label","Stop recording");status.textContent="Recording… 00:00:00"+(recordingMode==="canvas-video-only"?" · iPhone video-only mode":"");
+      const update=()=>{if(recorder&&recorder.state==="recording"){status.textContent="Recording… "+fmtDuration(Date.now()-startedAt)+(recordingMode==="canvas-video-only"?" · video only":"");requestAnimationFrame(update)}};requestAnimationFrame(update);
+    }catch(e){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="Could not start recording. This browser or stream may block capture.";recordButton.disabled=false;}
   });
   openLibrary.addEventListener("click",()=>{library.hidden=false;resetPlayback();refreshLibrary()});
   closeLibrary.addEventListener("click",()=>{library.hidden=true;resetPlayback()});
   library.addEventListener("click",e=>{if(e.target===library){library.hidden=true;resetPlayback()}});
-  list.addEventListener("click",async e=>{const playBtn=e.target.closest("[data-play-recording]"),downloadBtn=e.target.closest("[data-download-recording]"),deleteBtn=e.target.closest("[data-delete-recording]");const btn=playBtn||downloadBtn||deleteBtn;if(!btn)return;try{const id=btn.dataset.playRecording||btn.dataset.downloadRecording||btn.dataset.deleteRecording;const item=await getRecording(id);if(!item)return;if(playBtn){resetPlayback();currentPlaybackUrl=URL.createObjectURL(item.blob);playback.src=currentPlaybackUrl;playback.hidden=false;playback.play().catch(()=>{});}else if(downloadBtn){const url=URL.createObjectURL(item.blob);const a=document.createElement("a");a.href=url;a.download=(item.name||"live-tv-recording").replace(/[^a-z0-9-_]+/gi,"_")+".webm";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(confirm("Delete this recording?")){await dbAction("readwrite",s=>s.delete(id));resetPlayback();await refreshLibrary()}}catch(err){status.textContent="Unable to access this recording."}});
+  list.addEventListener("click",async e=>{const playBtn=e.target.closest("[data-play-recording]"),downloadBtn=e.target.closest("[data-download-recording]"),deleteBtn=e.target.closest("[data-delete-recording]");const btn=playBtn||downloadBtn||deleteBtn;if(!btn)return;try{const id=btn.dataset.playRecording||btn.dataset.downloadRecording||btn.dataset.deleteRecording;const item=await getRecording(id);if(!item)return;if(playBtn){resetPlayback();currentPlaybackUrl=URL.createObjectURL(item.blob);playback.src=currentPlaybackUrl;playback.hidden=false;playback.play().catch(()=>{});}else if(downloadBtn){const url=URL.createObjectURL(item.blob);const a=document.createElement("a");a.href=url;a.download=(item.name||"live-tv-recording").replace(/[^a-z0-9-_]+/gi,"_")+(item.mimeType&&item.mimeType.includes("mp4")?".mp4":".webm");a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}else if(confirm("Delete this recording?")){await dbAction("readwrite",s=>s.delete(id));resetPlayback();await refreshLibrary()}}catch(err){status.textContent="Unable to access this recording."}});
   window.addEventListener("beforeunload",e=>{if(recorder&&recorder.state==="recording"){e.preventDefault();e.returnValue="Recording is in progress."}});
   refreshLibrary();
 })();
