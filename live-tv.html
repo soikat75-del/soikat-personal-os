@@ -945,21 +945,26 @@ if ('serviceWorker' in navigator) {
 .recording-inline-player[hidden]{display:none!important}
 @media(max-width:700px){#recordButton,#sleepTimerButton{top:6px!important;font-size:16px!important}#recordButton{left:6px!important}#sleepTimerButton{left:32px!important}#recordButton .record-live-dot{font-size:17px!important}#sleepTimerButton svg{width:16px!important;height:16px!important}}
 
-/* Requested compact controls and recording state cycle */
-#recordButton,#sleepTimerButton{font-size:13px!important;padding:1px!important}
-#recordButton .record-live-dot{font-size:14px!important}
-#sleepTimerButton svg{width:14px!important;height:14px!important}
+/* Compact top controls; active recording/timer status occupies the sleep-control slot. */
+#recordButton,#sleepTimerButton{font-size:14px!important;padding:2px!important}
+#recordButton .record-live-dot{font-size:16px!important}
+#sleepTimerButton svg{width:15px!important;height:15px!important}
 #recordButtonLabel{display:none!important}
-#recordButton.show-recording-label #recordButtonLabel{display:inline!important;position:absolute!important;top:22px!important;left:0!important;white-space:nowrap!important;background:rgba(3,9,20,.82)!important;color:#ff8790!important;border-radius:3px!important;padding:2px 4px!important;font-size:10px!important}
-#recordButton.show-recording-time #recordTimer{display:inline!important;position:absolute!important;top:22px!important;left:0!important;white-space:nowrap!important;color:#ff8790!important;background:rgba(3,9,20,.82)!important;border-radius:3px!important;padding:2px 4px!important;font-size:10px!important}
-#recordButton.record-saved #recordButtonLabel{display:inline!important;position:absolute!important;top:22px!important;left:0!important;white-space:nowrap!important;color:#8df5bd!important;background:rgba(3,9,20,.88)!important;border-radius:3px!important;padding:3px 5px!important;font-size:10px!important;animation:recordSavedPop .45s ease both}
+#recordButton.show-recording-label #recordButtonLabel,
+#recordButton.record-saved #recordButtonLabel{display:inline!important;position:absolute!important;top:0!important;left:48px!important;white-space:nowrap!important;background:rgba(3,9,20,.9)!important;color:#ff8790!important;border-radius:4px!important;padding:4px 6px!important;font-size:11px!important;z-index:40!important}
+#recordButton.show-recording-time #recordTimer{display:inline!important;position:absolute!important;top:0!important;left:48px!important;white-space:nowrap!important;color:#ff8790!important;background:rgba(3,9,20,.9)!important;border-radius:4px!important;padding:4px 6px!important;font-size:11px!important;z-index:40!important}
+#recordButton.record-saved #recordButtonLabel{color:#8df5bd!important;animation:recordSavedPop .45s ease both}
 #recordButton.record-saved .record-live-dot{animation:recordSavedPop .45s ease both;color:#8df5bd!important}
+.player-wrap.recording-overlay-active #sleepTimerButton{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+#sleepTimerButton.timer-active svg{display:none!important}
+#sleepTimerButton.timer-active #sleepTimerLabel{display:inline!important;font-size:11px!important;white-space:nowrap!important}
+#sleepTimerButton.timer-active{left:48px!important;padding:4px 6px!important;border:1px solid rgba(232,189,74,.7)!important;border-radius:4px!important;background:rgba(3,9,20,.9)!important;color:#ffe08a!important}
 @keyframes recordSavedPop{0%{transform:scale(.65);opacity:.3}65%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:1}}
 #recordingChangeToast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:12000;max-width:calc(100% - 28px);padding:10px 15px;border:1px solid #2c7959;border-radius:10px;background:#08251b;color:#b8ffdc;font-size:12px;font-weight:800;box-shadow:0 10px 30px #0008}
 #recordingChangeToast[hidden]{display:none!important}
 .recording-item button{width:32px!important;height:32px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:0!important;font-size:17px!important;border-radius:8px!important}
 .recording-item button svg{width:16px;height:16px}
-@media(max-width:700px){#recordButton,#sleepTimerButton{top:6px!important;font-size:13px!important}#recordButton{left:18px!important}#sleepTimerButton{left:42px!important}#recordButton .record-live-dot{font-size:14px!important}#sleepTimerButton svg{width:14px!important;height:14px!important}}
+@media(max-width:700px){#recordButton,#sleepTimerButton{top:6px!important;font-size:14px!important}#recordButton{left:28px!important}#sleepTimerButton{left:54px!important}#recordButton .record-live-dot{font-size:16px!important}#sleepTimerButton svg{width:15px!important;height:15px!important}#recordButton.show-recording-label #recordButtonLabel,#recordButton.record-saved #recordButtonLabel,#recordButton.show-recording-time #recordTimer{left:48px!important;top:0!important}}
 
 </style>
 
@@ -2432,13 +2437,13 @@ document.addEventListener("change", function(e){
         try{
           const type=savedRecorder?.mimeType||mimeType||"video/mp4";
           const blob=new Blob(chunks,{type});
-          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration);recordButton.classList.remove("show-recording-label","show-recording-time","is-recording");recordButton.classList.add("record-saved");recordButtonLabel.textContent="✓ RECORD SAVED";recordTimer.classList.remove("visible");recordButton.querySelector(".record-live-dot").textContent="✓";showChangeToast("Recording saved: "+item.name);await refreshLibrary();setTimeout(()=>{if(!window.__soikatRecordingActive){recordButton.classList.remove("record-saved");recordButtonLabel.textContent="RECORD";recordButton.querySelector(".record-live-dot").textContent="●"}},3200)}
+          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration);recordButton.classList.remove("show-recording-label","show-recording-time","is-recording");recordButton.classList.add("record-saved");document.querySelector(".player-wrap")?.classList.add("recording-overlay-active");recordButtonLabel.textContent="✓ RECORD SAVED";recordTimer.classList.remove("visible");recordButton.querySelector(".record-live-dot").textContent="✓";showChangeToast("Recording saved: "+item.name);await refreshLibrary();setTimeout(()=>{if(!window.__soikatRecordingActive){recordButton.classList.remove("record-saved");document.querySelector(".player-wrap")?.classList.remove("recording-overlay-active");recordButtonLabel.textContent="RECORD";recordButton.querySelector(".record-live-dot").textContent="●"}},3200)}
           else status.textContent="No recording data received. This channel may not support capture.";
         }catch(e){status.textContent="Could not save recording. Check available device storage."}
         finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;window.__soikatRecordingActive=false;recordButton.classList.remove("is-recording","show-recording-label","show-recording-time");if(!recordButton.classList.contains("record-saved")){recordButtonLabel.textContent="RECORD";recordButton.querySelector(".record-live-dot").textContent="●"}recordButton.setAttribute("aria-label","Start recording");if(recordTimer){recordTimer.classList.remove("visible");recordTimer.textContent="00:00"}if(recordingLabelTimer){clearInterval(recordingLabelTimer);recordingLabelTimer=null}}
       };
       recorder.start(1000);if(recordingMode.includes("canvas-video"))startCanvasFrames();
-      window.__soikatRecordingActive=true;recordButton.classList.remove("record-saved","show-recording-time");recordButton.classList.add("is-recording","show-recording-label");recordButton.querySelector(".record-live-dot").textContent="●";recordButtonLabel.textContent="RECORDING";recordButton.setAttribute("aria-label","Stop recording");if(recordTimer){recordTimer.classList.add("visible");recordTimer.textContent="00:00"}status.textContent="Recording… 00:00:00";
+      window.__soikatRecordingActive=true;document.querySelector(".player-wrap")?.classList.add("recording-overlay-active");recordButton.classList.remove("record-saved","show-recording-time");recordButton.classList.add("is-recording","show-recording-label");recordButton.querySelector(".record-live-dot").textContent="●";recordButtonLabel.textContent="RECORDING";recordButton.setAttribute("aria-label","Stop recording");if(recordTimer){recordTimer.classList.add("visible");recordTimer.textContent="00:00"}status.textContent="Recording… 00:00:00";
       recordingLabelFlip=false;if(recordingLabelTimer)clearInterval(recordingLabelTimer);recordingLabelTimer=setInterval(()=>{if(!recorder||recorder.state!=="recording")return;recordingLabelFlip=!recordingLabelFlip;recordButton.classList.toggle("show-recording-label",!recordingLabelFlip);recordButton.classList.toggle("show-recording-time",recordingLabelFlip)},2600);
       const update=()=>{if(recorder&&recorder.state==="recording"){if(recordTimer)recordTimer.textContent=fmtDuration(Date.now()-startedAt).slice(3);status.textContent="Recording… "+fmtDuration(Date.now()-startedAt);setTimeout(update,250)}};requestAnimationFrame(update);
     }catch(e){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="Could not start recording. This browser or stream may block capture.";recordButton.disabled=false;}
@@ -2486,6 +2491,7 @@ document.addEventListener("change", function(e){
     if(interval)clearInterval(interval);
     interval=null;deadline=0;
     label.textContent="SLEEP";
+    button.classList.remove("timer-active");
     button.style.borderColor="rgba(145,170,205,.55)";
     button.style.color="#e9f0ff";
     button.title="Sleep timer";
@@ -2503,6 +2509,7 @@ document.addEventListener("change", function(e){
   function tick(){
     const remaining=Math.max(0,Math.ceil((deadline-Date.now())/1000));
     label.textContent=Math.floor(remaining/60)+":"+String(remaining%60).padStart(2,"0");
+    button.classList.add("timer-active");
     button.title="Sleep timer active — click to edit or cancel";
     if(remaining<=0){stopTimer();stopPlayback()}
   }
