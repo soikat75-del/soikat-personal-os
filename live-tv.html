@@ -2235,7 +2235,7 @@ document.addEventListener("change", function(e){
   const DB_NAME="SoikatLiveTVRecordings", STORE="recordings";
   let recorder=null,chunks=[],startedAt=0,activeName="Live TV",stream=null,recordingCanvas=null,canvasContext=null,drawFrameId=0,recordingMode="";
   let currentPlaybackUrl="";
-  let recordingAudioContext=null,recordingAudioSource=null,recordingAudioDestination=null;
+  let recordingAudioContext=null,recordingAudioSource=null,recordingAudioDestination=null,recordingMicStream=null,recordingMicSource=null;
   function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(STORE))req.result.createObjectStore(STORE,{keyPath:"id"})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
   async function dbAction(mode,fn){const db=await openDB();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,mode);const store=tx.objectStore(STORE);let result;try{result=fn(store)}catch(e){db.close();reject(e);return}tx.oncomplete=()=>{db.close();resolve(result?.result)};tx.onerror=()=>{db.close();reject(tx.error)};tx.onabort=()=>{db.close();reject(tx.error||new Error("Storage transaction failed"))}})}
   function fmtDuration(ms){const sec=Math.max(0,Math.floor(ms/1000));return String(Math.floor(sec/3600)).padStart(2,"0")+":"+String(Math.floor(sec%3600/60)).padStart(2,"0")+":"+String(sec%60).padStart(2,"0")}
@@ -2290,28 +2290,54 @@ document.addEventListener("change", function(e){
         try{
           stream=recordingCanvas.captureStream(25);
           recordingMode="canvas-video-only";
-          // Best-effort iOS audio capture: route the playing media element through Web Audio,
-          // then combine its audio track with the canvas video track. Cross-origin sources may
-          // intentionally produce silence; the browser does not permit bypassing that restriction.
-          try{
-            const AudioCtx=window.AudioContext||window.webkitAudioContext;
-            if(AudioCtx){
-              if(!recordingAudioContext){
-                recordingAudioContext=new AudioCtx();
-                recordingAudioSource=recordingAudioContext.createMediaElementSource(video);
-                recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();
-                recordingAudioSource.connect(recordingAudioDestination);
-                recordingAudioSource.connect(recordingAudioContext.destination);
-              }
-              if(recordingAudioContext.state==="suspended")await recordingAudioContext.resume();
-              recordingAudioDestination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
-              if(stream.getAudioTracks().length)recordingMode="canvas-video-audio-attempt";
-            }
-          }catch(audioErr){console.warn("iPhone audio capture unavailable for this stream:",audioErr)}
+          // Audio is attached below for both direct and canvas video capture modes.
         }
         catch(err){stopCanvasFrames();status.textContent="Safari blocked canvas capture for this stream (possibly CORS protected).";return;}
       }
       if(!stream||!stream.getTracks().some(t=>t.kind==="video")){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="No video track available. This channel cannot be recorded by the browser.";return;}
+
+      // Add audio for BOTH capture paths. Some Safari versions expose a video-only
+      // captureStream(), so do not assume the direct stream already contains audio.
+      if(stream.getAudioTracks().length===0){
+        try{
+          const AudioCtx=window.AudioContext||window.webkitAudioContext;
+          if(AudioCtx){
+            if(!recordingAudioContext){
+              recordingAudioContext=new AudioCtx();
+              recordingAudioSource=recordingAudioContext.createMediaElementSource(video);
+              recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();
+              recordingAudioSource.connect(recordingAudioDestination);
+              recordingAudioSource.connect(recordingAudioContext.destination);
+            }
+            if(recordingAudioContext.state!=="running")await recordingAudioContext.resume();
+            const audioTracks=recordingAudioDestination.stream.getAudioTracks();
+            audioTracks.forEach(track=>{if(!stream.getAudioTracks().some(t=>t.id===track.id))stream.addTrack(track)});
+            if(stream.getAudioTracks().length)recordingMode=recordingMode==="direct"?"direct+web-audio":"canvas-video-audio-attempt";
+          }
+        }catch(audioErr){console.warn("Audio track capture unavailable for this stream:",audioErr)}
+      }
+      // Last-resort iPhone Safari workaround: if the stream's audio track exists but
+      // is silent due to cross-origin media restrictions, mix in the device microphone.
+      // This captures speaker sound acoustically, so the iPhone must play audio aloud
+      // (not through headphones) and microphone permission must be granted.
+      try{
+        const AudioCtx=window.AudioContext||window.webkitAudioContext;
+        if(AudioCtx&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+          if(!recordingAudioContext){recordingAudioContext=new AudioCtx();recordingAudioDestination=recordingAudioContext.createMediaStreamDestination();}
+          if(!recordingMicStream){
+            recordingMicStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
+            recordingMicSource=recordingAudioContext.createMediaStreamSource(recordingMicStream);
+            recordingMicSource.connect(recordingAudioDestination);
+          }
+          if(recordingAudioContext.state!=="running")await recordingAudioContext.resume();
+          const mixedAudioTracks=recordingAudioDestination.stream.getAudioTracks();
+          mixedAudioTracks.forEach(track=>{if(!stream.getAudioTracks().some(t=>t.id===track.id))stream.addTrack(track)});
+          if(mixedAudioTracks.length)recordingMode+=(recordingMode?"+":"")+"mic-audio-fallback";
+        }
+      }catch(micErr){console.warn("Microphone audio fallback unavailable:",micErr)}
+      status.textContent=stream.getAudioTracks().length
+        ? "Recording video + audio attempt. For iPhone fallback, allow microphone and play sound on speaker."
+        : "Recording video; audio unavailable. Microphone permission may be required.";
       const mimeCandidates=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp8,opus","video/webm"];
       const mimeType=mimeCandidates.find(t=>MediaRecorder.isTypeSupported(t));
       recorder=new MediaRecorder(stream,mimeType?{mimeType}:undefined);startedAt=Date.now();
@@ -2323,14 +2349,14 @@ document.addEventListener("change", function(e){
         try{
           const type=savedRecorder?.mimeType||mimeType||"video/mp4";
           const blob=new Blob(chunks,{type});
-          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration)+(recordingMode==="canvas-video-only"?" · video only (audio unavailable)":recordingMode==="canvas-video-audio-attempt"?" · video + audio track attempted (verify playback)":"");await refreshLibrary()}
+          if(blob.size){const item={id:Date.now()+"-"+Math.random().toString(36).slice(2),name:activeName,createdAt:startedAt,duration:Date.now()-startedAt,size:blob.size,mimeType:blob.type,mode:recordingMode,blob};await dbAction("readwrite",s=>s.put(item));status.textContent="Saved recording · "+fmtDuration(item.duration)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio mixed in (verify playback)":recordingMode==="canvas-video-only"?" · video only (audio unavailable)":recordingMode==="canvas-video-audio-attempt"?" · video + audio track attempted (verify playback)":"");await refreshLibrary()}
           else status.textContent="No recording data received. This channel may not support capture.";
         }catch(e){status.textContent="Could not save recording. Check available device storage."}
-        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording")}
+        finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording")}
       };
-      recorder.start(1000);if(recordingMode==="canvas-video-only"||recordingMode==="canvas-video-audio-attempt")startCanvasFrames();
-      recordButton.classList.add("is-recording");recordButtonLabel.textContent="STOP";recordButton.setAttribute("aria-label","Stop recording");status.textContent="Recording… 00:00:00"+(recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
-      const update=()=>{if(recorder&&recorder.state==="recording"){status.textContent="Recording… "+fmtDuration(Date.now()-startedAt)+(recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · audio track included if permitted":"");requestAnimationFrame(update)}};requestAnimationFrame(update);
+      recorder.start(1000);if(recordingMode.includes("canvas-video"))startCanvasFrames();
+      recordButton.classList.add("is-recording");recordButtonLabel.textContent="STOP";recordButton.setAttribute("aria-label","Stop recording");status.textContent="Recording… 00:00:00"+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
+      const update=()=>{if(recorder&&recorder.state==="recording"){status.textContent="Recording… "+fmtDuration(Date.now()-startedAt)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · audio track included if permitted":"");requestAnimationFrame(update)}};requestAnimationFrame(update);
     }catch(e){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="Could not start recording. This browser or stream may block capture.";recordButton.disabled=false;}
   });
   openLibrary.addEventListener("click",()=>{library.hidden=false;resetPlayback();refreshLibrary()});
