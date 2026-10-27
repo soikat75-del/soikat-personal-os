@@ -855,15 +855,15 @@ footer{
 .sleep-timer-stop{width:100%;margin-top:9px;border:1px solid #6b3038;background:#35151a;color:#ff9aa2}
 @media(max-width:700px){#sleepTimerButton{top:6px;right:6px;padding:6px 7px;font-size:11px}.sleep-timer-card{padding:16px}}
 #recordButton{position:absolute;top:10px;left:10px;z-index:5;display:flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(255,95,105,.7);border-radius:9px;background:rgba(35,8,15,.9);color:#ff9aa2;font-size:12px;font-weight:800;cursor:pointer;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .18s ease,visibility .18s ease}
-.player-wrap:hover #recordButton,.player-wrap.controls-visible #recordButton,#recordButton:focus-visible{opacity:1;visibility:visible;pointer-events:auto}
+.player-wrap:hover #recordButton,.player-wrap.controls-visible #recordButton,#recordButton:focus-visible,#recordButton.is-recording{opacity:1;visibility:visible;pointer-events:auto}
 #recordButton.is-recording{background:#5b101b;color:#fff;border-color:#ff354d}
 #recordButton.is-recording .record-live-dot{animation:recordDotBlink .85s steps(2,start) infinite}
 .record-live-dot{display:inline-block}
 @keyframes recordDotBlink{to{visibility:hidden}}
-#recordTimer{position:absolute;top:10px;left:126px;z-index:5;display:none;padding:7px 9px;border:1px solid rgba(255,95,105,.45);border-radius:9px;background:rgba(35,8,15,.82);color:#ffb3ba;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
-#recordTimer.visible{display:block}
+#recordTimer{display:none;color:#ffd4d8;font-size:12px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.04em;margin-left:3px;padding-left:8px;border-left:1px solid rgba(255,179,186,.45)}
+#recordTimer.visible{display:inline-block}
 .recording-tools{display:none!important}
-@media(max-width:700px){#recordTimer{top:6px;left:105px;padding:6px 7px;font-size:10px}}
+@media(max-width:700px){#recordTimer{font-size:10px;padding-left:6px;margin-left:1px}}
 @keyframes recordPulse{50%{box-shadow:0 0 14px rgba(255,53,77,.4)}}
 .recording-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;width:min(820px,calc(100% - 32px));margin:10px auto 0;color:#8299bb;font-size:11px}
 #openRecordingsButton{border:1px solid #29476e;border-radius:8px;background:#071321;color:#b9c9e3;padding:8px 10px;font-size:10px;font-weight:800;letter-spacing:.06em;cursor:pointer}
@@ -931,8 +931,7 @@ if ('serviceWorker' in navigator) {
   <section class="player-panel">
     <div class="player-wrap">
       <video id="livePlayer" controls playsinline autoplay></video>
-      <button type="button" id="recordButton" aria-label="Start recording" title="Record this stream"><span class="record-live-dot">●</span> <span id="recordButtonLabel">RECORD</span></button>
-      <span id="recordTimer" aria-live="off">00:00</span>
+      <button type="button" id="recordButton" aria-label="Start recording" title="Record this stream"><span class="record-live-dot">●</span> <span id="recordButtonLabel">RECORD</span><span id="recordTimer" aria-live="off">00:00</span></button>
       <button type="button" id="sleepTimerButton" aria-label="Sleep timer" title="Sleep timer" aria-haspopup="dialog" aria-controls="sleepTimerPopup">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
         <span id="sleepTimerLabel">SLEEP</span>
@@ -2238,6 +2237,7 @@ document.addEventListener("change", function(e){
 (()=>{
   const recordButton=document.getElementById("recordButton");
   const recordButtonLabel=document.getElementById("recordButtonLabel");
+  const recordTimer=document.getElementById("recordTimer");
   const video=document.getElementById("livePlayer");
   const status=document.getElementById("recordingStatus");
   const openLibrary=document.getElementById("openRecordingsButton");
@@ -2371,8 +2371,8 @@ document.addEventListener("change", function(e){
         finally{stream?.getTracks().forEach(t=>t.stop());stream=null;if(recordingMicSource){try{recordingMicSource.disconnect()}catch(e){}recordingMicSource=null}if(recordingMicStream){recordingMicStream.getTracks().forEach(t=>t.stop());recordingMicStream=null}stopCanvasFrames();recorder=null;chunks=[];recordingMode="";recordButton.disabled=false;recordButton.classList.remove("is-recording");recordButtonLabel.textContent="RECORD";recordButton.setAttribute("aria-label","Start recording");if(recordTimer){recordTimer.classList.remove("visible");recordTimer.textContent="00:00"}}
       };
       recorder.start(1000);if(recordingMode.includes("canvas-video"))startCanvasFrames();
-      recordButton.classList.add("is-recording");recordButtonLabel.textContent="STOP";recordButton.setAttribute("aria-label","Stop recording");status.textContent="Recording… 00:00:00"+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
-      const update=()=>{if(recorder&&recorder.state==="recording"){status.textContent="Recording… "+fmtDuration(Date.now()-startedAt)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · audio track included if permitted":"");requestAnimationFrame(update)}};requestAnimationFrame(update);
+      recordButton.classList.add("is-recording");recordButtonLabel.textContent="RECORDING";recordButton.setAttribute("aria-label","Stop recording");if(recordTimer){recordTimer.classList.add("visible");recordTimer.textContent="00:00"}status.textContent="Recording… 00:00:00"+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · testing audio capture":"");
+      const update=()=>{if(recorder&&recorder.state==="recording"){if(recordTimer)recordTimer.textContent=fmtDuration(Date.now()-startedAt).slice(3);status.textContent="Recording… "+fmtDuration(Date.now()-startedAt)+(recordingMode.includes("mic-audio-fallback")?" · microphone audio fallback":recordingMode==="canvas-video-only"?" · video only":recordingMode==="canvas-video-audio-attempt"?" · audio track included if permitted":"");setTimeout(update,250)}};requestAnimationFrame(update);
     }catch(e){stream?.getTracks().forEach(t=>t.stop());stream=null;stopCanvasFrames();status.textContent="Could not start recording. This browser or stream may block capture.";recordButton.disabled=false;}
   });
   openLibrary.addEventListener("click",()=>{library.hidden=false;resetPlayback();refreshLibrary()});
