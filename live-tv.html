@@ -1052,6 +1052,11 @@ if ('serviceWorker' in navigator) {
 <style id="record-button-mobile-move-right-only">
 @media(max-width:700px){#recordButton{left:50px!important}}
 </style>
+<style id="fix-recordings-player-hidden-by-default">
+/* Keep the inline recording player hidden until the user presses Play. */
+#recordingsList .recording-inline-player[hidden],
+#recordingPlayback[hidden]{display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important}
+</style>
 </head>
 
 <body>
