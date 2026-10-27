@@ -968,6 +968,26 @@ if ('serviceWorker' in navigator) {
 
 </style>
 
+
+<style id="recording-status-left-of-sleep-fix">
+/* Keep RECORDING status in the gap before SLEEP; do not replace or hide SLEEP. */
+.player-wrap.recording-overlay-active #sleepTimerButton{opacity:1!important;visibility:visible!important;pointer-events:auto!important;left:154px!important}
+#recordButton.show-recording-label #recordButtonLabel,
+#recordButton.record-saved #recordButtonLabel,
+#recordButton.show-recording-time #recordTimer{left:23px!important;top:0!important;white-space:nowrap!important}
+#recordButton.show-recording-label #recordButtonLabel,
+#recordButton.record-saved #recordButtonLabel{min-width:max-content!important}
+#recordButton.show-recording-time #recordTimer{min-width:max-content!important}
+@media(max-width:700px){
+  #recordButton{left:28px!important}
+  #sleepTimerButton{left:54px!important}
+  .player-wrap.recording-overlay-active #sleepTimerButton{left:150px!important}
+  #recordButton.show-recording-label #recordButtonLabel,
+  #recordButton.record-saved #recordButtonLabel,
+  #recordButton.show-recording-time #recordTimer{left:22px!important;top:0!important}
+}
+</style>
+
 </head>
 
 <body>
