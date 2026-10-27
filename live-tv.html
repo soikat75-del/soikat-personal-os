@@ -995,6 +995,10 @@ if ('serviceWorker' in navigator) {
 /* The saved label already contains one checkmark; hide the separate dot. */
 #recordButton.record-saved .record-live-dot{display:none!important}
 </style>
+<style id="recording-dot-alignment-fix">
+/* Align the blinking recording dot with the RECORDING label. */
+#recordButton .record-live-dot{position:relative!important;top:-2px!important;vertical-align:middle!important;line-height:1!important}
+</style>
 </head>
 
 <body>
