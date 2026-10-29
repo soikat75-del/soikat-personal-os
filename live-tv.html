@@ -523,6 +523,14 @@ footer{
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}.admin-status-toggle{width:30px;height:30px;border:0;border-radius:8px;background:transparent;font-size:17px;cursor:pointer;padding:0;display:grid;place-items:center}.admin-status-toggle:hover{background:#102845}
 .admin-emoji{width:28px;height:28px;border:0;border-radius:0;background:transparent;color:#9db8dc;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji:hover{color:#fff}.admin-emoji.secondary{background:transparent}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
+.admin-backups{margin:9px 0 0 28px;padding-left:12px;border-left:2px solid #29476e;display:grid;gap:7px}
+.admin-backup-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:7px;align-items:center;padding:7px;border:1px dashed #29476e;border-radius:9px;background:#091a2d}
+.admin-backup-row input{height:38px;width:100%;min-width:0;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#dfeaff;padding:0 9px;font-size:12px;outline:0}
+.admin-backup-controls{display:flex;gap:4px;align-items:center}
+.admin-backup-controls button,.admin-add-backup{height:32px;min-width:30px;border:1px solid #29476e;border-radius:7px;background:#0b1b2e;color:#dfeaff;cursor:pointer;padding:0 6px}
+.admin-backup-label{grid-column:1/-1;color:#8eacd3;font-size:10px;letter-spacing:.5px}
+.admin-add-backup{margin-top:8px;font-weight:800}
+@media(max-width:600px){.admin-backups{margin-left:8px;padding-left:7px}.admin-backup-row{grid-template-columns:1fr;gap:5px}.admin-backup-controls{justify-content:flex-end}.admin-backup-label{grid-column:auto}}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
 .admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
@@ -1560,7 +1568,7 @@ async function openAdmin(){
       const data = await apiJsonp({action:"get"});
       if(data && data.ok){
         CATEGORIES = Array.isArray(data.categories) ? data.categories : [];
-        CHANNELS = Array.isArray(data.channels) ? data.channels : [];
+        CHANNELS = Array.isArray(data.channels) ? data.channels.map(c=>({...c,backups:Array.isArray(c.backups)?c.backups:[]})) : [];
         CENTRAL_DATA_READY = true;
       }
     }catch(e){}
@@ -1753,15 +1761,29 @@ function setAdminSearchTerm(value){
 
 function renderAdmin(){
   renderAdminCategoryFilter();
-
   const filter = adminCategoryFilter || "ALL";
   const indexedChannels = CHANNELS.map((c,i)=>({c,i}));
   const filteredChannels = indexedChannels.filter(({c}) =>
     (filter === "ALL" || String(c.category || "").toUpperCase() === filter) &&
-    (!adminSearchTerm || [c.name,c.category,c.url,c.source,c.logo].some(v => String(v||"").toLowerCase().includes(adminSearchTerm)))
+    (!adminSearchTerm || [c.name,c.category,c.url,c.source,c.logo,...(c.backups||[]).flatMap(b=>[b.url,b.source])].some(v => String(v||"").toLowerCase().includes(adminSearchTerm)))
   );
-
-  const list = filteredChannels.map(({c,i})=>`
+  const list = filteredChannels.map(({c,i})=>{
+    const backups = Array.isArray(c.backups) ? c.backups : [];
+    const backupRows = backups.map((b,bi)=>`
+      <div class="admin-backup-row" data-backup-row="${bi}" data-parent-row="${i}">
+        <div class="admin-backup-label">BACKUP STREAM ${bi+1}</div>
+        <input data-backup-key="url" data-backup-index="${bi}" value="${escapeAttr(b.url||"")}" placeholder="Stream URL (.m3u8)" aria-label="Backup stream URL ${bi+1}">
+        <input data-backup-key="source" data-backup-index="${bi}" value="${escapeAttr(b.source||"")}" placeholder="Source URL" aria-label="Backup source URL ${bi+1}">
+        <div class="admin-backup-controls">
+          <button type="button" onclick="addBackupStream(${i},${bi})" title="Add backup below">+</button>
+          <button type="button" onclick="toggleBackupStatus(${i},${bi})" title="Toggle backup status">${String(b.status||"LIVE").toUpperCase()==="DEAD"?"🔴":"🟢"}</button>
+          <button type="button" onclick="promoteBackupStream(${i},${bi})" title="Promote to primary">▲</button>
+          <button type="button" onclick="moveBackupStream(${i},${bi},-1)" ${bi===0?"disabled":""} title="Move backup up">▲</button>
+          <button type="button" onclick="moveBackupStream(${i},${bi},1)" ${bi===backups.length-1?"disabled":""} title="Move backup down">▼</button>
+          <button type="button" onclick="deleteBackupStream(${i},${bi})" title="Delete backup">🗑️</button>
+        </div>
+      </div>`).join("");
+    return `
     <div class="admin-row" data-row="${i}">
       <div class="admin-title">
         <div class="admin-left">
@@ -1772,6 +1794,7 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
+          <button type="button" class="admin-add-backup" onclick="addBackupStream(${i})" title="Add backup stream" aria-label="Add backup stream">+</button>
           <button type="button" class="admin-status-toggle" onclick="toggleAdminStatus(${i})" title="${String(c.status || "LIVE").toUpperCase()==="DEAD"?"LIVE":"DEAD"}" aria-label="Toggle live/dead">${String(c.status || "LIVE").toUpperCase()==="DEAD"?"🔴":"🟢"}</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
@@ -1779,21 +1802,50 @@ function renderAdmin(){
         </div>
       </div>
       <div class="admin-fields">
-        <div class="admin-field-wrap">
-          <input data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo URL / data image">
-        </div>
-        <div class="admin-field-wrap">
-          <input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)">
-          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button>
-        </div>
-        <div class="admin-field-wrap">
-          <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
-          <button type="button" class="admin-open-link" onclick="openAdminLink(this,'source')" title="Open source URL" aria-label="Open source URL">🔗</button>
-        </div>
+        <div class="admin-field-wrap"><input data-key="logo" value="${escapeAttr(c.logo || "")}" placeholder="Logo URL / data image"></div>
+        <div class="admin-field-wrap"><input data-key="url" value="${escapeAttr(c.url || "")}" placeholder="Stream URL (.m3u8)"><button type="button" class="admin-open-link" onclick="openAdminLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button></div>
+        <div class="admin-field-wrap"><input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL"><button type="button" class="admin-open-link" onclick="openAdminLink(this,'source')" title="Open source URL" aria-label="Open source URL">🔗</button></div>
       </div>
-    </div>`).join("");
-
+      ${backups.length?`<div class="admin-backups">${backupRows}</div>`:""}
+    </div>`;
+  }).join("");
   document.getElementById("adminRows").innerHTML = list || `<div class="admin-empty">No channels in ${escapeHtml(filter)}.</div>`;
+}
+
+function addBackupStream(channelIndex, afterIndex){
+  const channel=CHANNELS[channelIndex]; if(!channel)return;
+  if(!Array.isArray(channel.backups))channel.backups=[];
+  const item={url:"",source:"",status:"LIVE"};
+  const at=Number.isInteger(afterIndex)?afterIndex+1:channel.backups.length;
+  channel.backups.splice(at,0,item);
+  renderAdmin();
+  const rows=[...document.querySelectorAll(`#adminRows .admin-backup-row[data-parent-row="${channelIndex}"]`)];
+  const target=rows[Math.min(at,rows.length-1)];
+  target?.querySelector('[data-backup-key="url"]')?.focus();
+  scheduleAutoSave();
+}
+function toggleBackupStatus(channelIndex, backupIndex){
+  const b=CHANNELS[channelIndex]?.backups?.[backupIndex];if(!b)return;
+  b.status=String(b.status||"LIVE").toUpperCase()==="DEAD"?"LIVE":"DEAD";
+  renderAdmin();scheduleAutoSave();
+}
+function promoteBackupStream(channelIndex, backupIndex){
+  const c=CHANNELS[channelIndex], b=c?.backups?.[backupIndex];if(!c||!b)return;
+  const old={url:c.url||"",source:c.source||"",status:c.status||"LIVE"};
+  c.url=b.url||"";c.source=b.source||"";c.status=b.status||"LIVE";
+  if(old.url||old.source){c.backups[backupIndex]={...old};}
+  else c.backups.splice(backupIndex,1);
+  renderAdmin();renderChannels();scheduleAutoSave();
+}
+function moveBackupStream(channelIndex, backupIndex, direction){
+  const list=CHANNELS[channelIndex]?.backups;if(!list)return;
+  const next=backupIndex+direction;if(next<0||next>=list.length)return;
+  [list[backupIndex],list[next]]=[list[next],list[backupIndex]];
+  renderAdmin();scheduleAutoSave();
+}
+function deleteBackupStream(channelIndex, backupIndex){
+  const list=CHANNELS[channelIndex]?.backups;if(!list||!list[backupIndex])return;
+  list.splice(backupIndex,1);renderAdmin();scheduleAutoSave();
 }
 
 /* Touch + mouse drag-to-reorder. Existing move buttons remain unchanged. */
@@ -1901,7 +1953,7 @@ function openAdminLink(button,key){
 function collectAdminChannels(){
   // Keep ALL existing channels. Only update the rows currently visible
   // in the selected category filter.
-  const next = CHANNELS.map(channel => ({...channel}));
+  const next = CHANNELS.map(channel => ({...channel,backups:(channel.backups||[]).map(b=>({...b}))}));
 
   document.querySelectorAll("#adminRows .admin-row").forEach(row=>{
     const idx = Number(row.dataset.row);
@@ -2019,7 +2071,7 @@ async function autoSaveNow(){
   // CHANNELS is kept in sync on every admin input, so the save snapshot
   // never has to rebuild data from DOM elements that may be replaced.
   const versionAtStart=adminEditVersion;
-  const next=CHANNELS.map(channel=>({...channel}));
+  const next=CHANNELS.map(channel=>({...channel,backups:(channel.backups||[]).map(b=>({...b}))}));
 
   try{
     await saveCentralPost({
@@ -2129,6 +2181,21 @@ document.addEventListener("change", function(e){
 
   CHANNELS[idx][key]=e.target.value;
   scheduleAutoSave();
+});
+
+document.addEventListener("input", function(e){
+  const row=e.target.closest && e.target.closest("#adminRows .admin-backup-row");
+  if(!row)return;
+  const parent=Number(row.dataset.parentRow),bi=Number(e.target.dataset.backupIndex),key=e.target.dataset.backupKey;
+  const backup=CHANNELS[parent]?.backups?.[bi];if(!backup||!key)return;
+  backup[key]=e.target.value;scheduleAutoSave();
+});
+document.addEventListener("change", function(e){
+  const row=e.target.closest && e.target.closest("#adminRows .admin-backup-row");
+  if(!row)return;
+  const parent=Number(row.dataset.parentRow),bi=Number(e.target.dataset.backupIndex),key=e.target.dataset.backupKey;
+  const backup=CHANNELS[parent]?.backups?.[bi];if(!backup||!key)return;
+  backup[key]=e.target.value;scheduleAutoSave();
 });
 
 /* ===== SESSION TIMER REMINDERS ===== */
