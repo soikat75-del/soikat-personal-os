@@ -523,6 +523,31 @@ footer{
 .admin-delete:hover{background:#4a1b22;border-color:#a33d48}.admin-status-toggle{width:30px;height:30px;border:0;border-radius:8px;background:transparent;font-size:17px;cursor:pointer;padding:0;display:grid;place-items:center}.admin-status-toggle:hover{background:#102845}
 .admin-emoji{width:28px;height:28px;border:0;border-radius:0;background:transparent;color:#9db8dc;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}.admin-emoji:hover{color:#fff}.admin-emoji.secondary{background:transparent}.admin-emoji:disabled{opacity:.55;cursor:wait}
 .admin-fields{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%}
+.admin-extra-server{display:grid;grid-template-columns:1fr 2fr 1.2fr;gap:8px;width:100%;margin-top:6px}
+.admin-extra-server-spacer{min-width:0}
+.admin-extra-server .admin-field-wrap input{width:100%;min-width:0}
+.admin-extra-server-actions{display:flex;justify-content:flex-end;margin-top:7px}
+.admin-add-server{height:30px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;padding:0 10px;font-size:11px;font-weight:700;cursor:pointer}
+.admin-add-server:hover{border-color:#5e8fff;color:#fff}
+ .admin-remove-server{width:27px;height:27px;flex:0 0 27px;border:1px solid #6b3038;border-radius:7px;background:#35151a;color:#ff858d;cursor:pointer}
+.admin-extra-servers{display:none;border-top:1px solid #203b5d;padding-top:8px}
+.admin-extra-servers.is-open{display:block}
+.admin-server-toggle{height:30px;min-width:30px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;font-weight:900;cursor:pointer;padding:0 7px}
+.admin-server-toggle:hover{border-color:#5e8fff;color:#fff}
+.admin-extra-server{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;width:100%;margin-top:6px;align-items:center}
+.admin-extra-server .admin-field-wrap{min-width:0}
+.admin-extra-server .admin-field-wrap input{width:100%;min-width:0}
+.admin-server-actions{display:flex;align-items:center;gap:4px}
+.admin-server-actions button{width:28px;height:28px;min-width:28px;border:1px solid #29476e;border-radius:7px;background:#0b1b2e;color:#9db8dc;cursor:pointer;padding:0;font-weight:800}
+.admin-server-actions .server-status{color:#54d99a;font-size:15px}
+.admin-server-actions .server-delete{border-color:#6b3038;background:#35151a;color:#ff858d}
+.admin-server-actions button:disabled{opacity:.3;cursor:not-allowed}
+#streamServerBar{display:none!important}
+#streamServerBar.has-servers{display:flex!important}
+#streamServerSelect{min-height:38px!important;font-size:13px!important}
+@media(max-width:600px){.admin-extra-server{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:4px}.admin-extra-server .admin-field-wrap{gap:2px}.admin-extra-server .admin-field-wrap input{height:34px;padding:3px 5px;font-size:12px!important}.admin-extra-server .admin-open-link{width:25px;min-width:25px;height:27px}.admin-server-actions{gap:2px}.admin-server-actions button{width:23px;height:25px;min-width:23px;font-size:10px}.admin-extra-server-actions{margin-top:5px}}
+@media(max-width:600px){.admin-extra-server{grid-template-columns:1fr;gap:4px}.admin-extra-server-spacer{display:none}.admin-extra-server .admin-field-wrap input{height:28px;padding:3px 6px;font-size:16px!important}.admin-extra-server .admin-open-link{width:27px;min-width:27px;height:27px}.admin-extra-server-actions{margin-top:5px}}
+
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
 .admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
@@ -1057,6 +1082,27 @@ if ('serviceWorker' in navigator) {
 #recordingsList .recording-inline-player[hidden],
 #recordingPlayback[hidden]{display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important}
 </style>
+
+<style id="multi-server-requested-layout-fix">
+/* Additional servers: two equally sized URL fields, controls at the end. */
+.admin-extra-servers{display:none;border-top:1px solid #203b5d;padding-top:8px;margin-top:8px}
+.admin-extra-servers.is-open{display:block}
+.admin-extra-server{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:8px!important;align-items:center}
+.admin-extra-server-spacer{display:none!important}
+.admin-extra-server .admin-field-wrap{width:100%;min-width:0}
+.admin-extra-server .admin-field-wrap input{width:100%;min-width:0}
+.admin-server-actions{display:flex;align-items:center;gap:4px}
+.admin-server-actions button{width:28px;height:30px;min-width:28px;border:1px solid #29476e;border-radius:7px;background:#0b1b2e;color:#9db8dc;cursor:pointer;padding:0;font-weight:800}
+.admin-server-actions .server-status{color:#54d99a;font-size:15px}
+.admin-server-actions .server-delete{border-color:#6b3038;background:#35151a;color:#ff858d}
+.admin-server-actions button:disabled{opacity:.3;cursor:not-allowed}
+.admin-server-toggle{height:30px;min-width:30px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;font-weight:900;cursor:pointer;padding:0 7px}
+.channel-info-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.channel-server-select{width:100%;max-width:220px;height:27px;border:1px solid #29476e;border-radius:7px;background:#0b1b2e;color:#a9c6ed;padding:0 6px;font-size:10px;min-width:0}
+.channel-card{height:auto;min-height:76px}
+@media(max-width:600px){.admin-extra-server{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:4px!important}.admin-extra-server .admin-field-wrap{gap:2px}.admin-extra-server .admin-field-wrap input{height:32px;padding:3px 5px;font-size:12px!important}.admin-extra-server .admin-open-link{width:22px;min-width:22px;height:27px;font-size:10px}.admin-server-actions{gap:2px}.admin-server-actions button{width:21px;height:25px;min-width:21px;font-size:9px}.channel-server-select{font-size:9px;height:25px;max-width:100%}}
+</style>
+
 </head>
 
 <body>
@@ -1302,9 +1348,9 @@ let liveHlsInstance = null;
 let activeChannelForServers = null;
 function channelServerList(channel){
   const primary=String(channel?.url||"").trim();
-  const list=Array.isArray(channel?.servers)?channel.servers.map((item,index)=>typeof item==="string"?({name:"Server "+(index+1),url:item.trim()}):({name:String(item?.name||("Server "+(index+1))),url:String(item?.url||"").trim()})).filter(item=>item.url):[];
+  const list=Array.isArray(channel?.servers)?channel.servers.map((item,index)=>typeof item==="string"?({name:"Server "+(index+1),url:item.trim()}):({name:String(item?.name||("Server "+(index+1))),url:String(item?.url||"").trim(),enabled:item?.enabled!==false})).filter(item=>item.url):[];
   const urls=new Set();
-  const combined=[...(primary?[{name:"Server 1",url:primary}]:[]),...list];
+  const combined=[...(primary?[{name:"Server 1",url:primary,enabled:true}]:[]),...list.filter(item=>item.enabled!==false)];
   return combined.filter(item=>{if(!item.url||urls.has(item.url))return false;urls.add(item.url);return true}).map((item,index)=>({name:index===0?"Server 1":(item.name||("Server "+(index+1))),url:item.url}));
 }
 function setupChannelServers(channel){
@@ -1313,6 +1359,7 @@ function setupChannelServers(channel){
   if(!bar||!select)return;
   const servers=channelServerList(channel);
   activeChannelForServers=channel;
+  bar.classList.toggle("has-servers",servers.length>1);
   bar.style.display=servers.length>1?"flex":"none";
   select.innerHTML=servers.map((server,index)=>`<option value="${index}">${escapeHtml(server.name)}${index===0?" — Primary":""}</option>`).join("");
   select.onchange=()=>{
@@ -1483,11 +1530,30 @@ function renderChannels(){
           ? `<img src="${escapeAttr(channel.logo)}" alt="" referrerpolicy="no-referrer">`
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
-      <div class="channel-name">${escapeHtml(channel.name)}${playing?`<span class="playing-label">CURRENTLY PLAYING</span>`:""}</div>
+      <div class="channel-info-wrap"><div class="channel-name">${escapeHtml(channel.name)}${playing?`<span class="playing-label">CURRENTLY PLAYING</span>`:""}</div>
+        ${channelServerList(channel).length>1?`<select class="channel-server-select" data-server-channel="${escapeAttr(key)}" aria-label="Select stream server for ${escapeAttr(channel.name)}">${channelServerList(channel).map((server,index)=>`<option value="${index}">${escapeHtml(server.name)}${index===0?" · Primary":""}</option>`).join("")}</select>`:""}
+      </div>
       <button type="button" class="channel-favorite ${favorite?"is-favorite":""}" data-favorite-key="${escapeAttr(key)}" aria-label="${favorite?"Remove from favorites":"Add to favorites"}" title="${favorite?"Remove favorite":"Add favorite"}">${favorite?"★":"☆"}</button>
       <div class="channel-open ${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"channel-dead":""}">${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"DEAD":"PLAY"}</div>
     </div>`;
   }).join("");
+
+  channelsEl.querySelectorAll(".channel-server-select").forEach(select=>{
+    select.addEventListener("click",event=>event.stopPropagation());
+    select.addEventListener("keydown",event=>event.stopPropagation());
+    select.addEventListener("change",async event=>{
+      event.stopPropagation();
+      const key=select.dataset.serverChannel||"";
+      const channel=CHANNELS.find(ch=>channelFavoriteKey(ch)===key);
+      const server=channelServerList(channel)[Number(select.value)];
+      if(!channel||!server)return;
+      if(window.__soikatRecordingActive && !(await window.__soikatConfirmRecordingInterruption("Changing stream server")))return;
+      currentlyPlayingKey=key;
+      window.__soikatCurrentChannelName=channel.name||"Live TV";
+      playChannelInPage(channel,server.url);
+      renderChannels();
+    });
+  });
 
   channelsEl.querySelectorAll(".channel-favorite").forEach(button=>{
     button.addEventListener("click",event=>{
@@ -1503,7 +1569,7 @@ function renderChannels(){
   });
   channelsEl.querySelectorAll(".channel-card").forEach(card=>{
     const playSelectedChannel = async event => {
-      if(event && event.target.closest(".channel-favorite")) return;
+      if(event && event.target.closest(".channel-favorite, .channel-server-select")) return;
       const key=card.dataset.channelKey||"";
       const channel=CHANNELS.find(ch=>channelFavoriteKey(ch)===key);
       if(!channel) return;
@@ -1782,6 +1848,7 @@ function setAdminSearchTerm(value){
   renderAdmin();
 }
 
+const openAdditionalServerPanels = new Set();
 function renderAdmin(){
   renderAdminCategoryFilter();
 
@@ -1803,6 +1870,7 @@ function renderAdmin(){
           </select>
         </div>
         <div class="admin-right">
+          <button type="button" class="admin-server-toggle" onclick="toggleAdditionalServerPanel(${i})" title="Show or add stream servers" aria-label="Show or add stream servers">+</button>
           <button type="button" class="admin-status-toggle" onclick="toggleAdminStatus(${i})" title="${String(c.status || "LIVE").toUpperCase()==="DEAD"?"LIVE":"DEAD"}" aria-label="Toggle live/dead">${String(c.status || "LIVE").toUpperCase()==="DEAD"?"🔴":"🟢"}</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},-1)" ${i===0?"disabled":""} title="Move up" aria-label="Move up">▲</button>
           <button type="button" class="admin-move" onclick="moveChannel(${i},1)" ${i===CHANNELS.length-1?"disabled":""} title="Move down" aria-label="Move down">▼</button>
@@ -1822,9 +1890,10 @@ function renderAdmin(){
           <button type="button" class="admin-open-link" onclick="openAdminLink(this,'source')" title="Open source URL" aria-label="Open source URL">🔗</button>
         </div>
       </div>
-      <div style="margin-top:8px">
-        <textarea data-key="serversText" class="admin-servers-text" placeholder="Additional stream servers — one URL per line" aria-label="Additional stream servers" style="width:100%;min-height:58px;resize:vertical;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:9px 11px;font:12px Arial,Helvetica,sans-serif">${escapeHtml((Array.isArray(c.servers)?c.servers.map((server,index)=>typeof server==='string'?server:(server.url||'' )).filter(Boolean).filter(url=>url!==String(c.url||'').trim()):[]).join("\n"))}</textarea>
-        <div style="margin-top:4px;color:#7189ac;font-size:10px">Primary server is the Stream URL above. Add backup URLs here, one per line.</div>
+      <div class="admin-extra-servers ${openAdditionalServerPanels.has(i)?"is-open":""}" data-channel-index="${i}">
+        ${(Array.isArray(c.servers)?c.servers.map((server,index)=>typeof server==="string"?({name:"Server "+(index+1),url:server,source:"",enabled:true}):({name:String(server.name||("Server "+(index+1))),url:String(server.url||""),source:String(server.source||""),enabled:server.enabled!==false})).filter(server=>!server.url || server.url!==String(c.url||"").trim()):[]).map((server,serverIndex,serverList)=>`<div class="admin-extra-server" data-server-index="${serverIndex}" data-server-enabled="${server.enabled!==false}"><div class="admin-field-wrap"><input data-server-key="url" value="${escapeAttr(server.url)}" placeholder="Additional Stream URL (.m3u8)" aria-label="Additional stream URL"><button type="button" class="admin-open-link" onclick="openAdminServerLink(this,'url')" title="Open stream URL" aria-label="Open stream URL">🔗</button></div><div class="admin-field-wrap"><input data-server-key="source" value="${escapeAttr(server.source)}" placeholder="Additional Source URL" aria-label="Additional source URL"><button type="button" class="admin-open-link" onclick="openAdminServerLink(this,'source')" title="Open source URL" aria-label="Open source URL">🔗</button></div><div class="admin-server-actions"><button type="button" class="server-status" onclick="toggleAdditionalServerEnabled(${i},${serverIndex})" title="${server.enabled!==false?'Disable this server':'Enable this server'}" aria-label="${server.enabled!==false?'Disable this server':'Enable this server'}">${server.enabled!==false?'🟢':'🔴'}</button><button type="button" onclick="moveAdditionalServer(${i},${serverIndex},-1)" ${serverIndex===0?"disabled":""} title="Move server up" aria-label="Move server up">▲</button><button type="button" onclick="moveAdditionalServer(${i},${serverIndex},1)" ${serverIndex===serverList.length-1?"disabled":""} title="Move server down" aria-label="Move server down">▼</button><button type="button" class="server-delete" onclick="removeAdditionalServer(${i},${serverIndex})" title="Delete server" aria-label="Delete server">🗑️</button></div></div>`).join("")}
+        <div class="admin-extra-server-actions"><button type="button" class="admin-add-server" onclick="addAdditionalServer(${i})">+ Add Server</button></div>
+        <div style="margin-top:4px;color:#7189ac;font-size:10px">Each additional server has a Stream URL and Source URL.</div>
       </div>
     </div>`).join("");
 
@@ -1944,15 +2013,13 @@ function collectAdminChannels(){
 
     row.querySelectorAll("[data-key]").forEach(el=>{
       const key=el.dataset.key;
-      if(key === "serversText"){
-        const extra=el.value.split(/\r?\n/).map(url=>url.trim()).filter(Boolean);
-        const primary=String(next[idx].url||"").trim();
-        next[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...extra.filter(url=>url!==primary).map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
-      }else{
-        next[idx][key] = el.value.trim();
-      }
+      next[idx][key] = el.value.trim();
     });
 
+    const primary=String(next[idx].url||"").trim();
+    const extraRows=[...row.querySelectorAll(".admin-extra-server")];
+    const extras=extraRows.map((serverRow,serverIndex)=>({name:"Server "+(primary?serverIndex+2:serverIndex+1),url:String(serverRow.querySelector('[data-server-key="url"]')?.value||"").trim(),source:String(serverRow.querySelector('[data-server-key="source"]')?.value||"").trim()})).filter(server=>server.url && server.url!==primary);
+    next[idx].servers=[...(primary?[{name:"Server 1",url:primary,source:String(next[idx].source||"").trim()}]:[]),...extras];
     next[idx].status =
       (CHANNELS[idx]?.status || "LIVE").toUpperCase() === "DEAD"
         ? "DEAD"
@@ -2146,6 +2213,66 @@ function setAdminMessage(text,type){
   if(el){el.textContent=text;el.className="admin-message "+type;}
 }
 
+function updateExtraServersFromAdminRow(row,idx){
+  if(!row || idx<0 || idx>=CHANNELS.length)return;
+  const primary=String(row.querySelector('[data-key="url"]')?.value||CHANNELS[idx].url||"").trim();
+  const primarySource=String(row.querySelector('[data-key="source"]')?.value||CHANNELS[idx].source||"").trim();
+  const extras=[...row.querySelectorAll(".admin-extra-server")].map((serverRow,serverIndex)=>({name:"Server "+(primary?serverIndex+2:serverIndex+1),url:String(serverRow.querySelector('[data-server-key="url"]')?.value||"").trim(),source:String(serverRow.querySelector('[data-server-key="source"]')?.value||"").trim(),enabled:serverRow.dataset.serverEnabled!=="false"})).filter(server=>server.url && server.url!==primary);
+  CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary,source:primarySource}]:[]),...extras];
+  if(extras.length) CHANNELS[idx].status=extras.some(server=>server.enabled!==false)?"LIVE":"DEAD";
+}
+function toggleAdditionalServerEnabled(channelIndex,serverIndex){
+  const channel=CHANNELS[channelIndex];if(!channel)return;
+  const primary=String(channel.url||"").trim();
+  const extras=(Array.isArray(channel.servers)?channel.servers:[]).filter(server=>String(typeof server==="string"?server:server.url||"").trim()!==primary && String(typeof server==="string"?server:server.url||"").trim()).map(server=>typeof server==="string"?{url:server,source:"",enabled:true}:{...server,enabled:server.enabled!==false});
+  if(!extras[serverIndex])return;
+  extras[serverIndex].enabled=extras[serverIndex].enabled===false;
+  channel.servers=[...(primary?[{name:"Server 1",url:primary,source:String(channel.source||"")}]:[]),...extras.map((server,index)=>({...server,name:"Server "+(primary?index+2:index+1)}))];
+  // Extra-server switches control only those streams. If extra servers exist and all are OFF,
+  // preserve the legacy DEAD badge while a channel-card click still opens the primary URL.
+  if(extras.length) channel.status=extras.some(server=>server.enabled!==false)?"LIVE":"DEAD";
+  openAdditionalServerPanels.add(channelIndex);renderAdmin();renderChannels();scheduleAutoSave();
+}
+function toggleAdditionalServerPanel(channelIndex){
+  if(openAdditionalServerPanels.has(channelIndex)) openAdditionalServerPanels.delete(channelIndex);
+  else openAdditionalServerPanels.add(channelIndex);
+  renderAdmin();
+}
+function moveAdditionalServer(channelIndex,serverIndex,direction){
+  const channel=CHANNELS[channelIndex];if(!channel)return;
+  const primary=String(channel.url||"").trim();
+  const extras=(Array.isArray(channel.servers)?channel.servers:[]).filter(server=>String(typeof server==="string"?server:server.url||"").trim()!==primary && String(typeof server==="string"?server:server.url||"").trim()).map(server=>typeof server==="string"?{name:"",url:server,source:"",enabled:true}:{...server,enabled:server.enabled!==false});
+  const target=serverIndex+direction;if(target<0||target>=extras.length)return;
+  [extras[serverIndex],extras[target]]=[extras[target],extras[serverIndex]];
+  channel.servers=[...(primary?[{name:"Server 1",url:primary,source:String(channel.source||"")}]:[]),...extras.map((server,index)=>({...server,name:"Server "+(primary?index+2:index+1)}))];
+  openAdditionalServerPanels.add(channelIndex);renderAdmin();scheduleAutoSave();
+}
+function addAdditionalServer(channelIndex){
+  const channel=CHANNELS[channelIndex];if(!channel)return;
+  openAdditionalServerPanels.add(channelIndex);
+  if(!Array.isArray(channel.servers))channel.servers=[];
+  const primary=String(channel.url||"").trim();
+  const extras=channel.servers.filter(server=>String(typeof server==="string"?server:server.url||"").trim()!==primary && String(typeof server==="string"?server:server.url||"").trim());
+  extras.push({name:"Server "+(primary?extras.length+2:extras.length+1),url:"",source:""});
+  channel.servers=[...(primary?[{name:"Server 1",url:primary,source:String(channel.source||"")}]:[]),...extras];
+  renderAdmin();scheduleAutoSave();
+}
+function removeAdditionalServer(channelIndex,serverIndex){
+  const channel=CHANNELS[channelIndex];if(!channel)return;
+  openAdditionalServerPanels.add(channelIndex);
+  const primary=String(channel.url||"").trim();
+  const extras=(Array.isArray(channel.servers)?channel.servers:[]).filter(server=>String(typeof server==="string"?server:server.url||"").trim()!==primary && String(typeof server==="string"?server:server.url||"").trim()).map(server=>typeof server==="string"?{url:server,source:""}:({...server}));
+  extras.splice(serverIndex,1);
+  channel.servers=[...(primary?[{name:"Server 1",url:primary,source:String(channel.source||"")}]:[]),...extras.map((server,index)=>({...server,name:"Server "+(primary?index+2:index+1)}))];
+  renderAdmin();scheduleAutoSave();
+}
+function openAdminServerLink(button,key){
+  const row=button.closest(".admin-extra-server");const input=row?.querySelector(`[data-server-key="${key}"]`);if(!input)return;
+  const raw=String(input.value||"").trim();if(!raw)return;
+  let url=raw;if(!/^https?:\/\//i.test(url))url="https://"+url;
+  window.open(url,"_blank","noopener,noreferrer");
+}
+
 document.addEventListener("input", function(e){
   const row=e.target.closest && e.target.closest("#adminRows .admin-row");
   if(!row) return;
@@ -2157,16 +2284,11 @@ document.addEventListener("input", function(e){
   // Update the in-memory record immediately. This is the important part:
   // saving never needs to read/rebuild the form later, so typing cannot be
   // lost when a save is slow.
-  if(key === "serversText"){
-    const primary=String(CHANNELS[idx].url||"").trim();
-    CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...e.target.value.split(/\r?\n/).map(url=>url.trim()).filter(url=>url && url!==primary).map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
+  if(e.target.dataset && e.target.dataset.serverKey){
+    updateExtraServersFromAdminRow(row,idx);
   }else{
     CHANNELS[idx][key]=e.target.value;
-    if(key === "url"){
-      const primary=String(e.target.value||"").trim();
-      const extras=Array.isArray(CHANNELS[idx].servers)?CHANNELS[idx].servers.map(server=>typeof server==="string"?server:server.url).filter(url=>url && url!==primary):[];
-      CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...extras.map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
-    }
+    if(key === "url" || key === "source") updateExtraServersFromAdminRow(row,idx);
   }
   scheduleAutoSave();
 });
@@ -2179,11 +2301,11 @@ document.addEventListener("change", function(e){
   const key=e.target.dataset && e.target.dataset.key;
   if(!Number.isInteger(idx) || idx<0 || idx>=CHANNELS.length || !key) return;
 
-  if(key === "serversText"){
-    const primary=String(CHANNELS[idx].url||"").trim();
-    CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...e.target.value.split(/\r?\n/).map(url=>url.trim()).filter(url=>url && url!==primary).map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
+  if(e.target.dataset && e.target.dataset.serverKey){
+    updateExtraServersFromAdminRow(row,idx);
   }else{
     CHANNELS[idx][key]=e.target.value;
+    if(key === "url" || key === "source") updateExtraServersFromAdminRow(row,idx);
   }
   scheduleAutoSave();
 });
