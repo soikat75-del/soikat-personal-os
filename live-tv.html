@@ -528,7 +528,7 @@ footer{
 .admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
 .admin-open-link:hover{background:#102845;border-color:#5e8fff}
 .admin-fields input:focus{border-color:#5e8fff}
-.admin-fields input:focus,.admin-name:focus,.admin-category:focus{border-color:#5e8fff}
+.admin-fields input:focus,.admin-name:focus,.admin-category:focus,.admin-servers-text:focus{border-color:#5e8fff}
 .admin-message{min-height:18px;margin:8px 0 0;font-size:12px}
 .admin-message.ok{color:#54d99a}.admin-message.err{color:#ff7474}
 .admin-filter-wrap{margin-bottom:12px}
@@ -1081,6 +1081,10 @@ if ('serviceWorker' in navigator) {
         <span>Choose any channel below</span>
       </div>
     </div>
+    <div id="streamServerBar" style="display:none;align-items:center;gap:10px;padding:10px 12px;background:#071321;border-top:1px solid #1c3555;color:#8299bb;font-size:11px">
+      <label for="streamServerSelect" style="white-space:nowrap;font-weight:800">STREAM SERVER</label>
+      <select id="streamServerSelect" style="flex:1;min-width:0;height:34px;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#dfeaff;padding:0 9px;font-size:12px"></select>
+    </div>
   </section>
 </div>
 <div class="recording-tools">
@@ -1295,18 +1299,45 @@ async function loadCentralData(){
 }
 
 let liveHlsInstance = null;
-function playChannelInPage(channel){
+let activeChannelForServers = null;
+function channelServerList(channel){
+  const primary=String(channel?.url||"").trim();
+  const list=Array.isArray(channel?.servers)?channel.servers.map((item,index)=>typeof item==="string"?({name:"Server "+(index+1),url:item.trim()}):({name:String(item?.name||("Server "+(index+1))),url:String(item?.url||"").trim()})).filter(item=>item.url):[];
+  const urls=new Set();
+  const combined=[...(primary?[{name:"Server 1",url:primary}]:[]),...list];
+  return combined.filter(item=>{if(!item.url||urls.has(item.url))return false;urls.add(item.url);return true}).map((item,index)=>({name:index===0?"Server 1":(item.name||("Server "+(index+1))),url:item.url}));
+}
+function setupChannelServers(channel){
+  const bar=document.getElementById("streamServerBar");
+  const select=document.getElementById("streamServerSelect");
+  if(!bar||!select)return;
+  const servers=channelServerList(channel);
+  activeChannelForServers=channel;
+  bar.style.display=servers.length>1?"flex":"none";
+  select.innerHTML=servers.map((server,index)=>`<option value="${index}">${escapeHtml(server.name)}${index===0?" — Primary":""}</option>`).join("");
+  select.onchange=()=>{
+    if(!activeChannelForServers)return;
+    const chosen=channelServerList(activeChannelForServers)[Number(select.value)];
+    if(chosen)playChannelInPage(activeChannelForServers,chosen.url,false);
+  };
+}
+function playChannelInPage(channel, selectedUrl=null, resetServerList=true){
   const video=document.getElementById("livePlayer");
   const message=document.getElementById("playerMessage");
   const playerWrap=document.querySelector(".player-wrap");
-  if(!video || !channel || !channel.url) return;
+  const servers=channelServerList(channel);
+  const rawSelected=String(selectedUrl||channel?.url||servers[0]?.url||"").trim();
+  if(!video || !channel || !rawSelected) return;
+  if(resetServerList)setupChannelServers(channel);
+  const serverSelect=document.getElementById("streamServerSelect");
+  if(serverSelect){const chosenIndex=servers.findIndex(server=>server.url===rawSelected);if(chosenIndex>=0)serverSelect.value=String(chosenIndex);}
   const playerContainer=document.getElementById("tvPlayerContainer");
   if(playerContainer) playerContainer.classList.add("player-visible");
   if(liveHlsInstance){try{liveHlsInstance.destroy()}catch(e){} liveHlsInstance=null;}
   video.pause();
   video.removeAttribute("src");
   video.load();
-  const rawUrl=String(channel.url).trim();
+  const rawUrl=rawSelected;
   let url=rawUrl;
   let youtubeId="";
   let parsed=null;
@@ -1758,7 +1789,7 @@ function renderAdmin(){
   const indexedChannels = CHANNELS.map((c,i)=>({c,i}));
   const filteredChannels = indexedChannels.filter(({c}) =>
     (filter === "ALL" || String(c.category || "").toUpperCase() === filter) &&
-    (!adminSearchTerm || [c.name,c.category,c.url,c.source,c.logo].some(v => String(v||"").toLowerCase().includes(adminSearchTerm)))
+    (!adminSearchTerm || [c.name,c.category,c.url,c.source,c.logo,JSON.stringify(c.servers||[])].some(v => String(v||"").toLowerCase().includes(adminSearchTerm)))
   );
 
   const list = filteredChannels.map(({c,i})=>`
@@ -1790,6 +1821,10 @@ function renderAdmin(){
           <input data-key="source" value="${escapeAttr(c.source || "")}" placeholder="Source URL">
           <button type="button" class="admin-open-link" onclick="openAdminLink(this,'source')" title="Open source URL" aria-label="Open source URL">🔗</button>
         </div>
+      </div>
+      <div style="margin-top:8px">
+        <textarea data-key="serversText" class="admin-servers-text" placeholder="Additional stream servers — one URL per line" aria-label="Additional stream servers" style="width:100%;min-height:58px;resize:vertical;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:9px 11px;font:12px Arial,Helvetica,sans-serif">${escapeHtml((Array.isArray(c.servers)?c.servers.map((server,index)=>typeof server==='string'?server:(server.url||'' )).filter(Boolean).filter(url=>url!==String(c.url||'').trim()):[]).join("\n"))}</textarea>
+        <div style="margin-top:4px;color:#7189ac;font-size:10px">Primary server is the Stream URL above. Add backup URLs here, one per line.</div>
       </div>
     </div>`).join("");
 
@@ -1908,7 +1943,14 @@ function collectAdminChannels(){
     if(idx < 0 || idx >= next.length) return;
 
     row.querySelectorAll("[data-key]").forEach(el=>{
-      next[idx][el.dataset.key] = el.value.trim();
+      const key=el.dataset.key;
+      if(key === "serversText"){
+        const extra=el.value.split(/\r?\n/).map(url=>url.trim()).filter(Boolean);
+        const primary=String(next[idx].url||"").trim();
+        next[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...extra.filter(url=>url!==primary).map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
+      }else{
+        next[idx][key] = el.value.trim();
+      }
     });
 
     next[idx].status =
@@ -1924,7 +1966,7 @@ function addStream(){
   const targetCategory = adminCategoryFilter !== "ALL"
     ? adminCategoryFilter
     : (selectedCategory !== "ALL" && selectedCategory !== "FAVORITES" && CATEGORIES.some(c=>String(c).toUpperCase()===selectedCategory) ? selectedCategory : "MUSIC");
-  const newChannel = {name:"New Channel",category:targetCategory,logo:"",url:"",source:"",status:"LIVE"};
+  const newChannel = {name:"New Channel",category:targetCategory,logo:"",url:"",source:"",servers:[],status:"LIVE"};
   CHANNELS.push(newChannel);
   adminCategoryFilter = targetCategory;
   adminSearchTerm = "";
@@ -2115,7 +2157,17 @@ document.addEventListener("input", function(e){
   // Update the in-memory record immediately. This is the important part:
   // saving never needs to read/rebuild the form later, so typing cannot be
   // lost when a save is slow.
-  CHANNELS[idx][key]=e.target.value;
+  if(key === "serversText"){
+    const primary=String(CHANNELS[idx].url||"").trim();
+    CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...e.target.value.split(/\r?\n/).map(url=>url.trim()).filter(url=>url && url!==primary).map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
+  }else{
+    CHANNELS[idx][key]=e.target.value;
+    if(key === "url"){
+      const primary=String(e.target.value||"").trim();
+      const extras=Array.isArray(CHANNELS[idx].servers)?CHANNELS[idx].servers.map(server=>typeof server==="string"?server:server.url).filter(url=>url && url!==primary):[];
+      CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...extras.map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
+    }
+  }
   scheduleAutoSave();
 });
 
@@ -2127,7 +2179,12 @@ document.addEventListener("change", function(e){
   const key=e.target.dataset && e.target.dataset.key;
   if(!Number.isInteger(idx) || idx<0 || idx>=CHANNELS.length || !key) return;
 
-  CHANNELS[idx][key]=e.target.value;
+  if(key === "serversText"){
+    const primary=String(CHANNELS[idx].url||"").trim();
+    CHANNELS[idx].servers=[...(primary?[{name:"Server 1",url:primary}]:[]),...e.target.value.split(/\r?\n/).map(url=>url.trim()).filter(url=>url && url!==primary).map((url,i)=>({name:"Server "+(primary?i+2:i+1),url}))];
+  }else{
+    CHANNELS[idx][key]=e.target.value;
+  }
   scheduleAutoSave();
 });
 
