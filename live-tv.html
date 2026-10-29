@@ -528,9 +528,13 @@ footer{
 .admin-backup-row input{height:38px;width:100%;min-width:0;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#dfeaff;padding:0 9px;font-size:12px;outline:0}
 .admin-backup-controls{display:flex;gap:4px;align-items:center}
 .admin-backup-controls button,.admin-add-backup{height:32px;min-width:30px;border:1px solid #29476e;border-radius:7px;background:#0b1b2e;color:#dfeaff;cursor:pointer;padding:0 6px}
+.admin-backup-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
+.admin-backup-field-wrap input{flex:1;min-width:0}
+.admin-backup-open-link{height:38px;width:38px;min-width:38px;flex:0 0 38px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;font-size:16px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
+.admin-backup-open-link:hover{background:#102845;border-color:#5e8fff}
 .admin-backup-label{grid-column:1/-1;color:#8eacd3;font-size:10px;letter-spacing:.5px}
 .admin-add-backup{margin-top:8px;font-weight:800}
-@media(max-width:600px){.admin-backups{margin-left:8px;padding-left:7px}.admin-backup-row{grid-template-columns:1fr;gap:5px}.admin-backup-controls{justify-content:flex-end}.admin-backup-label{grid-column:auto}}
+@media(max-width:600px){.admin-backups{margin-left:8px;padding-left:7px}.admin-backup-row{grid-template-columns:1fr;gap:5px}.admin-backup-controls{justify-content:flex-end}.admin-backup-label{grid-column:auto}.admin-backup-open-link{height:38px;width:38px;min-width:38px;flex-basis:38px}}
 .admin-field-wrap{display:flex;align-items:center;gap:6px;min-width:0}
 .admin-field-wrap input{height:42px;flex:1;min-width:0;border:1px solid #29476e;border-radius:9px;background:#0b1b2e;color:#dfeaff;padding:0 11px;font-size:12px;outline:0}
 .admin-open-link{height:42px;width:42px;flex:0 0 42px;border:1px solid #31547e;border-radius:9px;background:#0b1b2e;color:#9fc0ff;font-size:17px;cursor:pointer;padding:0;display:inline-grid;place-items:center}
@@ -1772,8 +1776,14 @@ function renderAdmin(){
     const backupRows = backups.map((b,bi)=>`
       <div class="admin-backup-row" data-backup-row="${bi}" data-parent-row="${i}">
         <div class="admin-backup-label">BACKUP STREAM ${bi+1}</div>
-        <div class="admin-field-wrap"><input data-backup-key="url" data-backup-index="${bi}" value="${escapeAttr(b.url||"")}" placeholder="Stream URL (.m3u8)" aria-label="Backup stream URL ${bi+1}"><button type="button" class="admin-open-link" onclick="openBackupLink(this,'url')" title="Open backup stream URL" aria-label="Open backup stream URL">🔗</button></div>
-        <div class="admin-field-wrap"><input data-backup-key="source" data-backup-index="${bi}" value="${escapeAttr(b.source||"")}" placeholder="Source URL" aria-label="Backup source URL ${bi+1}"><button type="button" class="admin-open-link" onclick="openBackupLink(this,'source')" title="Open backup source URL" aria-label="Open backup source URL">🔗</button></div>
+        <div class="admin-backup-field-wrap">
+          <input data-backup-key="url" data-backup-index="${bi}" value="${escapeAttr(b.url||"")}" placeholder="Stream URL (.m3u8)" aria-label="Backup stream URL ${bi+1}">
+          <button type="button" class="admin-backup-open-link" onclick="openBackupAdminLink(this,'url')" title="Open backup stream URL" aria-label="Open backup stream URL">🔗</button>
+        </div>
+        <div class="admin-backup-field-wrap">
+          <input data-backup-key="source" data-backup-index="${bi}" value="${escapeAttr(b.source||"")}" placeholder="Source URL" aria-label="Backup source URL ${bi+1}">
+          <button type="button" class="admin-backup-open-link" onclick="openBackupAdminLink(this,'source')" title="Open backup source URL" aria-label="Open backup source URL">🔗</button>
+        </div>
         <div class="admin-backup-controls">
           <button type="button" onclick="addBackupStream(${i},${bi})" title="Add backup below">+</button>
           <button type="button" onclick="toggleBackupStatus(${i},${bi})" title="Toggle backup status">${String(b.status||"LIVE").toUpperCase()==="DEAD"?"🔴":"🟢"}</button>
@@ -1932,9 +1942,9 @@ function moveChannel(index, direction){
   scheduleAutoSave();
 }
 
-function openBackupLink(button,key){
-  const row=button?.closest('.admin-backup-row');
-  const input=row?.querySelector(`[data-backup-key="${key}"]`);
+function openBackupAdminLink(button,key){
+  const wrap=button?.closest('.admin-backup-field-wrap');
+  const input=wrap?.querySelector(`[data-backup-key="${key}"]`);
   const raw=String(input?.value || '').trim();
   if(!raw){
     setAdminMessage(key === 'url' ? 'Backup stream URL is empty.' : 'Backup source URL is empty.','err');
