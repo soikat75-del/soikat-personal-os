@@ -1998,12 +1998,13 @@ async function saveCentralPost(payload){
     throw new Error("API URL not configured");
   }
 
+  // Do not use keepalive: the full channel list (including data-URL logos)
+  // can exceed the browser's keepalive request-body limit.
   await fetch(API_URL,{
     method:"POST",
     mode:"no-cors",
     headers:{"Content-Type":"text/plain;charset=UTF-8"},
-    body:JSON.stringify(payload),
-    keepalive:true
+    body:JSON.stringify(payload)
   });
 }
 
