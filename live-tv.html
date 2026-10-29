@@ -1772,8 +1772,8 @@ function renderAdmin(){
     const backupRows = backups.map((b,bi)=>`
       <div class="admin-backup-row" data-backup-row="${bi}" data-parent-row="${i}">
         <div class="admin-backup-label">BACKUP STREAM ${bi+1}</div>
-        <input data-backup-key="url" data-backup-index="${bi}" value="${escapeAttr(b.url||"")}" placeholder="Stream URL (.m3u8)" aria-label="Backup stream URL ${bi+1}">
-        <input data-backup-key="source" data-backup-index="${bi}" value="${escapeAttr(b.source||"")}" placeholder="Source URL" aria-label="Backup source URL ${bi+1}">
+        <div class="admin-field-wrap"><input data-backup-key="url" data-backup-index="${bi}" value="${escapeAttr(b.url||"")}" placeholder="Stream URL (.m3u8)" aria-label="Backup stream URL ${bi+1}"><button type="button" class="admin-open-link" onclick="openBackupLink(this,'url')" title="Open backup stream URL" aria-label="Open backup stream URL">🔗</button></div>
+        <div class="admin-field-wrap"><input data-backup-key="source" data-backup-index="${bi}" value="${escapeAttr(b.source||"")}" placeholder="Source URL" aria-label="Backup source URL ${bi+1}"><button type="button" class="admin-open-link" onclick="openBackupLink(this,'source')" title="Open backup source URL" aria-label="Open backup source URL">🔗</button></div>
         <div class="admin-backup-controls">
           <button type="button" onclick="addBackupStream(${i},${bi})" title="Add backup below">+</button>
           <button type="button" onclick="toggleBackupStatus(${i},${bi})" title="Toggle backup status">${String(b.status||"LIVE").toUpperCase()==="DEAD"?"🔴":"🟢"}</button>
@@ -1930,6 +1930,24 @@ function moveChannel(index, direction){
   renderAdmin();
   setAdminMessage(`Channel moved to serial ${nextIndex + 1}. Saving automatically…`, "ok");
   scheduleAutoSave();
+}
+
+function openBackupLink(button,key){
+  const row=button?.closest('.admin-backup-row');
+  const input=row?.querySelector(`[data-backup-key="${key}"]`);
+  const raw=String(input?.value || '').trim();
+  if(!raw){
+    setAdminMessage(key === 'url' ? 'Backup stream URL is empty.' : 'Backup source URL is empty.','err');
+    input?.focus();
+    return;
+  }
+  let url=raw;
+  if(!/^https?:\\/\\//i.test(url) && !/^data:/i.test(url)) url='https://'+url;
+  if(/^data:/i.test(url)){
+    setAdminMessage('This is a data image, not a web link.','err');
+    return;
+  }
+  window.open(url,'_blank','noopener,noreferrer');
 }
 
 function openAdminLink(button,key){
