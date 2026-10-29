@@ -1098,9 +1098,11 @@ if ('serviceWorker' in navigator) {
 .admin-server-actions button:disabled{opacity:.3;cursor:not-allowed}
 .admin-server-toggle{height:30px;min-width:30px;border:1px solid #31547e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;font-weight:900;cursor:pointer;padding:0 7px}
 .channel-info-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
-.channel-server-select{width:100%;max-width:220px;height:27px;border:1px solid #29476e;border-radius:7px;background:#0b1b2e;color:#a9c6ed;padding:0 6px;font-size:10px;min-width:0}
+.channel-server-select{width:100%;max-width:240px;height:30px;border:1px solid #3d6799;border-radius:8px;background:#102844;color:#d7e8ff;padding:0 8px;font-size:11px;font-weight:700;min-width:0;cursor:pointer;box-shadow:0 0 0 1px #142f4c;display:block}
+.channel-server-control{display:flex;align-items:center;gap:5px;min-width:0}
+.channel-server-label{font-size:9px;font-weight:900;letter-spacing:.5px;color:#80b5ff;white-space:nowrap}
 .channel-card{height:auto;min-height:76px}
-@media(max-width:600px){.admin-extra-server{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:4px!important}.admin-extra-server .admin-field-wrap{gap:2px}.admin-extra-server .admin-field-wrap input{height:32px;padding:3px 5px;font-size:12px!important}.admin-extra-server .admin-open-link{width:22px;min-width:22px;height:27px;font-size:10px}.admin-server-actions{gap:2px}.admin-server-actions button{width:21px;height:25px;min-width:21px;font-size:9px}.channel-server-select{font-size:9px;height:25px;max-width:100%}}
+@media(max-width:600px){.admin-extra-server{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto!important;gap:4px!important}.admin-extra-server .admin-field-wrap{gap:2px}.admin-extra-server .admin-field-wrap input{height:32px;padding:3px 5px;font-size:12px!important}.admin-extra-server .admin-open-link{width:22px;min-width:22px;height:27px;font-size:10px}.admin-server-actions{gap:2px}.admin-server-actions button{width:21px;height:25px;min-width:21px;font-size:9px}.channel-server-select{font-size:10px;height:28px;max-width:100%}.channel-server-control{gap:4px}.channel-server-label{font-size:8px}}
 </style>
 
 </head>
@@ -1531,7 +1533,7 @@ function renderChannels(){
           : `<span>${String(channel.name || "?").charAt(0).toUpperCase()}</span>`}
       </div>
       <div class="channel-info-wrap"><div class="channel-name">${escapeHtml(channel.name)}${playing?`<span class="playing-label">CURRENTLY PLAYING</span>`:""}</div>
-        ${channelServerList(channel).length>1?`<select class="channel-server-select" data-server-channel="${escapeAttr(key)}" aria-label="Select stream server for ${escapeAttr(channel.name)}">${channelServerList(channel).map((server,index)=>`<option value="${index}">${escapeHtml(server.name)}${index===0?" · Primary":""}</option>`).join("")}</select>`:""}
+        ${channelServerList(channel).length>1?`<div class="channel-server-control"><span class="channel-server-label">SERVER</span><select class="channel-server-select" data-server-channel="${escapeAttr(key)}" aria-label="Change stream server for ${escapeAttr(channel.name)}" title="Change stream server">${channelServerList(channel).map((server,index)=>`<option value="${index}">${index===0?"1 · PRIMARY":`${index+1} · ${escapeHtml(server.name)}`}</option>`).join("")}</select></div>`:""}
       </div>
       <button type="button" class="channel-favorite ${favorite?"is-favorite":""}" data-favorite-key="${escapeAttr(key)}" aria-label="${favorite?"Remove from favorites":"Add to favorites"}" title="${favorite?"Remove favorite":"Add favorite"}">${favorite?"★":"☆"}</button>
       <div class="channel-open ${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"channel-dead":""}">${String(channel.status || "LIVE").toUpperCase()==="DEAD"?"DEAD":"PLAY"}</div>
@@ -2018,7 +2020,7 @@ function collectAdminChannels(){
 
     const primary=String(next[idx].url||"").trim();
     const extraRows=[...row.querySelectorAll(".admin-extra-server")];
-    const extras=extraRows.map((serverRow,serverIndex)=>({name:"Server "+(primary?serverIndex+2:serverIndex+1),url:String(serverRow.querySelector('[data-server-key="url"]')?.value||"").trim(),source:String(serverRow.querySelector('[data-server-key="source"]')?.value||"").trim()})).filter(server=>server.url && server.url!==primary);
+    const extras=extraRows.map((serverRow,serverIndex)=>({name:"Server "+(primary?serverIndex+2:serverIndex+1),url:String(serverRow.querySelector('[data-server-key="url"]')?.value||"").trim(),source:String(serverRow.querySelector('[data-server-key="source"]')?.value||"").trim(),enabled:serverRow.dataset.serverEnabled!=="false"})).filter(server=>server.url && server.url!==primary);
     next[idx].servers=[...(primary?[{name:"Server 1",url:primary,source:String(next[idx].source||"").trim()}]:[]),...extras];
     next[idx].status =
       (CHANNELS[idx]?.status || "LIVE").toUpperCase() === "DEAD"
