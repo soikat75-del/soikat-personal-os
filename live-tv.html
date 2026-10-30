@@ -1131,6 +1131,15 @@ if ('serviceWorker' in navigator) {
 
 <main>
   <section class="channels-section">
+    <section id="sportsMatchesPanel" class="sports-matches-panel" hidden aria-live="polite">
+      <div class="sports-panel-heading">
+        <div class="section-title">LIVE MATCHES</div>
+        <button type="button" id="sportsRefreshButton" class="sports-refresh-button">↻ REFRESH</button>
+      </div>
+      <div id="sportsTypeTabs" class="sports-type-tabs"></div>
+      <div id="sportsMatchesContent"></div>
+      <div id="sportsUpdatedAt" class="sports-updated-at"></div>
+    </section>
     <div class="section-title">CHANNELS</div>
     <div id="channels" class="channels"></div>
   </section>
@@ -1150,6 +1159,36 @@ url  = Live .m3u8 stream URL
 
 =========================================================
 -->
+
+
+<style id="sports-live-match-styles">
+.sports-matches-panel{margin:0 0 28px;padding:16px;border:1px solid #1c3555;border-radius:14px;background:linear-gradient(145deg,rgba(8,24,42,.96),rgba(4,13,25,.96))}
+.sports-matches-panel[hidden]{display:none!important}
+.sports-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sports-panel-heading .section-title{margin:0}
+.sports-refresh-button{height:32px;padding:0 11px;border:1px solid #29476e;border-radius:8px;background:#0b1b2e;color:#9fc0ff;font-size:10px;font-weight:800;letter-spacing:.06em;cursor:pointer}
+.sports-refresh-button:hover{border-color:#5e8fff;color:#fff}
+.sports-refresh-button:disabled{opacity:.55;cursor:wait}
+.sports-type-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px}
+.sports-type-tab{height:32px;padding:0 13px;border:1px solid #29476e;border-radius:8px;background:#071525;color:#9bb0cf;font-size:10px;font-weight:800;letter-spacing:.06em;cursor:pointer}
+.sports-type-tab.active{border-color:#3d96ff;background:linear-gradient(110deg,#247fda,#6655df);color:#fff}
+.sports-match-group{margin-top:15px}
+.sports-match-group:first-child{margin-top:0}
+.sports-match-heading{margin:0 0 9px;color:#a9bad4;font-size:11px;font-weight:900;letter-spacing:.13em}
+.sports-match-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.sports-match-card{min-width:0;padding:12px;border:1px solid #203b5d;border-radius:10px;background:#071525}
+.sports-match-teams{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#e8f0ff;font-size:13px;font-weight:800}
+.sports-match-vs{color:#7189ac;font-size:10px;font-weight:700}
+.sports-match-event{margin-top:7px;color:#8fa8c8;font-size:10px;line-height:1.45}
+.sports-match-time{margin-top:4px;color:#7189ac;font-size:10px}
+.sports-match-status{flex:0 0 auto;padding:3px 6px;border-radius:5px;background:rgba(67,215,166,.12);color:#54d99a;font-size:9px;font-weight:900}
+.sports-match-streams{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.sports-match-stream{min-height:29px;padding:0 9px;border:1px solid #31547e;border-radius:7px;background:#0b1b2e;color:#b9d3fa;font-size:10px;font-weight:800;cursor:pointer}
+.sports-match-stream:hover{border-color:#5e8fff;color:#fff}
+.sports-match-empty{padding:12px 2px;color:#a4b3ca;font-size:12px}
+.sports-updated-at{margin-top:12px;color:#607895;font-size:9px;text-align:right}
+@media(max-width:700px){.sports-matches-panel{padding:12px;margin-bottom:22px}.sports-match-list{grid-template-columns:1fr}.sports-type-tab{padding:0 10px}}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
 <footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by <span class="footer-soikat" onclick="openAdmin()">Soikat</span></div><span class="footer-line right"></span></footer>
@@ -1191,6 +1230,132 @@ function apiJsonp(params, timeoutMs=5000, retries=1){
     tryRequest();
   });
 }
+
+
+/* ================= SPORTS MATCH AUTO UPDATE ================= */
+const SPORTS_M3U_URL = "https://raw.githubusercontent.com/sm-monirulislam/Upcoming-and-Live-Sports-Data/refs/heads/main/Sports_data.m3u";
+const SPORTS_JSON_URL = "https://raw.githubusercontent.com/sm-monirulislam/Upcoming-and-Live-Sports-Data/refs/heads/main/Sports_data.json";
+let SPORTS_MATCH_DATA = [];
+let selectedSportsType = "CRICKET";
+let sportsRefreshBusy = false;
+const SPORTS_REFRESH_INTERVAL = 5 * 60 * 1000;
+
+function sportsText(value){
+  return String(value == null ? "" : value).trim();
+}
+function sportsCategory(value){
+  const raw=sportsText(value).toUpperCase();
+  if(!raw)return "OTHER";
+  if(raw.includes("CRICKET"))return "CRICKET";
+  if(raw.includes("FOOTBALL")||raw.includes("SOCCER"))return "FOOTBALL";
+  if(raw.includes("HOCKEY"))return "HOCKEY";
+  if(raw.includes("BASKET"))return "BASKETBALL";
+  if(raw.includes("TENNIS"))return "TENNIS";
+  return raw.replace(/[^A-Z0-9 ]/g,"").trim() || "OTHER";
+}
+function isSportsLive(match){
+  const status=sportsText(match && match.status).toUpperCase();
+  return ["LIVE","IN PLAY","IN-PLAY","INPLAY","1ST HALF","2ND HALF","HALF TIME","HT","Q1","Q2","Q3","Q4","SET 1","SET 2","SET 3"].includes(status) || status.includes("LIVE");
+}
+function sportsMatchTeams(match){
+  const info=match && match.eventInfo || {};
+  return {
+    a:sportsText(info.teamA || match.teamA || match.home_team || match.home || match.event_name || "Team A"),
+    b:sportsText(info.teamB || match.teamB || match.away_team || match.away || "")
+  };
+}
+function sportsMatchTime(match){
+  const info=match && match.eventInfo || {};
+  const raw=info.startTime || match.startTime || match.start_time || match.date || "";
+  if(!raw)return "";
+  const date=new Date(raw);
+  return Number.isNaN(date.getTime()) ? sportsText(raw) : date.toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
+}
+function renderSportsMatches(){
+  const panel=document.getElementById("sportsMatchesPanel");
+  const tabs=document.getElementById("sportsTypeTabs");
+  const content=document.getElementById("sportsMatchesContent");
+  if(!panel||!tabs||!content)return;
+  const visible=selectedCategory==="SPORTS" && !channelSearchTerm.trim();
+  panel.hidden=!visible;
+  if(!visible)return;
+
+  const categories=[...new Set(SPORTS_MATCH_DATA.map(m=>sportsCategory(m.Category || m.category || m.sport)))];
+  const preferred=["CRICKET","FOOTBALL","HOCKEY","BASKETBALL","TENNIS"];
+  const ordered=[...preferred.filter(c=>categories.includes(c)),...categories.filter(c=>!preferred.includes(c)).sort()];
+  if(!ordered.length)ordered.push("CRICKET","FOOTBALL");
+  if(!ordered.includes(selectedSportsType))selectedSportsType=ordered[0];
+  tabs.innerHTML=ordered.map(cat=>`<button type="button" class="sports-type-tab ${selectedSportsType===cat?"active":""}" data-sports-type="${escapeAttr(cat)}">${escapeHtml(cat)}</button>`).join("");
+  tabs.querySelectorAll("button").forEach(button=>button.addEventListener("click",()=>{
+    selectedSportsType=button.dataset.sportsType||"CRICKET";
+    renderSportsMatches();
+  }));
+
+  const matches=SPORTS_MATCH_DATA.filter(m=>sportsCategory(m.Category || m.category || m.sport)===selectedSportsType);
+  const live=matches.filter(isSportsLive);
+  const upcoming=matches.filter(m=>!isSportsLive(m));
+  function matchCard(match,isLive){
+    const teams=sportsMatchTeams(match);
+    const event=sportsText(match.eventInfo?.eventName || match.event_name || match.name || match.tournament || "");
+    const time=sportsMatchTime(match);
+    const streams=Array.isArray(match.streams)?match.streams:[];
+    const streamButtons=streams.map((stream,index)=>{
+      const url=sportsText(stream && (stream.stream_url || stream.url));
+      if(!url)return "";
+      const label=sportsText(stream.name)||`STREAM ${index+1}`;
+      return `<button type="button" class="sports-match-stream" data-sports-stream="${escapeAttr(url)}" data-sports-stream-name="${escapeAttr(label)}">${escapeHtml(label)}</button>`;
+    }).join("");
+    return `<article class="sports-match-card">
+      <div class="sports-match-teams"><span>${escapeHtml(teams.a)}</span><span class="sports-match-vs">VS</span><span>${escapeHtml(teams.b)}</span>${isLive?'<span class="sports-match-status">LIVE</span>':""}</div>
+      ${event?`<div class="sports-match-event">${escapeHtml(event)}</div>`:""}
+      ${time?`<div class="sports-match-time">${isLive?"Started":"Starts"} · ${escapeHtml(time)}</div>`:""}
+      ${streamButtons?`<div class="sports-match-streams">${streamButtons}</div>`:""}
+    </article>`;
+  }
+  const liveHtml=live.length?live.map(m=>matchCard(m,true)).join(""):`<div class="sports-match-empty">🔴 No live matches</div>`;
+  const upcomingHtml=upcoming.length?upcoming.map(m=>matchCard(m,false)).join(""):`<div class="sports-match-empty">⏰ No upcoming matches</div>`;
+  content.innerHTML=`<section class="sports-match-group"><h3 class="sports-match-heading">LIVE NOW</h3><div class="sports-match-list">${liveHtml}</div></section>
+    <section class="sports-match-group"><h3 class="sports-match-heading">UPCOMING</h3><div class="sports-match-list">${upcomingHtml}</div></section>`;
+  content.querySelectorAll("[data-sports-stream]").forEach(button=>button.addEventListener("click",()=>{
+    const channel={name:button.dataset.sportsStreamName||"Sports Match",url:button.dataset.sportsStream};
+    currentlyPlayingKey="";
+    window.__soikatCurrentChannelName=channel.name;
+    playChannelInPage(channel);
+  }));
+}
+async function refreshSportsData(manual=false){
+  if(sportsRefreshBusy)return;
+  sportsRefreshBusy=true;
+  const button=document.getElementById("sportsRefreshButton");
+  const updated=document.getElementById("sportsUpdatedAt");
+  if(button){button.disabled=true;button.textContent="↻ UPDATING";}
+  try{
+    const data=await apiJsonp({action:"sportsdata"},12000,1);
+    if(!data||!data.ok)throw new Error(data?.error||"Sports data unavailable");
+    SPORTS_MATCH_DATA=Array.isArray(data.matches)?data.matches:[];
+    if(Array.isArray(data.channels)){
+      CHANNELS=data.channels.map(c=>({...c,backups:Array.isArray(c.backups)?c.backups:[]}));
+      CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
+      CENTRAL_DATA_READY=true;
+      saveLocalCentralData();
+      renderPublicCategories();
+      renderChannels();
+    }
+    renderSportsMatches();
+    if(updated){
+      const time=data.updatedAt?new Date(data.updatedAt):new Date();
+      updated.textContent=`Updated ${time.toLocaleTimeString()}${Number(data.addedChannels)>0?` · ${data.addedChannels} new channel(s) added`:""}`;
+    }
+  }catch(error){
+    console.warn("Sports auto update failed:",error);
+    if(updated && !updated.textContent)updated.textContent="Sports data temporarily unavailable";
+    if(manual)alert("Sports data update failed. Please try again later.");
+  }finally{
+    sportsRefreshBusy=false;
+    if(button){button.disabled=false;button.textContent="↻ REFRESH";}
+  }
+}
+document.getElementById("sportsRefreshButton")?.addEventListener("click",()=>refreshSportsData(true));
 
 function saveLocalCentralData(){
   try{localStorage.setItem("SOIKAT_LIVE_TV_DATA",JSON.stringify({channels:CHANNELS,categories:CATEGORIES,savedAt:Date.now()}))}catch(e){}
@@ -1248,6 +1413,7 @@ function renderPublicCategories(){
       try{sessionStorage.setItem(SELECTED_CATEGORY_KEY,selectedCategory)}catch(e){}
       renderPublicCategories();
       renderChannels();
+      renderSportsMatches();
     });
   });
 }
@@ -1440,6 +1606,8 @@ function renderChannels(){
     return categoryMatch && searchMatch;
   });
 
+  renderSportsMatches();
+
   if(!list.length){
     channelsEl.innerHTML = `
       <div class="empty-category">
@@ -1556,6 +1724,8 @@ document.addEventListener("click",event=>{
   }
 });
 loadCentralData();
+setTimeout(()=>refreshSportsData(false),1200);
+setInterval(()=>refreshSportsData(false),SPORTS_REFRESH_INTERVAL);
 
 /* ================= ADMIN PANEL ================= */
 async function openAdmin(){
