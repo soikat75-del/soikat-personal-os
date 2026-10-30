@@ -1191,6 +1191,7 @@ url  = Live .m3u8 stream URL
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.7.3/dist/hls.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dashjs@4.7.4/dist/dash.all.min.js"></script>
 <footer><span class="footer-line"></span><div>Built with <span class="heart">♥</span> by <span class="footer-soikat" onclick="openAdmin()">Soikat</span></div><span class="footer-line right"></span></footer>
 
 <script>
@@ -1236,13 +1237,12 @@ function apiJsonp(params, timeoutMs=5000, retries=1){
 const SPORTS_M3U_URL = "https://raw.githubusercontent.com/sm-monirulislam/Upcoming-and-Live-Sports-Data/refs/heads/main/Sports_data.m3u";
 const SPORTS_JSON_URL = "https://raw.githubusercontent.com/sm-monirulislam/Upcoming-and-Live-Sports-Data/refs/heads/main/Sports_data.json";
 let SPORTS_MATCH_DATA = [];
+let SPORTS_PLAYLIST_DATA = [];
 let selectedSportsType = "CRICKET";
 let sportsRefreshBusy = false;
 const SPORTS_REFRESH_INTERVAL = 5 * 60 * 1000;
 
-function sportsText(value){
-  return String(value == null ? "" : value).trim();
-}
+function sportsText(value){return String(value == null ? "" : value).trim();}
 function sportsCategory(value){
   const raw=sportsText(value).toUpperCase();
   if(!raw)return "OTHER";
@@ -1253,106 +1253,131 @@ function sportsCategory(value){
   if(raw.includes("TENNIS"))return "TENNIS";
   return raw.replace(/[^A-Z0-9 ]/g,"").trim() || "OTHER";
 }
-function isSportsLive(match){
-  const status=sportsText(match && match.status).toUpperCase();
-  return ["LIVE","IN PLAY","IN-PLAY","INPLAY","1ST HALF","2ND HALF","HALF TIME","HT","Q1","Q2","Q3","Q4","SET 1","SET 2","SET 3"].includes(status) || status.includes("LIVE");
+function sportsGetMatches(data){
+  if(Array.isArray(data))return data;
+  if(!data||typeof data!=="object")return [];
+  for(const key of ["matches","data","events","fixtures","result","items"]){
+    if(Array.isArray(data[key]))return data[key];
+    if(data[key]&&typeof data[key]==="object"){
+      for(const nested of ["matches","events","fixtures","items"])if(Array.isArray(data[key][nested]))return data[key][nested];
+    }
+  }
+  return [];
 }
-function sportsMatchTeams(match){
-  const info=match && match.eventInfo || {};
-  return {
-    a:sportsText(info.teamA || match.teamA || match.home_team || match.home || match.event_name || "Team A"),
-    b:sportsText(info.teamB || match.teamB || match.away_team || match.away || "")
+function sportsGetStreamUrl(stream){
+  if(typeof stream==="string")return sportsText(stream);
+  if(!stream||typeof stream!=="object")return "";
+  return sportsText(stream.stream_url||stream.streamUrl||stream.url||stream.link||stream.src||stream.file||stream.play_url);
+}
+function sportsNormalizeMatch(match){
+  if(!match||typeof match!=="object")return null;
+  const info=match.eventInfo&&typeof match.eventInfo==="object"?match.eventInfo:{};
+  let streams=Array.isArray(match.streams)?match.streams:(Array.isArray(match.links)?match.links:(Array.isArray(match.sources)?match.sources:[]));
+  streams=streams.map((stream,i)=>{
+    const url=sportsGetStreamUrl(stream);if(!url)return null;
+    return typeof stream==="string"?{name:`STREAM ${i+1}`,url,stream_url:url}:{...stream,name:sportsText(stream.name||stream.title||stream.label)||`STREAM ${i+1}`,url,stream_url:url};
+  }).filter(Boolean);
+  return {...match,
+    Category:match.Category||match.category||match.sport||match.sports_type||match.type||info.category||info.sport||"OTHER",
+    status:match.status||match.match_status||match.state||info.status||"",
+    eventInfo:{...info,teamA:info.teamA||match.teamA||match.home_team||match.home||match.team1||match.participant1,
+      teamB:info.teamB||match.teamB||match.away_team||match.away||match.team2||match.participant2,
+      eventName:info.eventName||match.event_name||match.name||match.tournament||match.league,
+      startTime:info.startTime||match.startTime||match.start_time||match.date||match.datetime||match.match_time},
+    streams
   };
 }
-function sportsMatchTime(match){
-  const info=match && match.eventInfo || {};
-  const raw=info.startTime || match.startTime || match.start_time || match.date || "";
-  if(!raw)return "";
-  const date=new Date(raw);
-  return Number.isNaN(date.getTime()) ? sportsText(raw) : date.toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
+function sportsParseM3U(text){
+  const lines=String(text||"").replace(/^\uFEFF/,"").split(/\r?\n/);
+  const entries=[];let meta={};
+  for(const raw of lines){
+    const line=raw.trim();if(!line)continue;
+    if(line.startsWith("#EXTINF")){
+      const attrs={};
+      line.replace(/([\w-]+)="([^"]*)"/g,(_,k,v)=>(attrs[k.toLowerCase()]=v));
+      const comma=line.indexOf(",");
+      meta={name:line.slice(comma>=0?comma+1:0).trim()||attrs["tvg-name"]||"Sports Stream",category:attrs["group-title"]||attrs["tvg-group"]||"SPORTS",logo:attrs["tvg-logo"]||"",id:attrs["tvg-id"]||""};
+    }else if(!line.startsWith("#")&&/^https?:\/\//i.test(line)){
+      entries.push({...meta,url:line,stream_url:line});meta={};
+    }
+  }
+  return entries;
 }
+function sportsMatchTeams(match){
+  const info=match&&match.eventInfo||{};
+  return {a:sportsText(info.teamA||match.teamA||match.home_team||match.home||match.team1||match.event_name||match.name||"Team A"),
+    b:sportsText(info.teamB||match.teamB||match.away_team||match.away||match.team2||"")};
+}
+function sportsMatchTime(match){
+  const info=match&&match.eventInfo||{};const raw=info.startTime||match.startTime||match.start_time||match.date||"";
+  if(!raw)return "";const date=new Date(raw);
+  return Number.isNaN(date.getTime())?sportsText(raw):date.toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
+}
+function isSportsLive(match){
+  const status=sportsText(match&&match.status).toUpperCase();
+  return /\b(LIVE|IN PLAY|IN-PLAY|INPLAY|1ST HALF|2ND HALF|HALF TIME|HT|Q[1-4]|SET [1-5]|BREAK|OVERTIME)\b/.test(status);
+}
+function sportsEscapeAttr(value){return escapeAttr(String(value||""));}
 function renderSportsMatches(){
-  const panel=document.getElementById("sportsMatchesPanel");
-  const tabs=document.getElementById("sportsTypeTabs");
-  const content=document.getElementById("sportsMatchesContent");
+  const panel=document.getElementById("sportsMatchesPanel"),tabs=document.getElementById("sportsTypeTabs"),content=document.getElementById("sportsMatchesContent");
   if(!panel||!tabs||!content)return;
-  const visible=selectedCategory==="SPORTS" && !channelSearchTerm.trim();
-  panel.hidden=!visible;
-  if(!visible)return;
-
-  const categories=[...new Set(SPORTS_MATCH_DATA.map(m=>sportsCategory(m.Category || m.category || m.sport)))];
+  const visible=selectedCategory==="SPORTS"&&!channelSearchTerm.trim();panel.hidden=!visible;if(!visible)return;
+  const categories=[...new Set(SPORTS_MATCH_DATA.map(m=>sportsCategory(m.Category||m.category||m.sport)))];
   const preferred=["CRICKET","FOOTBALL","HOCKEY","BASKETBALL","TENNIS"];
   const ordered=[...preferred.filter(c=>categories.includes(c)),...categories.filter(c=>!preferred.includes(c)).sort()];
   if(!ordered.length)ordered.push("CRICKET","FOOTBALL");
   if(!ordered.includes(selectedSportsType))selectedSportsType=ordered[0];
-  tabs.innerHTML=ordered.map(cat=>`<button type="button" class="sports-type-tab ${selectedSportsType===cat?"active":""}" data-sports-type="${escapeAttr(cat)}">${escapeHtml(cat)}</button>`).join("");
-  tabs.querySelectorAll("button").forEach(button=>button.addEventListener("click",()=>{
-    selectedSportsType=button.dataset.sportsType||"CRICKET";
-    renderSportsMatches();
-  }));
-
-  const matches=SPORTS_MATCH_DATA.filter(m=>sportsCategory(m.Category || m.category || m.sport)===selectedSportsType);
-  const live=matches.filter(isSportsLive);
-  const upcoming=matches.filter(m=>!isSportsLive(m));
+  tabs.innerHTML=ordered.map(cat=>`<button type="button" class="sports-type-tab ${selectedSportsType===cat?"active":""}" data-sports-type="${sportsEscapeAttr(cat)}">${escapeHtml(cat)}</button>`).join("");
+  tabs.querySelectorAll("button").forEach(button=>button.addEventListener("click",()=>{selectedSportsType=button.dataset.sportsType||"CRICKET";renderSportsMatches();}));
+  const matches=SPORTS_MATCH_DATA.filter(m=>sportsCategory(m.Category||m.category||m.sport)===selectedSportsType);
+  const live=matches.filter(isSportsLive),upcoming=matches.filter(m=>!isSportsLive(m));
   function matchCard(match,isLive){
-    const teams=sportsMatchTeams(match);
-    const event=sportsText(match.eventInfo?.eventName || match.event_name || match.name || match.tournament || "");
-    const time=sportsMatchTime(match);
-    const streams=Array.isArray(match.streams)?match.streams:[];
-    const streamButtons=streams.map((stream,index)=>{
-      const url=sportsText(stream && (stream.stream_url || stream.url));
-      if(!url)return "";
-      const label=sportsText(stream.name)||`STREAM ${index+1}`;
-      return `<button type="button" class="sports-match-stream" data-sports-stream="${escapeAttr(url)}" data-sports-stream-name="${escapeAttr(label)}">${escapeHtml(label)}</button>`;
-    }).join("");
-    return `<article class="sports-match-card">
-      <div class="sports-match-teams"><span>${escapeHtml(teams.a)}</span><span class="sports-match-vs">VS</span><span>${escapeHtml(teams.b)}</span>${isLive?'<span class="sports-match-status">LIVE</span>':""}</div>
-      ${event?`<div class="sports-match-event">${escapeHtml(event)}</div>`:""}
-      ${time?`<div class="sports-match-time">${isLive?"Started":"Starts"} · ${escapeHtml(time)}</div>`:""}
-      ${streamButtons?`<div class="sports-match-streams">${streamButtons}</div>`:""}
-    </article>`;
+    const teams=sportsMatchTeams(match),info=match.eventInfo||{};
+    const event=sportsText(info.eventName||match.event_name||match.name||match.tournament||match.league||"");
+    const time=sportsMatchTime(match),streams=Array.isArray(match.streams)?match.streams:[];
+    const streamButtons=streams.map((stream,index)=>{const url=sportsGetStreamUrl(stream);if(!url)return "";const label=sportsText(stream.name||stream.title)||`STREAM ${index+1}`;
+      return `<button type="button" class="sports-match-stream" data-sports-stream="${sportsEscapeAttr(url)}" data-sports-stream-name="${sportsEscapeAttr(label)}">${escapeHtml(label)}</button>`;}).join("");
+    return `<article class="sports-match-card"><div class="sports-match-teams"><span>${escapeHtml(teams.a)}</span><span class="sports-match-vs">VS</span><span>${escapeHtml(teams.b)}</span>${isLive?'<span class="sports-match-status">LIVE</span>':""}</div>${event?`<div class="sports-match-event">${escapeHtml(event)}</div>`:""}${time?`<div class="sports-match-time">${isLive?"Started":"Starts"} · ${escapeHtml(time)}</div>`:""}${streamButtons?`<div class="sports-match-streams">${streamButtons}</div>`:`<div class="sports-match-time">Stream link not provided</div>`}</article>`;
   }
-  const liveHtml=live.length?live.map(m=>matchCard(m,true)).join(""):`<div class="sports-match-empty">🔴 No live matches</div>`;
-  const upcomingHtml=upcoming.length?upcoming.map(m=>matchCard(m,false)).join(""):`<div class="sports-match-empty">⏰ No upcoming matches</div>`;
-  content.innerHTML=`<section class="sports-match-group"><h3 class="sports-match-heading">LIVE NOW</h3><div class="sports-match-list">${liveHtml}</div></section>
-    <section class="sports-match-group"><h3 class="sports-match-heading">UPCOMING</h3><div class="sports-match-list">${upcomingHtml}</div></section>`;
-  content.querySelectorAll("[data-sports-stream]").forEach(button=>button.addEventListener("click",()=>{
-    const channel={name:button.dataset.sportsStreamName||"Sports Match",url:button.dataset.sportsStream};
-    currentlyPlayingKey="";
-    window.__soikatCurrentChannelName=channel.name;
-    playChannelInPage(channel);
-  }));
+  const liveHtml=live.length?live.map(m=>matchCard(m,true)).join(""):`<div class="sports-match-empty">No live matches</div>`;
+  const upcomingHtml=upcoming.length?upcoming.map(m=>matchCard(m,false)).join(""):`<div class="sports-match-empty">No upcoming matches</div>`;
+  const playlistHtml=SPORTS_PLAYLIST_DATA.length?`<section class="sports-match-group"><h3 class="sports-match-heading">SPORTS PLAYLIST (${SPORTS_PLAYLIST_DATA.length})</h3><div class="sports-match-list">${SPORTS_PLAYLIST_DATA.map((stream,i)=>`<article class="sports-match-card"><div class="sports-match-event">${escapeHtml(stream.name||`Sports Stream ${i+1}`)}</div><div class="sports-match-time">${escapeHtml(stream.category||"SPORTS")}</div><div class="sports-match-streams"><button type="button" class="sports-match-stream" data-sports-stream="${sportsEscapeAttr(stream.url)}" data-sports-stream-name="${sportsEscapeAttr(stream.name||`Sports Stream ${i+1}`)}">PLAY</button></div></article>`).join("")}</div></section>`:"";
+  content.innerHTML=`<section class="sports-match-group"><h3 class="sports-match-heading">LIVE NOW</h3><div class="sports-match-list">${liveHtml}</div></section><section class="sports-match-group"><h3 class="sports-match-heading">UPCOMING</h3><div class="sports-match-list">${upcomingHtml}</div></section>${playlistHtml}`;
+  content.querySelectorAll("[data-sports-stream]").forEach(button=>button.addEventListener("click",()=>{const channel={name:button.dataset.sportsStreamName||"Sports Match",url:button.dataset.sportsStream};currentlyPlayingKey="";window.__soikatCurrentChannelName=channel.name;playChannelInPage(channel);}));
+}
+async function fetchSportsText(url){
+  const response=await fetch(url,{cache:"no-store",headers:{"Accept":"application/json, text/plain, */*"}});
+  if(!response.ok)throw new Error(`HTTP ${response.status} from ${new URL(url).pathname.split("/").pop()}`);
+  return await response.text();
 }
 async function refreshSportsData(manual=false){
-  if(sportsRefreshBusy)return;
-  sportsRefreshBusy=true;
-  const button=document.getElementById("sportsRefreshButton");
-  const updated=document.getElementById("sportsUpdatedAt");
+  if(sportsRefreshBusy)return;sportsRefreshBusy=true;
+  const button=document.getElementById("sportsRefreshButton"),updated=document.getElementById("sportsUpdatedAt");
   if(button){button.disabled=true;button.textContent="↻ UPDATING";}
+  const results=await Promise.allSettled([fetchSportsText(SPORTS_JSON_URL),fetchSportsText(SPORTS_M3U_URL)]);
+  let messages=[];
   try{
-    const data=await apiJsonp({action:"sportsdata"},12000,1);
-    if(!data||!data.ok)throw new Error(data?.error||"Sports data unavailable");
-    SPORTS_MATCH_DATA=Array.isArray(data.matches)?data.matches:[];
-    if(Array.isArray(data.channels)){
-      CHANNELS=data.channels.map(c=>({...c,backups:Array.isArray(c.backups)?c.backups:[]}));
-      CATEGORIES=Array.isArray(data.categories)?data.categories:CATEGORIES;
-      CENTRAL_DATA_READY=true;
-      saveLocalCentralData();
-      renderPublicCategories();
-      renderChannels();
-    }
+    if(results[0].status==="fulfilled"){
+      let parsed;try{parsed=JSON.parse(results[0].value)}catch(e){throw new Error("Sports JSON is not valid JSON");}
+      const matches=sportsGetMatches(parsed).map(sportsNormalizeMatch).filter(Boolean);
+      if(!matches.length)throw new Error("JSON loaded, but no match records were found");
+      SPORTS_MATCH_DATA=matches;
+    }else{messages.push("JSON: "+(results[0].reason?.message||"load failed"));}
+    if(results[1].status==="fulfilled"){
+      SPORTS_PLAYLIST_DATA=sportsParseM3U(results[1].value);
+      if(!SPORTS_PLAYLIST_DATA.length)messages.push("M3U loaded but contains no valid HTTP stream entries");
+    }else{messages.push("M3U: "+(results[1].reason?.message||"load failed"));}
+    if(results[0].status==="fulfilled"&&results[1].status==="fulfilled")messages=[];
     renderSportsMatches();
-    if(updated){
-      const time=data.updatedAt?new Date(data.updatedAt):new Date();
-      updated.textContent=`Updated ${time.toLocaleTimeString()}${Number(data.addedChannels)>0?` · ${data.addedChannels} new channel(s) added`:""}`;
-    }
+    if(updated)updated.textContent=`Updated ${new Date().toLocaleTimeString()} · ${SPORTS_MATCH_DATA.length} matches · ${SPORTS_PLAYLIST_DATA.length} streams${messages.length?" · "+messages.join("; "):""}`;
+    if(manual&&messages.length)alert("Sports data partially loaded:\n"+messages.join("\n"));
   }catch(error){
-    console.warn("Sports auto update failed:",error);
-    if(updated && !updated.textContent)updated.textContent="Sports data temporarily unavailable";
-    if(manual)alert("Sports data update failed. Please try again later.");
+    console.warn("Sports data update failed:",error);
+    if(updated)updated.textContent="Sports data error · "+error.message;
+    renderSportsMatches();
+    if(manual)alert("Sports data update failed: "+error.message);
   }finally{
-    sportsRefreshBusy=false;
-    if(button){button.disabled=false;button.textContent="↻ REFRESH";}
+    sportsRefreshBusy=false;if(button){button.disabled=false;button.textContent="↻ REFRESH";}
   }
 }
 document.getElementById("sportsRefreshButton")?.addEventListener("click",()=>refreshSportsData(true));
@@ -1469,6 +1494,7 @@ async function loadCentralData(){
 }
 
 let liveHlsInstance = null;
+let liveDashInstance = null;
 function playChannelInPage(channel){
   const video=document.getElementById("livePlayer");
   const message=document.getElementById("playerMessage");
@@ -1477,6 +1503,7 @@ function playChannelInPage(channel){
   const playerContainer=document.getElementById("tvPlayerContainer");
   if(playerContainer) playerContainer.classList.add("player-visible");
   if(liveHlsInstance){try{liveHlsInstance.destroy()}catch(e){} liveHlsInstance=null;}
+  if(liveDashInstance){try{liveDashInstance.reset()}catch(e){} liveDashInstance=null;}
   video.pause();
   video.removeAttribute("src");
   video.load();
@@ -1520,52 +1547,28 @@ function playChannelInPage(channel){
     return;
   }
 
-  // HTTPS pages cannot request HTTP media. Try the same URL over HTTPS where supported;
-  // this does not bypass browser security and will fail if the source has no HTTPS endpoint.
-  if(location.protocol==="https:" && /^http:\/\//i.test(url)){
-    url=url.replace(/^http:\/\//i,"https://");
+  const extension=(url.split("?")[0].split("#")[0].split(".").pop()||"").toLowerCase();
+  const insecureHttp=/^http:\/\//i.test(rawUrl)&&location.protocol==="https:";
+  if(message){message.style.display="flex";message.innerHTML=`<strong>${escapeHtml(channel.name||"Live TV")}</strong><span>${insecureHttp?"This HTTP stream may be blocked on this HTTPS page.":"Loading stream…"}</span>`;}
+  if(insecureHttp){
+    if(message)message.innerHTML=`<strong>Secure playback blocked</strong><span>This playlist entry uses HTTP. The browser blocks HTTP media on an HTTPS website; use an HTTPS stream URL.</span>`;
+    return;
   }
-
-  if(message){
-    message.style.display="flex";
-    const wasHttp=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
-    message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>${wasHttp?"Trying secure HTTPS stream…":"Loading stream…"}</span>`;
-  }
-  if(window.Hls && window.Hls.isSupported() && /\.m3u8(?:$|[?#])/i.test(url)){
-    liveHlsInstance=new Hls({enableWorker:true});
-    liveHlsInstance.loadSource(url);
-    liveHlsInstance.attachMedia(video);
-    liveHlsInstance.on(Hls.Events.MANIFEST_PARSED,()=>{
-      if(message) message.style.display="none";
-      video.play().catch(()=>{if(message){message.style.display="flex";message.innerHTML=`<strong>${escapeHtml(channel.name || "Live TV")}</strong><span>Press Play to start the stream</span>`;}});
-    });
-    liveHlsInstance.on(Hls.Events.ERROR,(_event,data)=>{
-      if(data && data.fatal && message){
-        message.style.display="flex";
-        const insecureBlocked=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
-        message.innerHTML=`<strong>Stream unavailable</strong><span>${insecureBlocked?"The HTTPS version could not be played. This source may not support HTTPS; the player cannot bypass browser Mixed Content security.":"This channel may block playback or its stream may be offline."}</span>`;
-      }
-    });
+  if((extension==="m3u8"||/\.m3u8(?:$|[?#])/i.test(url))&&window.Hls&&window.Hls.isSupported()){
+    liveHlsInstance=new Hls({enableWorker:true,lowLatencyMode:true});
+    liveHlsInstance.loadSource(url);liveHlsInstance.attachMedia(video);
+    liveHlsInstance.on(Hls.Events.MANIFEST_PARSED,()=>{if(message)message.style.display="none";video.play().catch(()=>{if(message){message.style.display="flex";message.innerHTML=`<strong>${escapeHtml(channel.name||"Live TV")}</strong><span>Press Play to start playback.</span>`;}});});
+    liveHlsInstance.on(Hls.Events.ERROR,(_event,data)=>{if(data&&data.fatal&&message){message.style.display="flex";message.innerHTML=`<strong>Stream unavailable</strong><span>${data.details?escapeHtml(data.details):"The stream is offline, blocked, or the provider rejected playback."}</span>`;}});
+  }else if((extension==="mpd"||/\.mpd(?:$|[?#])/i.test(url))&&window.dashjs){
+    liveDashInstance=window.dashjs.MediaPlayer().create();
+    liveDashInstance.initialize(video,url,true);
+    liveDashInstance.on(window.dashjs.MediaPlayer.events.STREAM_INITIALIZED,()=>{if(message)message.style.display="none";});
+    liveDashInstance.on(window.dashjs.MediaPlayer.events.ERROR,()=>{if(message){message.style.display="flex";message.innerHTML="<strong>Stream unavailable</strong><span>The DASH stream could not be loaded. It may be offline or restricted by its provider.</span>";}});
   }else{
-    video.src=url;
-    video.load();
-    video.play().then(()=>{
-      if(message) message.style.display="none";
-    }).catch(()=>{
-      if(message){
-        message.style.display="flex";
-        const insecureBlocked=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
-        message.innerHTML=`<strong>Unable to play this stream</strong><span>${insecureBlocked?"HTTPS playback failed. The source needs an HTTPS stream or a permitted HTTPS proxy.":"Press Play, or this stream may not support in-page playback."}</span>`;
-      }
-    });
-    video.onplaying=()=>{if(message) message.style.display="none";};
-    video.onerror=()=>{
-      if(message){
-        message.style.display="flex";
-        const insecureBlocked=/^http:\/\//i.test(rawUrl) && location.protocol==="https:";
-        message.innerHTML=`<strong>Unable to play this stream</strong><span>${insecureBlocked?"This source may not support HTTPS. A player-code change cannot bypass Mixed Content blocking.":"The channel may be offline or blocked by its provider."}</span>`;
-      }
-    };
+    video.src=url;video.load();
+    video.play().then(()=>{if(message)message.style.display="none";}).catch(()=>{if(message){message.style.display="flex";message.innerHTML=`<strong>Unable to play this stream</strong><span>This format may not be supported by your browser, or the stream may be offline. HLS (.m3u8) and DASH (.mpd) use their dedicated players.</span>`;}});
+    video.onplaying=()=>{if(message)message.style.display="none";};
+    video.onerror=()=>{if(message){message.style.display="flex";message.innerHTML="<strong>Unable to play this stream</strong><span>The stream may be offline, unsupported, or blocked by its provider.</span>";}};
   }
   document.getElementById("tvPlayerContainer")?.scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -2831,6 +2834,7 @@ document.addEventListener("change", function(e){
     video.pause();
     try{video.removeAttribute("src");video.load()}catch(e){}
     if(typeof liveHlsInstance!=="undefined"&&liveHlsInstance){try{liveHlsInstance.destroy()}catch(e){}liveHlsInstance=null}
+    if(typeof liveDashInstance!=="undefined"&&liveDashInstance){try{liveDashInstance.reset()}catch(e){}liveDashInstance=null}
     const frame=document.querySelector(".player-wrap .youtube-frame");if(frame)frame.remove();
     video.style.display="";
     const message=document.getElementById("playerMessage");
