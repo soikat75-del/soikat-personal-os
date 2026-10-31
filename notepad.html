@@ -452,6 +452,16 @@ body::before,body::after{display:none!important}
  .keep-header-actions{margin-left:auto!important;flex:0 0 auto!important}
 }
 
+
+.keep-header-actions button svg{
+  width:24px;height:24px;display:block;fill:none;
+  stroke:currentColor;stroke-width:2.15;stroke-linecap:round;stroke-linejoin:round
+}
+@media(max-width:640px){
+ .keep-header-actions button{width:38px!important;height:38px!important;flex-basis:38px!important}
+ .keep-header-actions button svg{width:25px;height:25px;stroke-width:2.15}
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -472,7 +482,11 @@ if ('serviceWorker' in navigator) {
   <button class="keep-menu-btn" type="button" onclick="toggleKeepSidebar()" aria-label="Toggle menu">☰</button>
   <div class="keep-brand"><span>SOIKAT</span><small>NOTEPAD</small></div>
   <div class="keep-global-search"><span class="keep-search-symbol">⌕</span><input id="search" type="text" placeholder="Search" oninput="renderNotes()" aria-label="Search notes"><button type="button" class="keep-search-clear" onclick="clearKeepSearch()" aria-label="Clear search">×</button></div>
-  <div class="keep-header-actions"><button type="button" class="keep-mobile-search-btn" title="Search" aria-label="Search" onclick="toggleKeepHeaderSearch()">⌕</button><button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()">↻</button><button type="button" title="Toggle list view" aria-label="Toggle list view" id="viewToggle" onclick="toggleKeepView()">▤</button></div>
+  <div class="keep-header-actions">
+    <button type="button" class="keep-mobile-search-btn" title="Search" aria-label="Search" onclick="toggleKeepHeaderSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7"/><path d="m15.8 15.8 5 5"/></svg></button>
+    <button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19.1 12a7.2 7.2 0 1 1-1.9-5"/></svg></button>
+    <button type="button" title="Toggle list view" aria-label="Toggle list view" id="viewToggle" onclick="toggleKeepView()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx=".5"/><path d="M3.5 9.3h17M3.5 14.7h17"/></svg></button>
+  </div>
 </header>
 <main class="keep-layout" id="keepLayout">
   <aside class="keep-sidebar" id="keepSidebar"><nav class="keep-nav" aria-label="Keep navigation">
