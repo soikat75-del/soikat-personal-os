@@ -502,6 +502,732 @@ body::before,body::after{display:none!important}
  }
 }
 
+
+.keep-nav-item{gap:28px!important;padding-left:24px!important}
+.keep-nav-icon{width:24px!important;height:24px!important;display:flex!important;align-items:center;justify-content:center;flex:0 0 24px}
+.keep-nav-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#archiveNoteBtn svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+\n
+.keep-sidebar{position:sticky;z-index:30;pointer-events:auto}
+.keep-sidebar .keep-nav,.keep-sidebar .keep-nav-item{pointer-events:auto}
+.keep-nav-item{position:relative;z-index:1;min-height:48px}
+.keep-nav-icon{pointer-events:none}
+.keep-nav-icon svg{pointer-events:none}
+
+
+/* Google Keep-style empty states for Archive and Trash */
+.keep-empty.keep-archive-empty{
+  min-height:55vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:24px;color:#9aa0a6;font-size:18px;
+  text-align:center;padding:24px;box-sizing:border-box
+}
+.keep-archive-empty svg{
+  width:116px;height:116px;display:block;fill:none;stroke:#5f6368;
+  stroke-width:11;stroke-linecap:square;stroke-linejoin:round;opacity:.48
+}
+.archive-empty.keep-trash-empty{
+  min-height:270px;padding:24px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:24px;box-sizing:border-box;
+  color:#9aa0a6;font-size:18px;text-align:center
+}
+.keep-trash-empty svg{
+  width:116px;height:116px;display:block;fill:none;stroke:#5f6368;
+  stroke-width:11;stroke-linecap:square;stroke-linejoin:round;opacity:.48
+}
+@media(max-width:640px){
+ .keep-empty.keep-archive-empty{min-height:52vh;font-size:16px;gap:20px}
+ .keep-archive-empty svg,.keep-trash-empty svg{width:104px;height:104px}
+ .archive-empty.keep-trash-empty{min-height:240px;font-size:16px;gap:20px}
+}
+
+
+/* Center Archive empty state in the full content area, not inside the masonry board. */
+.keep-content:has(.keep-archive-empty){
+  position:relative;min-height:calc(100vh - 64px);
+  display:flex;flex-direction:column;box-sizing:border-box
+}
+.keep-content:has(.keep-archive-empty) .keep-take-note{display:none!important}
+.keep-content:has(.keep-archive-empty) #notes{
+  flex:1;min-height:0;width:100%;display:flex;align-items:center;
+  justify-content:center;columns:unset!important;max-width:none;margin:0;
+}
+.keep-content:has(.keep-archive-empty) .keep-empty.keep-archive-empty{
+  width:100%;min-height:0;flex:1;display:flex;align-items:center;
+  justify-content:center;margin:0;padding:0 20px 35px;box-sizing:border-box;
+}
+@media(max-width:640px){
+ .keep-content:has(.keep-archive-empty){min-height:calc(100dvh - 56px);padding-top:16px}
+ .keep-content:has(.keep-archive-empty) .keep-empty.keep-archive-empty{padding-bottom:30px}
+}
+
+
+/* Match Archive's full-area empty-state alignment for the Trash view. */
+.archive-modal.show:has(.keep-trash-empty){
+  align-items:stretch!important;justify-content:stretch!important;
+  padding:0!important;background:#202124!important;
+}
+.archive-modal.show:has(.keep-trash-empty) .archive-box{
+  width:100%!important;max-width:none!important;height:100%!important;
+  min-height:100dvh!important;max-height:none!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  display:flex!important;flex-direction:column!important;
+  background:#202124!important;
+}
+.archive-modal.show:has(.keep-trash-empty) .archive-head{
+  flex:0 0 auto;
+}
+.archive-modal.show:has(.keep-trash-empty) .archive-list{
+  flex:1!important;min-height:0!important;display:flex!important;
+  align-items:center!important;justify-content:center!important;
+  padding:0!important;overflow:auto!important;
+}
+.archive-modal.show:has(.keep-trash-empty) .archive-empty.keep-trash-empty{
+  width:100%!important;min-height:0!important;height:100%!important;
+  flex:1!important;display:flex!important;align-items:center!important;
+  justify-content:center!important;margin:0!important;
+  padding:0 20px 36px!important;box-sizing:border-box!important;
+}
+
+
+.keep-content:has(.keep-trash-empty){
+  position:relative;min-height:calc(100vh - 64px);
+  display:flex;flex-direction:column;box-sizing:border-box
+}
+.keep-content:has(.keep-trash-empty) .keep-take-note{display:none!important}
+.keep-content:has(.keep-trash-empty) #notes{
+  flex:1;min-height:0;width:100%;display:flex;align-items:center;
+  justify-content:center;columns:unset!important;max-width:none;margin:0
+}
+.keep-content:has(.keep-trash-empty) .keep-empty.keep-trash-empty{
+  width:100%;min-height:0;flex:1;display:flex;align-items:center;
+  justify-content:center;margin:0;padding:0 20px 35px;box-sizing:border-box
+}
+.keep-trash-empty{min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;color:#9aa0a6;font-size:18px;text-align:center}
+.keep-trash-empty svg{width:116px;height:116px;display:block;fill:none;stroke:#5f6368;stroke-width:11;stroke-linecap:square;stroke-linejoin:round;opacity:.48}
+.keep-trash-card-actions{display:flex;gap:8px;margin-top:12px;opacity:.9}
+.keep-trash-card-actions button{border:0;background:transparent;color:#bdc1c6;padding:7px 10px;border-radius:6px;cursor:pointer}
+.keep-trash-card-actions button:hover{background:#303134}
+@media(max-width:640px){.keep-content:has(.keep-trash-empty){min-height:calc(100dvh - 56px)}.keep-trash-empty svg{width:104px;height:104px}.keep-trash-empty{font-size:16px;gap:20px}}
+
+
+/* Google Keep-style note composer/editor on desktop and mobile */
+.editor{
+ display:none!important;position:fixed!important;z-index:200!important;
+ left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+ transform:translate(-50%,-50%)!important;
+ width:min(505px,calc(100vw - 32px))!important;
+ height:auto!important;min-height:202px!important;max-height:86dvh!important;
+ padding:14px 19px 12px!important;margin:0!important;
+ border:1px solid #5f6368!important;border-radius:9px!important;
+ background:#202124!important;color:#e8eaed!important;
+ box-shadow:0 4px 18px rgba(0,0,0,.55)!important;
+ overflow:auto!important;box-sizing:border-box!important;
+}
+.editor.mobile-open{display:flex!important;flex-direction:column!important;gap:0!important}
+.editor.mobile-open:before{content:"";position:fixed;z-index:-1;inset:-100vh -100vw;background:rgba(0,0,0,.62)!important}
+.editor .mobile-editor-close{display:none!important}
+.editor .title-input{
+ flex:0 0 42px!important;width:100%!important;height:42px!important;
+ min-height:42px!important;padding:0 42px 0 0!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ color:#e8eaed!important;font-size:20px!important;font-weight:500!important;
+ box-shadow:none!important;outline:none!important
+}
+.editor .title-input::placeholder{color:#9aa0a6!important}
+.editor .editor-body{
+ position:relative!important;display:flex!important;flex:1 1 auto!important;
+ width:100%!important;height:auto!important;min-height:48px!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ padding:5px 0 0!important;overflow:visible!important
+}
+.editor .editor-body .content{
+ flex:1 1 auto!important;width:100%!important;min-height:44px!important;
+ height:100%!important;resize:vertical!important;padding:0!important;
+ border:0!important;background:transparent!important;color:#e8eaed!important;
+ font-size:16px!important;line-height:1.5!important
+}
+.editor .editor-checklist-btn{display:none!important}
+.editor .counter{font-size:10px!important;color:#80868b!important;padding:3px 0 0!important}
+.editor .toolbar{
+ order:3!important;display:flex!important;align-items:center!important;
+ flex-wrap:nowrap!important;gap:8px!important;margin:9px 0 2px!important;
+ padding:0!important;border:0!important;overflow:visible!important;
+}
+.editor .toolbar .current-date-box,.editor .toolbar .spacer{display:none!important}
+.editor .toolbar button{
+ width:31px!important;min-width:31px!important;height:31px!important;
+ flex:0 0 31px!important;border:0!important;border-radius:6px!important;
+ background:transparent!important;color:#bdc1c6!important;
+ padding:0!important;box-shadow:none!important;font-size:16px!important
+}
+.editor .toolbar button:hover{background:#303134!important}
+.editor .toolbar .file-add-btn{display:flex!important}
+.editor .editor-footer{display:flex!important;justify-content:flex-end!important;align-items:center!important;min-height:30px!important}
+.editor .keep-editor-close{
+ border:0!important;background:transparent!important;color:#d7e3f7!important;
+ font-size:14px!important;font-weight:500!important;padding:5px 9px!important;
+ border-radius:5px!important;cursor:pointer!important
+}
+.editor .keep-editor-close:hover{background:#303134!important}
+.editor .attachments{margin:5px 0!important}
+@media(max-width:640px){
+ .editor{
+  left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:calc(100vw - 28px)!important;height:auto!important;
+  min-height:202px!important;max-height:86dvh!important;
+  border-radius:9px!important;padding:13px 16px 10px!important
+ }
+ .editor .title-input{font-size:19px!important}
+ .editor .editor-body .content{font-size:15px!important}
+ .editor .toolbar{gap:5px!important;overflow-x:auto!important}
+ .editor .toolbar button{width:30px!important;min-width:30px!important;flex-basis:30px!important}
+ .editor .editor-footer{min-height:29px!important}
+}
+
+
+.keep-take-note{width:min(505px,100%)!important;height:58px!important;margin:0 auto 24px!important;border-radius:9px!important}
+.keep-take-actions{gap:23px!important}
+@media(max-width:640px){
+ .keep-content{padding:16px 12px 30px!important}
+ .keep-take-note{width:100%!important;height:58px!important;margin:0 auto 22px!important;padding:0 17px!important;font-size:16px!important}
+ .keep-take-actions{gap:18px!important;font-size:21px!important}
+}
+
+
+/* Refined Keep-like editor: compact card, clean spacing, no nested scrollbars */
+.editor.mobile-open{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:0!important;overflow:hidden!important;
+  width:min(505px,calc(100vw - 32px))!important;
+  height:auto!important;min-height:202px!important;max-height:min(82dvh,620px)!important;
+  padding:14px 19px 12px!important;box-sizing:border-box!important;
+}
+.editor.mobile-open:before{
+  content:"";position:fixed!important;z-index:-1;inset:0!important;
+  width:100vw;height:100dvh;background:rgba(0,0,0,.58)!important;
+}
+.editor .title-input{
+  display:block!important;flex:0 0 38px!important;height:38px!important;min-height:38px!important;
+  width:100%!important;margin:0!important;padding:0 42px 0 0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  color:#e8eaed!important;font-size:20px!important;font-weight:500!important;
+  line-height:1.4!important;box-shadow:none!important;outline:0!important;
+}
+.editor .editor-body{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  position:relative!important;width:100%!important;height:auto!important;
+  min-height:58px!important;max-height:none!important;margin:0!important;
+  padding:4px 0 0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;overflow:visible!important;box-sizing:border-box!important;
+}
+.editor .editor-body .content{
+  display:block!important;flex:1 1 auto!important;width:100%!important;
+  min-width:0!important;min-height:52px!important;height:auto!important;max-height:42vh!important;
+  margin:0!important;padding:0!important;resize:vertical!important;
+  overflow:auto!important;border:0!important;border-radius:0!important;
+  outline:0!important;background:transparent!important;color:#e8eaed!important;
+  font:16px/1.5 Arial,Helvetica,sans-serif!important;box-shadow:none!important;
+}
+.editor .editor-body .content::placeholder{color:#9aa0a6!important}
+.editor .counter{
+  flex:0 0 auto!important;display:block!important;text-align:right!important;
+  padding:2px 0 0!important;margin:0!important;color:#9aa0a6!important;
+  font-size:11px!important;line-height:1.3!important;
+}
+.editor .toolbar{
+  order:3!important;display:flex!important;flex:0 0 34px!important;
+  align-items:center!important;justify-content:flex-start!important;
+  flex-wrap:nowrap!important;gap:9px!important;width:100%!important;
+  min-width:0!important;height:34px!important;min-height:34px!important;
+  margin:10px 0 2px!important;padding:0!important;overflow:hidden!important;
+  border:0!important;background:transparent!important;box-sizing:border-box!important;
+}
+.editor .toolbar .current-date-box,.editor .toolbar .spacer{display:none!important}
+.editor .toolbar button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 32px!important;width:32px!important;min-width:32px!important;
+  height:32px!important;min-height:32px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:6px!important;background:transparent!important;
+  color:#bdc1c6!important;box-shadow:none!important;font-size:18px!important;
+}
+.editor .toolbar button:hover{background:#303134!important}
+.editor .toolbar .file-add-btn{display:flex!important}
+.editor .editor-footer{
+  display:flex!important;flex:0 0 30px!important;align-items:center!important;
+  justify-content:flex-end!important;width:100%!important;height:30px!important;
+  min-height:30px!important;margin:0!important;padding:0!important;
+  border:0!important;background:transparent!important;
+}
+.editor .keep-editor-close{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  height:30px!important;margin:0!important;padding:0 9px!important;
+  border:0!important;border-radius:5px!important;background:transparent!important;
+  color:#d7e3f7!important;font-size:14px!important;font-weight:500!important;
+  cursor:pointer!important;
+}
+.editor .keep-editor-close:hover{background:#303134!important}
+.editor .mobile-editor-close{display:none!important}
+.editor .attachments{max-width:100%!important;overflow-x:auto!important;margin:3px 0!important}
+.editor .drop-hint{display:none!important}
+.editor .editor-checklist-btn{display:none!important}
+.editor.mobile-open,.editor.mobile-open *{box-sizing:border-box}
+@media(max-width:640px){
+ .editor.mobile-open{
+  width:calc(100vw - 28px)!important;min-height:202px!important;
+  max-height:82dvh!important;padding:13px 16px 10px!important;
+  overflow:hidden!important;border-radius:9px!important;
+ }
+ .editor .title-input{font-size:19px!important}
+ .editor .editor-body .content{font-size:15px!important;max-height:40dvh!important}
+ .editor .toolbar{gap:5px!important;overflow-x:auto!important}
+ .editor .toolbar button{flex-basis:30px!important;width:30px!important;min-width:30px!important}
+}
+
+<style>html.keep-editor-active,html.keep-editor-active body{overflow:hidden!important}
+/* Match the supplied Google Keep editor reference more closely */
+.editor.mobile-open{
+  width:min(505px,calc(100vw - 20px))!important;
+  min-height:203px!important;height:203px!important;
+  max-height:82dvh!important;padding:12px 19px 10px!important;
+  border:1px solid #5f6368!important;border-radius:9px!important;
+  background:#202124!important;box-shadow:0 2px 8px rgba(0,0,0,.42)!important;
+  overflow:hidden!important;
+}
+.editor.mobile-open input.title-input,
+.editor.mobile-open .title-input{
+  flex:0 0 38px!important;height:38px!important;min-height:38px!important;
+  padding:0 42px 0 0!important;margin:0!important;
+  color:#e8eaed!important;font-family:Arial,Helvetica,sans-serif!important;
+  font-size:20px!important;font-weight:400!important;line-height:1.4!important;
+  letter-spacing:0!important;text-shadow:none!important;
+}
+.editor.mobile-open .editor-body .content{
+  color:#e8eaed!important;font-family:Arial,Helvetica,sans-serif!important;
+  font-size:16px!important;font-weight:400!important;line-height:1.5!important;
+}
+.editor.mobile-open .toolbar{margin-top:9px!important;gap:9px!important}
+.editor.mobile-open .editor-footer{min-height:29px!important;height:29px!important}
+.editor.mobile-open .keep-editor-close{
+  color:#d7e3f7!important;font-size:14px!important;font-weight:500!important;
+}
+@media(max-width:640px){
+ .editor.mobile-open{
+  width:calc(100vw - 20px)!important;max-width:505px!important;
+  height:203px!important;min-height:203px!important;
+  padding:12px 19px 10px!important;
+ }
+ .editor.mobile-open input.title-input,
+ .editor.mobile-open .title-input{font-size:20px!important;font-weight:400!important}
+ .editor.mobile-open .editor-body .content{font-size:16px!important}
+}
+
+
+/* Google Keep behavior: expand the composer in place, not as a modal */
+.keep-content{position:relative!important}
+.keep-take-note{display:flex!important}
+.keep-content:has(#editorPanel.mobile-open) .keep-take-note{display:none!important}
+.keep-content .editor{
+  display:none!important;position:relative!important;inset:auto!important;
+  left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
+  transform:none!important;z-index:2!important;
+  width:min(505px,100%)!important;height:auto!important;
+  min-height:203px!important;max-height:none!important;
+  margin:0 auto 24px!important;padding:12px 19px 10px!important;
+  border:1px solid #5f6368!important;border-radius:9px!important;
+  background:#202124!important;color:#e8eaed!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.35)!important;
+  overflow:visible!important;box-sizing:border-box!important;
+}
+.keep-content .editor.mobile-open{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:0!important;visibility:visible!important;opacity:1!important;
+}
+.keep-content .editor.mobile-open:before{display:none!important;content:none!important}
+.keep-content .editor .title-input{
+  display:block!important;flex:0 0 38px!important;height:38px!important;min-height:38px!important;
+  width:100%!important;margin:0!important;padding:0 42px 0 0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  color:#e8eaed!important;font:400 20px/1.4 Arial,Helvetica,sans-serif!important;
+  box-shadow:none!important;outline:0!important;
+}
+.keep-content .editor .editor-body{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  position:relative!important;width:100%!important;height:auto!important;
+  min-height:58px!important;max-height:none!important;margin:0!important;
+  padding:4px 0 0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;overflow:visible!important;box-sizing:border-box!important;
+}
+.keep-content .editor .editor-body .content{
+  display:block!important;flex:1 1 auto!important;width:100%!important;min-width:0!important;
+  min-height:52px!important;height:auto!important;max-height:none!important;
+  margin:0!important;padding:0!important;resize:vertical!important;overflow:auto!important;
+  border:0!important;border-radius:0!important;outline:0!important;
+  background:transparent!important;color:#e8eaed!important;
+  font:400 16px/1.5 Arial,Helvetica,sans-serif!important;box-shadow:none!important;
+}
+.keep-content .editor .counter{
+  display:block!important;flex:0 0 auto!important;text-align:right!important;
+  padding:2px 0 0!important;margin:0!important;color:#9aa0a6!important;
+  font-size:11px!important;line-height:1.3!important;
+}
+.keep-content .editor .toolbar{
+  order:3!important;display:flex!important;flex:0 0 34px!important;
+  align-items:center!important;justify-content:flex-start!important;flex-wrap:nowrap!important;
+  gap:9px!important;width:100%!important;height:34px!important;min-height:34px!important;
+  margin:10px 0 2px!important;padding:0!important;overflow:hidden!important;
+  border:0!important;background:transparent!important;box-sizing:border-box!important;
+}
+.keep-content .editor .toolbar .current-date-box,
+.keep-content .editor .toolbar .spacer{display:none!important}
+.keep-content .editor .toolbar button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 32px!important;width:32px!important;min-width:32px!important;
+  height:32px!important;min-height:32px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:6px!important;background:transparent!important;
+  color:#bdc1c6!important;box-shadow:none!important;font-size:18px!important;
+}
+.keep-content .editor .toolbar button:hover{background:#303134!important}
+.keep-content .editor .editor-footer{
+  display:flex!important;flex:0 0 30px!important;align-items:center!important;
+  justify-content:flex-end!important;width:100%!important;height:30px!important;
+  min-height:30px!important;margin:0!important;padding:0!important;
+  border:0!important;background:transparent!important;
+}
+.keep-content .editor .keep-editor-close{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  height:30px!important;margin:0!important;padding:0 9px!important;
+  border:0!important;border-radius:5px!important;background:transparent!important;
+  color:#d7e3f7!important;font-size:14px!important;font-weight:500!important;cursor:pointer!important;
+}
+.keep-content .editor .mobile-editor-close{display:none!important}
+html.keep-editor-active,html.keep-editor-active body{overflow:auto!important}
+@media(max-width:640px){
+ .keep-content .editor{width:100%!important;max-width:100%!important;margin:0 auto 22px!important;padding:12px 16px 10px!important}
+ .keep-content .editor .title-input{font-size:20px!important}
+ .keep-content .editor .editor-body .content{font-size:16px!important}
+ .keep-content .editor .toolbar{gap:5px!important;overflow-x:auto!important}
+ .keep-content .editor .toolbar button{flex-basis:30px!important;width:30px!important;min-width:30px!important}
+}
+
+
+/* Center the empty Notes hint in the available page area */
+.keep-content:has(#notes .keep-empty:not(.keep-archive-empty):not(.keep-trash-empty)){
+  min-height:calc(100vh - 64px)!important;
+  display:flex!important;flex-direction:column!important;
+}
+.keep-content:has(#notes .keep-empty:not(.keep-archive-empty):not(.keep-trash-empty)) #notes{
+  flex:1 1 auto!important;min-height:320px!important;width:100%!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  columns:unset!important;max-width:none!important;margin:0!important;
+}
+.keep-content:has(#notes .keep-empty:not(.keep-archive-empty):not(.keep-trash-empty)) #notes .keep-empty{
+  width:100%!important;min-height:100%!important;display:flex!important;
+  flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  margin:0!important;padding:0 20px 28px!important;box-sizing:border-box!important;
+  text-align:center!important;
+}
+@media(max-width:640px){
+ .keep-content:has(#notes .keep-empty:not(.keep-archive-empty):not(.keep-trash-empty)){
+  min-height:calc(100dvh - 56px)!important;
+ }
+ .keep-content:has(#notes .keep-empty:not(.keep-archive-empty):not(.keep-trash-empty)) #notes{
+  min-height:calc(100dvh - 230px)!important;
+ }
+}
+
+
+/* Keep-style title row: pin sits immediately to the right of the title */
+.keep-content .editor .keep-title-row{
+  display:flex!important;align-items:center!important;gap:8px!important;
+  width:100%!important;min-height:38px!important;flex:0 0 38px!important;
+  margin:0!important;padding:0!important;box-sizing:border-box!important;
+}
+.keep-content .editor .keep-title-row .title-input{
+  flex:1 1 auto!important;min-width:0!important;width:auto!important;
+  height:38px!important;min-height:38px!important;padding:0!important;
+}
+.keep-content .editor .keep-title-row #pinBtn{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 36px!important;width:36px!important;min-width:36px!important;
+  height:36px!important;min-height:36px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:50%!important;background:transparent!important;
+  color:#bdc1c6!important;box-shadow:none!important;cursor:pointer!important;
+}
+.keep-content .editor .keep-title-row #pinBtn:hover{background:#303134!important}
+.keep-content .editor .keep-title-row #pinIcon{font-size:20px!important;line-height:1!important}
+.keep-content .editor .editor-footer{
+  display:flex!important;justify-content:flex-end!important;
+  align-items:center!important;min-height:30px!important;height:30px!important;
+  margin-top:3px!important;
+}
+
+
+/* Close is part of the icon/action toolbar row, aligned at the far right */
+.keep-content .editor .toolbar{
+  display:flex!important;align-items:center!important;flex-wrap:nowrap!important;
+}
+.keep-content .editor .toolbar .keep-editor-close{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 auto!important;width:auto!important;min-width:0!important;height:32px!important;
+  margin:0 0 0 auto!important;padding:0 9px!important;
+  border:0!important;border-radius:5px!important;background:transparent!important;
+  color:#d7e3f7!important;font-size:14px!important;font-weight:500!important;
+  cursor:pointer!important;white-space:nowrap!important;
+}
+.keep-content .editor .toolbar .keep-editor-close:hover{background:#303134!important}
+.keep-content .editor .editor-footer{display:none!important}
+
+
+/* No character/last-edited metadata or resize handle; note body grows with its text */
+.keep-content .editor .counter{display:none!important}
+.keep-content .editor .editor-body .content{
+  display:block!important;flex:0 0 auto!important;
+  height:auto!important;min-height:52px!important;max-height:none!important;
+  overflow-x:hidden!important;overflow-y:hidden!important;
+  resize:none!important;field-sizing:content!important;
+  white-space:pre-wrap!important;overflow-wrap:anywhere!important;
+}
+.keep-content .editor .editor-body{
+  height:auto!important;min-height:58px!important;max-height:none!important;
+  overflow:visible!important;
+}
+.keep-content .editor{
+  height:auto!important;max-height:none!important;overflow:visible!important;
+}
+
+
+/* Dark note cards: readable text and Google Keep-like edited date */
+.keep-card{
+  background:#202124!important;color:#e8eaed!important;
+  border:1px solid #5f6368!important;
+}
+.keep-card .note-title,.keep-card-content{
+  color:#e8eaed!important;
+}
+.keep-card-bottom{
+  justify-content:flex-end!important;color:#9aa0a6!important;
+}
+.keep-card-edited{
+  margin-left:auto!important;color:#9aa0a6!important;
+  font-size:11px!important;white-space:nowrap!important;
+}
+
+/* Existing notes open in a centered Keep-style dialog. New notes expand in place. */
+.keep-content .editor.keep-existing-open{
+  display:flex!important;position:fixed!important;
+  left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  z-index:500!important;width:min(505px,calc(100vw - 28px))!important;
+  max-height:90dvh!important;overflow-y:auto!important;
+  margin:0!important;background:#202124!important;
+  box-shadow:0 4px 22px rgba(0,0,0,.58)!important;
+}
+.keep-content .editor.keep-existing-open:before{
+  content:""!important;display:block!important;position:fixed!important;
+  z-index:-1!important;inset:0!important;width:100vw!important;height:100dvh!important;
+  background:rgba(0,0,0,.58)!important;
+}
+.keep-content .editor.new-note-inline{
+  position:relative!important;left:auto!important;top:auto!important;
+  transform:none!important;width:min(505px,100%)!important;
+  margin:0 auto 24px!important;box-shadow:0 2px 8px rgba(0,0,0,.35)!important;
+}
+.keep-content .editor .title-input,
+.keep-content .editor .editor-body .content{
+  color:#e8eaed!important;-webkit-text-fill-color:#e8eaed!important;
+  caret-color:#e8eaed!important;
+}
+.keep-content .editor .title-input::placeholder,
+.keep-content .editor .editor-body .content::placeholder{
+  color:#9aa0a6!important;-webkit-text-fill-color:#9aa0a6!important;opacity:1!important;
+}
+.keep-content .editor .editor-body .content{
+  background:transparent!important;
+}
+@media(max-width:640px){
+ .keep-content .editor.keep-existing-open{
+  width:calc(100vw - 24px)!important;max-height:88dvh!important;
+ }
+}
+
+
+/* Notes board: real side-by-side grid, with a true one-column list mode */
+.keep-note-board{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
+  align-items:start!important;gap:16px!important;
+  columns:unset!important;column-count:unset!important;
+}
+.keep-note-board .keep-card{
+  display:block!important;width:100%!important;max-width:none!important;
+  margin:0!important;break-inside:auto!important;
+}
+.keep-note-board.list-view{
+  grid-template-columns:minmax(0,700px)!important;
+  justify-content:center!important;
+}
+.keep-note-board.list-view .keep-card{max-width:700px!important}
+
+/* Keep-like note opening: expand from the card the user clicked */
+.keep-content .editor.keep-existing-open{
+  position:fixed!important;left:var(--editor-left,12px)!important;
+  top:var(--editor-top,12px)!important;right:auto!important;bottom:auto!important;
+  transform:none!important;width:var(--editor-width,min(505px,calc(100vw - 28px)))!important;
+  max-height:calc(100dvh - 24px)!important;overflow-y:auto!important;
+  margin:0!important;z-index:500!important;
+  background:#202124!important;box-shadow:0 4px 22px rgba(0,0,0,.5)!important;
+}
+.keep-content .editor.keep-existing-open:before{
+  content:""!important;display:block!important;position:fixed!important;
+  z-index:-1!important;inset:0!important;width:100vw!important;height:100dvh!important;
+  background:rgba(0,0,0,.48)!important;
+}
+.keep-content .editor .editor-edited-label{
+  display:block!important;width:100%!important;text-align:right!important;
+  color:#9aa0a6!important;font-size:11px!important;line-height:1.4!important;
+  padding:2px 2px 0!important;margin:0!important;
+}
+.keep-content .editor.new-note-inline .editor-edited-label{display:none!important}
+@media(max-width:640px){
+ .keep-note-board{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+ .keep-note-board.list-view{grid-template-columns:minmax(0,1fr)!important}
+ .keep-content .editor.keep-existing-open{
+   left:12px!important;top:50%!important;transform:translateY(-50%)!important;
+   width:calc(100vw - 24px)!important;max-height:88dvh!important;
+ }
+}
+
+
+.keep-content .editor.keep-existing-open{
+  position:fixed!important;left:50%!important;top:50%!important;
+  right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;
+  width:min(505px,calc(100vw - 28px))!important;
+  max-height:88dvh!important;overflow-y:auto!important;
+  margin:0!important;z-index:500!important;background:#202124!important;
+  border:1px solid #5f6368!important;border-radius:9px!important;
+  box-shadow:0 4px 22px rgba(0,0,0,.55)!important;
+}
+.keep-content .editor.keep-existing-open:before{
+  content:""!important;display:block!important;position:fixed!important;
+  z-index:-1!important;inset:0!important;width:100vw!important;height:100dvh!important;
+  background:rgba(0,0,0,.58)!important;
+}
+.keep-content .editor .toolbar .spacer{display:block!important;flex:1 1 auto!important;min-width:8px!important}
+.keep-content .editor .toolbar .editor-edited-label{
+  display:inline-flex!important;align-items:center!important;justify-content:flex-end!important;
+  flex:0 1 auto!important;min-width:0!important;margin:0 5px 0 auto!important;padding:0!important;
+  color:#9aa0a6!important;font-size:11px!important;line-height:1.2!important;white-space:nowrap!important;
+}
+.keep-content .editor.new-note-inline .toolbar .editor-edited-label{display:none!important}
+.keep-content .editor .toolbar .keep-editor-close{flex:0 0 auto!important;margin-left:0!important}
+@media(max-width:640px){
+ .keep-content .editor.keep-existing-open{left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:calc(100vw - 24px)!important;max-height:88dvh!important}
+ .keep-content .editor .toolbar .editor-edited-label{font-size:10px!important}
+}
+
+
+/* Saved-note editor: Google Keep-style compact dialog, centered in the viewport */
+.keep-content .editor.keep-existing-open.mobile-open{
+  display:flex!important;position:fixed!important;
+  left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  width:min(505px,calc(100vw - 28px))!important;
+  height:auto!important;min-height:203px!important;max-height:88dvh!important;
+  margin:0!important;padding:12px 19px 10px!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  z-index:1000!important;background:#202124!important;color:#e8eaed!important;
+  border:1px solid #5f6368!important;border-radius:9px!important;
+  box-shadow:0 4px 22px rgba(0,0,0,.58)!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open:before{
+  content:""!important;display:block!important;position:fixed!important;
+  z-index:-1!important;inset:0!important;width:100vw!important;height:100dvh!important;
+  background:rgba(32,33,36,.58)!important;
+}
+.keep-content .editor.keep-existing-open .editor-body{
+  height:auto!important;min-height:58px!important;max-height:none!important;
+  flex:0 0 auto!important;overflow:visible!important;
+}
+.keep-content .editor.keep-existing-open .editor-body .content{
+  height:auto!important;min-height:52px!important;max-height:none!important;
+  overflow-y:hidden!important;resize:none!important;
+}
+.keep-content .editor .toolbar .editor-edited-label{
+  display:inline-flex!important;align-items:center!important;justify-content:flex-end!important;
+  margin-left:auto!important;flex:0 0 auto!important;
+  color:#9aa0a6!important;font-size:11px!important;white-space:nowrap!important;
+}
+.keep-content .editor.new-note-inline .toolbar .editor-edited-label{display:none!important}
+@media(max-width:640px){
+ .keep-content .editor.keep-existing-open.mobile-open{
+  width:calc(100vw - 24px)!important;max-height:88dvh!important;
+ }
+}
+
+
+/* v13 fix: note-card clicks are not swallowed by outside-click dismissal */
+.keep-content .editor.keep-existing-open.mobile-open{
+  display:flex!important;visibility:visible!important;opacity:1!important;
+  pointer-events:auto!important;position:fixed!important;
+  left:50%!important;top:50%!important;right:auto!important;bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  z-index:10001!important;width:min(505px,calc(100vw - 28px))!important;
+  max-height:88dvh!important;overflow-y:auto!important;
+  background:#202124!important;color:#e8eaed!important;
+  border:1px solid #5f6368!important;border-radius:9px!important;
+  box-shadow:0 4px 22px rgba(0,0,0,.58)!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open:before{
+  content:""!important;display:block!important;position:fixed!important;
+  inset:0!important;width:100vw!important;height:100dvh!important;
+  z-index:-1!important;background:rgba(32,33,36,.58)!important;
+  pointer-events:none!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .title-input,
+.keep-content .editor.keep-existing-open.mobile-open .editor-body .content{
+  color:#e8eaed!important;-webkit-text-fill-color:#e8eaed!important;
+}
+
+
+/* Keep the edited timestamp visible on its own line at the editor's bottom-right */
+.keep-content .editor .editor-edited-label{
+  display:block!important;width:100%!important;min-height:16px!important;
+  box-sizing:border-box!important;text-align:right!important;
+  padding:2px 4px 0!important;margin:0 0 2px!important;
+  color:#9aa0a6!important;font:400 11px/14px Arial,Helvetica,sans-serif!important;
+  white-space:nowrap!important;visibility:visible!important;opacity:1!important;
+}
+.keep-content .editor.new-note-inline .editor-edited-label{display:none!important}
+
+/* Dialog proportions and spacing closer to Keep's compact note editor */
+.keep-content .editor.keep-existing-open.mobile-open{
+  position:fixed!important;left:50%!important;top:50%!important;
+  transform:translate(-50%,-50%)!important;right:auto!important;bottom:auto!important;
+  width:min(600px,calc(100vw - 32px))!important;
+  height:auto!important;min-height:190px!important;max-height:88dvh!important;
+  padding:16px 18px 12px!important;margin:0!important;
+  overflow-y:auto!important;overflow-x:hidden!important;
+  border:1px solid #5f6368!important;border-radius:9px!important;
+  background:#202124!important;color:#e8eaed!important;
+  box-shadow:0 4px 24px rgba(0,0,0,.5)!important;
+  z-index:10001!important;display:flex!important;flex-direction:column!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .editor-body{
+  min-height:72px!important;flex:0 0 auto!important;overflow:visible!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .editor-body .content{
+  min-height:64px!important;height:auto!important;max-height:none!important;
+  overflow-y:hidden!important;resize:none!important;
+}
+@media(max-width:640px){
+ .keep-content .editor.keep-existing-open.mobile-open{
+  width:calc(100vw - 24px)!important;max-height:88dvh!important;
+  padding:14px 15px 10px!important;
+ }
+}
+
+</style>
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -530,11 +1256,10 @@ if ('serviceWorker' in navigator) {
 </header>
 <main class="keep-layout" id="keepLayout">
   <aside class="keep-sidebar" id="keepSidebar"><nav class="keep-nav" aria-label="Keep navigation">
-    <button class="keep-nav-item active" id="navNotes" type="button" onclick="showNotesView()"><span>▤</span> Notes</button>
-    <button class="keep-nav-item" id="navReminders" type="button" onclick="showRemindersView()"><span>♧</span> Reminders</button>
-    <div class="keep-label-head"><span>LABELS</span><button type="button" title="Edit labels">＋</button></div>
-    <button class="keep-nav-item" type="button" onclick="openArchive()"><span>▣</span> Archive</button>
-    <button class="keep-nav-item" type="button" onclick="showTrashView()"><span>⌫</span> Trash</button>
+    <button class="keep-nav-item active" id="navNotes" type="button" onclick="showNotesView()"><span class="keep-nav-icon"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M8.4 14.4A7 7 0 1 1 15.6 14.4c-.9.8-1.4 1.7-1.6 2.6H10c-.2-.9-.7-1.8-1.6-2.6Z"/><path d="M12 2v2M4.9 4.9l1.4 1.4M19.1 4.9l-1.4 1.4"/></svg></span> Notes</button>
+    <button class="keep-nav-item" id="navReminders" type="button" onclick="showRemindersView()"><span class="keep-nav-icon"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/><path d="M12 3V2"/></svg></span> Reminders</button>
+    <button class="keep-nav-item" id="navArchive" type="button" onclick="showArchiveView()"><span class="keep-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 5h18v4H3zM5 9v11h14V9"/><path d="M12 11v6m-3-3 3 3 3-3"/></svg></span> Archive</button>
+    <button class="keep-nav-item" id="navTrash" type="button" onclick="showTrashView()"><span class="keep-nav-icon"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15M10 10v7M14 10v7"/></svg></span> Trash</button>
   </nav><div class="keep-sidebar-footer">SOIKAT NOTEPAD</div></aside>
   <section class="keep-content">
     <div class="keep-mobile-title"><span id="viewTitle">Notes</span><button type="button" onclick="newNote()" aria-label="Create note">＋</button></div>
@@ -543,18 +1268,25 @@ if ('serviceWorker' in navigator) {
   </section>
   <section class="panel editor" id="editorPanel" aria-label="Note editor">
     <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
-    <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
-    <div class="toolbar"><div class="date-box current-date-box"><span>📆</span><span id="date"></span></div><div class="spacer"></div>
-      <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
-      <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
+    <div class="keep-title-row">
+      <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
       <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
-      <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
     </div>
     <div class="editor-body"><button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
       <div id="reminderDisplay" class="countdown-display" style="display:none"></div><div id="noteAttachments" class="attachments"></div><div class="drop-hint">DROP FILES TO ATTACH</div>
-      <textarea id="content" class="content" placeholder="Take a note..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
-      <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
+      <textarea id="content" class="content" placeholder="Take a note..." oninput="autoGrowNote();saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
+      
     </div>
+    <div id="editorEditedLabel" class="editor-edited-label" aria-live="polite"></div>
+    <div class="toolbar"><div class="date-box current-date-box"><span>📆</span><span id="date"></span></div><div class="spacer"></div>
+      <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
+      <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
+      
+      <button type="button" id="archiveNoteBtn" class="tool-btn icon-btn" title="Archive" aria-label="Archive note"><svg viewBox="0 0 24 24"><path d="M3 5h18v4H3zM5 9v11h14V9"/><path d="M12 11v6m-3-3 3 3 3-3"/></svg></button>
+      <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
+      <button type="button" class="keep-editor-close" onclick="closeMobileEditor()">Close</button>
+    </div>
+    
   </section>
 </main>
 <div class="feature-modal" id="reminderModal" onclick="closeFeatureModal(event,'reminderModal')">
@@ -624,12 +1356,15 @@ if ('serviceWorker' in navigator) {
 
 <script>
 const KEY="soikat_notepad_v1";
-const ARCHIVE_KEY="soikat_notepad_archive_v1";
+const ARCHIVE_KEY="soikat_notepad_archive_v1"; // Legacy deleted notes remain in Trash.
+const KEEP_ARCHIVED_KEY="soikat_notepad_kept_archive_v1";
 const ARCHIVE_DAYS=30;
 let notes=[];
 let archive=[];
+let keptArchive=[];
 let currentId=null;
 let draftMode=false;
+let newNoteOpen=false;
 let reminderTimer=null;
 
 function now(){
@@ -664,6 +1399,7 @@ function load(){
 }
 function persist(){localStorage.setItem(KEY,JSON.stringify(notes))}
 function persistArchive(){localStorage.setItem(ARCHIVE_KEY,JSON.stringify(archive))}
+function persistKeptArchive(){localStorage.setItem(KEEP_ARCHIVED_KEY,JSON.stringify(keptArchive))}
 function purgeExpiredArchive(){
   const limit=Date.now()-(ARCHIVE_DAYS*24*60*60*1000);
   const before=archive.length;
@@ -681,20 +1417,38 @@ let keepListView=false;
 function renderNotes(){
  const q=(document.getElementById("search")?.value||"").trim().toLowerCase();
  const box=document.getElementById("notes");
- let list=notes.filter(n=>(String(n.title||"")+" "+String(n.content||"")).toLowerCase().includes(q));
+ let source=activeView==="archive"?keptArchive:activeView==="trash"?archive:notes;
+ let list=source.filter(n=>(String(n.title||"")+" "+String(n.content||"")).toLowerCase().includes(q));
+ if(newNoteOpen && activeView==="notes")list=list.filter(n=>n.id!==currentId);
  if(activeView==="reminders")list=list.filter(n=>!!n.reminder);
  list.sort((a,b)=>(Number(!!b.pinned)-Number(!!a.pinned))||((b.updated||"").localeCompare(a.updated||"")));
- if(!list.length){box.innerHTML='<div class="keep-empty"><span>💡</span><div>'+(activeView==="reminders"?"No reminders":"Notes you add appear here")+'</div></div>';return}
- box.innerHTML=list.map(n=>`<article class="note keep-card ${n.id===currentId?"active":""}" style="--note-bg:${escapeHtml(n.color||"#ffffff")}" onclick="selectNote('${String(n.id).replace(/'/g,"\\\\'")}')">
+ if(!list.length){
+   if(activeView==="archive"){
+     box.innerHTML='<div class="keep-empty keep-archive-empty"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M15 32h90v13H15zM22 45v58h76V45M15 32l10-15h70l10 15M43 68l17 17 17-17M60 85V57"/></svg><div>Your archived notes appear here</div></div>';
+   }else if(activeView==="trash"){
+     box.innerHTML='<div class="keep-empty keep-trash-empty"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M25 30h70M42 20h36M34 30l4 73h44l4-73M49 44v43M71 44v43"/></svg><div>No notes in Trash</div></div>';
+   }else{
+     const msg=activeView==="reminders"?"No reminders":"Notes you add appear here";
+     box.innerHTML='<div class="keep-empty"><span>💡</span><div>'+msg+'</div></div>';
+   }
+   return;
+ }
+ box.innerHTML=list.map(n=>activeView==="trash"?`
+ <article class="note keep-card keep-trash-card" style="--note-bg:#202124" data-trash-card="${String(n.id)}" onclick="readArchivedNote('${String(n.id)}')">
+   ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}<div class="keep-card-content">${escapeHtml(n.content||"")}</div>
+   <div class="keep-card-bottom"><span>Deleted ${escapeHtml(formatArchiveDate(n.deletedAt))} · ${daysLeft(n.deletedAt)} day${daysLeft(n.deletedAt)===1?"":"s"} left</span></div>
+   <div class="keep-trash-card-actions"><button type="button" data-trash-action="restore" data-id="${String(n.id)}">Restore</button><button type="button" data-trash-action="forever" data-id="${String(n.id)}">Delete forever</button></div>
+ </article>`:`<article class="note keep-card ${n.id===currentId?"active":""}" style="--note-bg:${escapeHtml(n.color||"#ffffff")}" onclick="selectNote('${String(n.id).replace(/'/g,"\\\\'")}')">
  <div class="keep-card-actions">${n.pinned?'<span title="Pinned">📌</span>':""}${n.reminder?'<span title="Reminder">🔔</span>':""}</div>
  ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}<div class="keep-card-content">${escapeHtml(n.content||"")}</div>
- <div class="keep-card-bottom"><span>${escapeHtml(n.updated||"")}</span><span class="keep-card-pin">⋮</span></div></article>`).join("");
+ <div class="keep-card-bottom"><span class="keep-card-pin">⋮</span></div></article>`).join("");
  box.classList.toggle("list-view",keepListView);
 }
-function setKeepActive(id){["navNotes","navReminders"].forEach(x=>document.getElementById(x)?.classList.toggle("active",x===id));document.getElementById("keepLayout")?.classList.remove("sidebar-open");}
+function setKeepActive(id){["navNotes","navReminders","navArchive","navTrash"].forEach(x=>document.getElementById(x)?.classList.toggle("active",x===id));document.getElementById("keepLayout")?.classList.remove("sidebar-open");}
 function showNotesView(){activeView="notes";document.getElementById("viewTitle").textContent="Notes";setKeepActive("navNotes");renderNotes();}
 function showRemindersView(){activeView="reminders";document.getElementById("viewTitle").textContent="Reminders";setKeepActive("navReminders");renderNotes();}
-function showTrashView(){openArchive();}
+function showArchiveView(){activeView="archive";document.getElementById("viewTitle").textContent="Archive";setKeepActive("navArchive");renderNotes();}
+function showTrashView(){activeView="trash";currentId=null;draftMode=false;document.getElementById("viewTitle").textContent="Trash";setKeepActive("navTrash");render();}
 function toggleKeepSidebar(){
  const layout=document.getElementById("keepLayout");
  if(window.matchMedia("(max-width:640px)").matches){layout.classList.toggle("sidebar-open");return;}
@@ -719,23 +1473,36 @@ function refreshKeepNotes(){
 function toggleKeepView(){keepListView=!keepListView;document.getElementById("viewToggle").classList.toggle("active",keepListView);renderNotes();}
 function clearKeepSearch(){document.getElementById("search").value="";renderNotes();}
 function selectNote(id){
+  const found=notes.some(n=>String(n.id)===String(id)) ||
+              keptArchive.some(n=>String(n.id)===String(id)) ||
+              archive.some(n=>String(n.id)===String(id));
+  if(!found)return;
   draftMode=false;
+  newNoteOpen=false;
   currentId=id;
-  if(window.innerWidth<=600){
-    document.getElementById("editorPanel").classList.add("mobile-open");
-  }
+  const panel=document.getElementById("editorPanel");
+  panel.classList.remove("new-note-inline");
+  panel.classList.add("keep-existing-open","mobile-open");
   render();
+  panel.classList.add("keep-existing-open","mobile-open");
+  const note=current();
+  const editedEl=document.getElementById("editorEditedLabel");
+  if(editedEl)editedEl.textContent=note?.updated ? editedDateLabel(note.updated) : "";
 }
-function current(){return notes.find(n=>n.id===currentId)}
+
+function current(){return notes.find(n=>n.id===currentId)||keptArchive.find(n=>n.id===currentId)||archive.find(n=>n.id===currentId)}
 function render(){
   renderNotes();
   const n=current();
   if(!n){
     document.getElementById("title").value="";
     document.getElementById("content").value="";
+    autoGrowNote();
     document.getElementById("date").textContent=now();
     document.getElementById("count").textContent="0";
     updateLastEditedDisplay(null);
+    const editedEl=document.getElementById("editorEditedLabel");
+    if(editedEl)editedEl.textContent="";
     document.getElementById("pinIcon").textContent="📌";
     document.getElementById("pinBtn").classList.remove("pinned");
     document.getElementById("reminderBtn").classList.remove("active");
@@ -745,9 +1512,12 @@ function render(){
   }
   document.getElementById("title").value=n.title||"";
   document.getElementById("content").value=n.content||"";
+  autoGrowNote();
   document.getElementById("date").textContent=n.updated||now();
   document.getElementById("count").textContent=(n.content||"").length;
   updateLastEditedDisplay(n);
+  const editedEl=document.getElementById("editorEditedLabel");
+  if(editedEl)editedEl.textContent=(n.updated && !draftMode) ? editedDateLabel(n.updated) : "";
   document.getElementById("pinIcon").textContent="📌";
   document.getElementById("pinBtn").classList.toggle("pinned",!!n.pinned);
   document.getElementById("reminderBtn").classList.toggle("active",!!n.reminder);
@@ -796,7 +1566,7 @@ function saveCurrent(){
   n.title=title.trim() || "Untitled Note";
   n.content=content;
   n.updated=now();
-  persist();
+  if(keptArchive.some(x=>x.id===n.id))persistKeptArchive();else persist();
 
   document.getElementById("count").textContent=n.content.length;
   updateLastEditedDisplay(n);
@@ -804,10 +1574,11 @@ function saveCurrent(){
 }
 function newNote(){
   draftMode=true;
+  newNoteOpen=true;
   currentId=null;
-  if(window.innerWidth<=600){
-    document.getElementById("editorPanel").classList.add("mobile-open");
-  }
+  const panel=document.getElementById("editorPanel");
+  panel.classList.remove("keep-existing-open");
+  panel.classList.add("new-note-inline","mobile-open");
   document.getElementById("title").value="";
   document.getElementById("content").value="";
   document.getElementById("count").textContent="0";
@@ -818,7 +1589,9 @@ function newNote(){
 
   document.getElementById("reminderDisplay").style.display="none";
   renderNotes();
-  document.getElementById("title").focus();
+  const focusTitle=()=>{const titleEl=document.getElementById("title");if(titleEl){titleEl.focus({preventScroll:true});titleEl.setSelectionRange(titleEl.value.length,titleEl.value.length);}};
+  requestAnimationFrame(()=>requestAnimationFrame(focusTitle));
+  setTimeout(focusTitle,120);
 }
 function deleteCurrent(){
   const n=current();
@@ -831,14 +1604,13 @@ function deleteCurrent(){
     return;
   }
 
-  // Move note to Archive instead of permanently deleting it.
-  archive.unshift({
-    ...n,
-    deletedAt:Date.now()
-  });
+  // Move deleted note to Trash, separate from Archive.
+  archive.unshift({...n,deletedAt:Date.now()});
 
   notes=notes.filter(x=>x.id!==n.id);
+  keptArchive=keptArchive.filter(x=>x.id!==n.id);
   persist();
+  persistKeptArchive();
   persistArchive();
 
   currentId=notes[0]?.id||null;
@@ -846,6 +1618,24 @@ function deleteCurrent(){
   render();
 }
 
+function archiveCurrentNote(){
+  const n=notes.find(x=>x.id===currentId);
+  if(!n)return;
+  keptArchive.unshift({...n,archivedAt:Date.now()});
+  notes=notes.filter(x=>x.id!==n.id);
+  persist();persistKeptArchive();
+  currentId=notes[0]?.id||null;draftMode=false;render();
+}
+function unarchiveCurrentNote(){
+  const n=keptArchive.find(x=>x.id===currentId);
+  if(!n)return;
+  notes.unshift({...n,updated:now()});
+  keptArchive=keptArchive.filter(x=>x.id!==n.id);
+  persist();persistKeptArchive();
+  currentId=n.id;draftMode=false;activeView="notes";
+  document.getElementById("viewTitle").textContent="Notes";
+  setKeepActive("navNotes");render();
+}
 function togglePin(){
   let n=current();
   if(!n){
@@ -859,7 +1649,7 @@ function togglePin(){
   }
   n.pinned=!n.pinned;
   n.updated=now();
-  persist();
+  if(keptArchive.some(x=>x.id===n.id))persistKeptArchive();else persist();
   render();
 }
 function formatArchiveDate(timestamp){
@@ -874,6 +1664,7 @@ function daysLeft(deletedAt){
 }
 function openArchive(){
   purgeExpiredArchive();
+  document.querySelector("#archiveModal .archive-head strong").textContent="TRASH";
   renderArchive();
   document.getElementById("archiveModal").classList.add("show");
 }
@@ -884,7 +1675,7 @@ function closeArchive(event){
 function renderArchive(){
   const box=document.getElementById("archiveList");
   if(!archive.length){
-    box.innerHTML='<div class="archive-empty">Archive is empty.</div>';
+    box.innerHTML='<div class="archive-empty keep-trash-empty"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M25 30h70M42 20h36M34 30l4 73h44l4-73M49 44v43M71 44v43"/></svg><div>No notes in Trash</div></div>';
     return;
   }
   box.innerHTML=archive.map(n=>`
@@ -920,13 +1711,13 @@ function restoreNote(id){
   currentId=restored.id;
   draftMode=false;
   render();
-  renderArchive();
+  if(activeView==="trash")renderNotes();
 }
 function deleteForever(id){
   if(!id)return;
   archive=archive.filter(x=>String(x.id)!==String(id));
   persistArchive();
-  renderArchive();
+  if(activeView==="trash")renderNotes();else renderArchive();
 }
 
 let readerNoteId=null;
@@ -962,7 +1753,7 @@ function deleteForeverFromReader(){
 
   readerNoteId=null;
   document.getElementById("archiveReader").classList.remove("show");
-  renderArchive();
+  if(activeView==="trash")renderNotes();else renderArchive();
 }
 
 document.getElementById("archiveList").addEventListener("click", function(e){
@@ -1296,12 +2087,13 @@ function toggleMobileSearch(){
 function closeMobileEditor(){
   const panel=document.getElementById("editorPanel");
   if(!panel)return;
-  panel.classList.remove("mobile-open");
+  panel.classList.remove("mobile-open","keep-existing-open","new-note-inline");
+  newNoteOpen=false;
   if(draftMode && !current()){
     draftMode=false;
-    currentId=notes[0]?.id||null;
-    render();
+    currentId=null;
   }
+  renderNotes();
 }
 
 function updateClock(){
@@ -1309,6 +2101,11 @@ function updateClock(){
     day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",hour12:true
   });
 }
+document.getElementById("archiveNoteBtn")?.addEventListener("click", function(e){
+  e.preventDefault();e.stopPropagation();
+  if(keptArchive.some(x=>x.id===currentId))unarchiveCurrentNote();
+  else archiveCurrentNote();
+});
 document.getElementById("deleteBtn").addEventListener("click", function(e){
   e.preventDefault();
   e.stopPropagation();
@@ -1462,5 +2259,54 @@ load();updateClock();setInterval(updateClock,1000);
 
 </script>
 <script>document.addEventListener("DOMContentLoaded",applySavedSidebarState);window.addEventListener("resize",applySavedSidebarState);</script>
-</body>
+
+
+
+
+<script>
+(function(){
+ const content=document.querySelector(".keep-content");
+ const launcher=document.querySelector(".keep-take-note");
+ const editor=document.getElementById("editorPanel");
+ if(content&&launcher&&editor&&editor.parentElement!==content){
+   content.insertBefore(editor,launcher.nextSibling);
+ }
+})();
+</script>
+
+
+<script>
+document.addEventListener("pointerdown",function(e){
+ const panel=document.getElementById("editorPanel");
+ if(!panel||!panel.classList.contains("mobile-open"))return;
+ if(panel.contains(e.target))return;
+ /* A note-card click must reach its click handler; closing here would
+    re-render the board during pointerdown and swallow that click. */
+ if(e.target.closest(".keep-card"))return;
+ closeMobileEditor();
+},true);
+</script>
+
+<script>
+function autoGrowNote(){
+  const el=document.getElementById("content");
+  if(!el)return;
+  el.style.height="auto";
+  el.style.height=Math.max(el.scrollHeight,52)+"px";
+  el.style.overflowY="hidden";
+}
+</script>
+
+<script>
+function editedDateLabel(value){
+  if(!value)return "";
+  const raw=String(value).trim();
+  const m=raw.match(/^(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})/);
+  if(m)return "Edited "+Number(m[1])+" "+m[2].slice(0,3);
+  const d=new Date(raw);
+  if(!Number.isNaN(d.getTime()))return "Edited "+d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  return "";
+}
+</script>
+\n</body>
 </html>
