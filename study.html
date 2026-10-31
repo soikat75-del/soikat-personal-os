@@ -399,6 +399,23 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
   .routine-item,.revision-item{animation:none;transition:none}
 }
 
+
+/* TEMPORARY PAUSE SCREEN — original project code and data remain intact */
+html, body { width:100%; height:100%; min-height:100%; margin:0; overflow:hidden; }
+body > :not(#project-pause-screen) { display:none !important; }
+#project-pause-screen {
+  position:fixed; inset:0; z-index:2147483647;
+  display:flex; align-items:center; justify-content:center;
+  width:100%; height:100%; min-height:100vh;
+  margin:0; padding:20px; box-sizing
+<div id="project-pause-screen"><div class="pause-main">PROJECT PAUSED</div><div class="pause-sub">FOR A WHILE<span class="pause-dots"></span></div></div>
+:border-box;
+  background:#070b14; color:#edf3ff;
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+  font-size:clamp(28px,6vw,54px); font-weight:800;
+  letter-spacing:.16em; text-align:center;
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -411,6 +428,62 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<style id="pause-animation-enhancement">
+#project-pause-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+#project-pause-screen .pause-main {
+  display: inline-block;
+  font: 700 clamp(25px, 5vw, 42px)/1.2 system-ui, sans-serif;
+  letter-spacing: .16em;
+  color: #f4f4f5;
+  animation: pauseFloat 2.8s ease-in-out infinite, pauseGlow 2.8s ease-in-out infinite;
+}
+#project-pause-screen .pause-sub {
+  font: 500 clamp(10px, 1.6vw, 13px)/1.5 system-ui, sans-serif;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  animation: pauseFade 2.8s ease-in-out infinite;
+}
+#project-pause-screen .pause-dots::after {
+  content: "";
+  display: inline-block;
+  width: 1.5em;
+  text-align: left;
+  animation: pauseDots 1.5s steps(4, end) infinite;
+}
+@keyframes pauseFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pauseGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(255,255,255,.08); opacity: .82; }
+  50% { text-shadow: 0 0 24px rgba(255,255,255,.28); opacity: 1; }
+}
+@keyframes pauseFade {
+  0%, 100% { opacity: .48; }
+  50% { opacity: 1; }
+}
+@keyframes pauseDots {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75%, 100% { content: "..."; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #project-pause-screen .pause-main,
+  #project-pause-screen .pause-sub,
+  #project-pause-screen .pause-dots::after { animation: none; }
+}
+</style>
+
 </head>
 <body>
 <div class="wrap" style="padding-top:72px">
