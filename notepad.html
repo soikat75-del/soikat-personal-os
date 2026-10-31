@@ -2759,10 +2759,14 @@ async function attachmentTx(mode, action){
   return new Promise((resolve,reject)=>{
     const tx=db.transaction(ATTACH_STORE,mode);
     const store=tx.objectStore(ATTACH_STORE);
-    let req;
-    try{req=action(store);}catch(e){reject(e);return;}
-    if(req){req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);}
-    else{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);}
+    let req=null, result;
+    try{
+      req=action(store);
+      if(req)req.onsuccess=()=>{result=req.result;};
+    }catch(e){reject(e);return;}
+    tx.oncomplete=()=>resolve(result);
+    tx.onerror=()=>reject(tx.error||new Error("Attachment transaction failed"));
+    tx.onabort=()=>reject(tx.error||new Error("Attachment transaction aborted"));
   });
 }
 function fileIcon(name){
@@ -2773,15 +2777,21 @@ function fileIcon(name){
   if(ext==="pdf")return "📕";
   return "📄";
 }
+let attachmentRenderToken=0;
 async function renderAttachments(){
   const wrap=document.getElementById("noteAttachments");
   if(!wrap)return;
-  wrap.innerHTML="";
+  const token=++attachmentRenderToken;
   const n=current();
-  if(!n || !n.id)return;
+  const noteId=n&&n.id!=null?String(n.id):"";
+  wrap.innerHTML="";
+  if(!noteId)return;
   let items=[];
-  try{items=await attachmentTx("readonly",s=>s.getAll());}catch(e){console.warn("Attachment storage unavailable",e);return;}
-  items.filter(f=>f.noteId===n.id).forEach(f=>{
+  try{items=await attachmentTx("readonly",s=>s.getAll())||[];}
+  catch(e){console.warn("Attachment storage unavailable",e);return;}
+  // Ignore an older async read if the user has switched notes meanwhile.
+  if(token!==attachmentRenderToken || String(current()?.id||"")!==noteId)return;
+  items.filter(f=>String(f.noteId)===noteId).forEach(f=>{
     const chip=document.createElement("div");chip.className="attachment-chip";
     const icon=document.createElement("span");icon.className="attachment-icon";icon.textContent=fileIcon(f.name);
     const name=document.createElement("span");name.className="attachment-name";name.textContent=f.name;name.title=f.name;
@@ -2816,7 +2826,12 @@ editorDropZone.addEventListener("drop",async e=>{e.preventDefault();e.stopPropag
 const originalRenderAttachmentsHook=render;
 render=function(){originalRenderAttachmentsHook();renderAttachments();};
 
-load();updateClock();setInterval(updateClock,1000);
+load();
+// Re-read attachments after the initial note selection and when a page is restored
+// from the browser's back-forward cache.
+requestAnimationFrame(()=>renderAttachments());
+window.addEventListener("pageshow",()=>renderAttachments());
+updateClock();setInterval(updateClock,1000);
 
 </script>
 <script>document.addEventListener("DOMContentLoaded",applySavedSidebarState);window.addEventListener("resize",applySavedSidebarState);</script>
