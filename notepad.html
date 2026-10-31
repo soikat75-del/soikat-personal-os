@@ -1699,7 +1699,7 @@ html.keep-editor-active,html.keep-editor-active body{overflow:auto!important}
   backdrop-filter:blur(5px);
   pointer-events:none;
 }
-body:has(#editorPanel.mobile-open) .keep-editor-backdrop{display:block!important}
+body:has(#editorPanel.keep-existing-open.mobile-open) .keep-editor-backdrop{display:block!important}
 
 
 /* Editor layout: action toolbar stays pinned at the bottom; only note text scrolls. */
@@ -2634,6 +2634,17 @@ function toggleMobileSearch(){
     document.getElementById("search").focus();
   }
 }
+
+
+/* Close the expanded mobile header search when tapping anywhere outside it. */
+document.addEventListener("pointerdown", function(e){
+  const header=document.querySelector(".keep-header");
+  if(!header || !header.classList.contains("mobile-search-open")) return;
+  if(e.target.closest(".keep-global-search")) return;
+  if(e.target.closest(".keep-mobile-search-btn")) return;
+  header.classList.remove("mobile-search-open");
+  document.getElementById("search")?.blur();
+}, true);
 function closeMobileEditor(skipBoardRender=false){
   const panel=document.getElementById("editorPanel");
   if(!panel)return;
