@@ -2749,29 +2749,19 @@ load();updateClock();setInterval(updateClock,1000);
 
 
 <script>
-let ignoreNextCardClickAfterClose=false;
-document.addEventListener("pointerdown",function(e){
- const panel=document.getElementById("editorPanel");
- if(!panel||!panel.classList.contains("mobile-open"))return;
- if(panel.contains(e.target))return;
- const clickedCard=e.target.closest(".keep-card");
- if(clickedCard){
-   ignoreNextCardClickAfterClose=true;
-   e.preventDefault();
-   e.stopImmediatePropagation();
-   closeMobileEditor(false);
-   return;
- }
- closeMobileEditor(false);
-},true);
+/* Outside-click rule: the first click outside the expanded editor only closes it.
+   A note card clicked in that same action must not open until the next click. */
 document.addEventListener("click",function(e){
- if(!ignoreNextCardClickAfterClose)return;
- const card=e.target.closest(".keep-card");
- if(!card)return;
- ignoreNextCardClickAfterClose=false;
- e.preventDefault();
- e.stopImmediatePropagation();
+  const panel=document.getElementById("editorPanel");
+  if(!panel || !panel.classList.contains("mobile-open")) return;
+  if(panel.contains(e.target)) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  closeMobileEditor(true); // Keep the board DOM intact; do not trigger another card.
 },true);
+</script>
 
 <script>
 function autoGrowNote(){
@@ -2794,7 +2784,8 @@ function editedDateLabel(value){
   return "";
 }
 </script>
-\n<script>
+
+<script>
 /* v20: Keep the expanded composer directly inside the Take a note area. */
 (function(){
   const placeComposer=()=>{
@@ -2813,7 +2804,5 @@ function editedDateLabel(value){
 })();
 </script>
 
-document.addEventListener("pointerdown",function(e){
- if(!e.target.closest(".keep-card"))ignoreNextCardClickAfterClose=false;
-},false);\n</body>
+</body>
 </html>
