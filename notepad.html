@@ -282,6 +282,20 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
  }
 }
 
+
+/* Note file attachments */
+.file-add-btn{height:36px;min-width:38px;padding:0 10px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#9ab1d4;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px}
+.file-add-btn:hover{border-color:#3b8fff;color:#fff}
+.attachments{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.attachment-chip{display:flex;align-items:center;gap:8px;max-width:100%;padding:7px 9px;border:1px solid #29476e;border-radius:9px;background:#091727;color:#c8d8f0;font-size:11px}
+.attachment-icon{font-size:17px;flex:none}
+.attachment-name{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.attachment-action{border:0;background:transparent;color:#75b2ff;cursor:pointer;font-size:12px}
+.attachment-remove{color:#ff6682}
+.editor-body.drag-over{outline:2px dashed #4a9bff;outline-offset:-6px;background:#0b1d32}
+.drop-hint{display:none;position:absolute;inset:0;z-index:8;align-items:center;justify-content:center;background:rgba(4,13,26,.88);border:2px dashed #4b9cff;border-radius:12px;color:#dceaff;font-size:16px;font-weight:700;letter-spacing:1px;pointer-events:none}
+.editor-body.drag-over .drop-hint{display:flex}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -324,6 +338,7 @@ if ('serviceWorker' in navigator) {
     <div class="toolbar">
       <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
       <div class="spacer"></div>
+      <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
       <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
       
       <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
@@ -332,6 +347,8 @@ if ('serviceWorker' in navigator) {
     <div class="editor-body">
       <button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
       <div id="reminderDisplay" class="countdown-display" style="display:none"></div>
+      <div id="noteAttachments" class="attachments"></div>
+      <div class="drop-hint">DROP FILES TO ATTACH</div>
       <textarea id="content" class="content" placeholder="Start writing..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
       <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
     </div>
@@ -1117,6 +1134,84 @@ setInterval(()=>{
     renderNotes();
   }
 },1000);
+
+
+// File attachments are stored in IndexedDB (not localStorage) and linked to each note.
+const ATTACH_DB_NAME = "soikat_notepad_attachments_v1";
+const ATTACH_STORE = "files";
+let attachDbPromise = null;
+
+function openAttachDb(){
+  if(attachDbPromise) return attachDbPromise;
+  attachDbPromise = new Promise((resolve,reject)=>{
+    const req=indexedDB.open(ATTACH_DB_NAME,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(ATTACH_STORE))db.createObjectStore(ATTACH_STORE,{keyPath:"id"});};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+  return attachDbPromise;
+}
+async function attachmentTx(mode, action){
+  const db=await openAttachDb();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(ATTACH_STORE,mode);
+    const store=tx.objectStore(ATTACH_STORE);
+    let req;
+    try{req=action(store);}catch(e){reject(e);return;}
+    if(req){req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);}
+    else{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);}
+  });
+}
+function fileIcon(name){
+  const ext=(name.split(".").pop()||"").toLowerCase();
+  if(["html","htm"].includes(ext))return "🌐";
+  if(["doc","docx","rtf"].includes(ext))return "📝";
+  if(["xls","xlsx","csv","ods"].includes(ext))return "📊";
+  if(ext==="pdf")return "📕";
+  return "📄";
+}
+async function renderAttachments(){
+  const wrap=document.getElementById("noteAttachments");
+  if(!wrap)return;
+  wrap.innerHTML="";
+  const n=current();
+  if(!n || !n.id)return;
+  let items=[];
+  try{items=await attachmentTx("readonly",s=>s.getAll());}catch(e){console.warn("Attachment storage unavailable",e);return;}
+  items.filter(f=>f.noteId===n.id).forEach(f=>{
+    const chip=document.createElement("div");chip.className="attachment-chip";
+    const icon=document.createElement("span");icon.className="attachment-icon";icon.textContent=fileIcon(f.name);
+    const name=document.createElement("span");name.className="attachment-name";name.textContent=f.name;name.title=f.name;
+    const download=document.createElement("button");download.className="attachment-action";download.type="button";download.textContent="Open";
+    download.addEventListener("click",()=>{const url=URL.createObjectURL(f.blob);const a=document.createElement("a");a.href=url;a.download=f.name;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);});
+    const remove=document.createElement("button");remove.className="attachment-action attachment-remove";remove.type="button";remove.textContent="×";remove.title="Remove file";
+    remove.addEventListener("click",async()=>{await attachmentTx("readwrite",s=>s.delete(f.id));renderAttachments();});
+    chip.append(icon,name,download,remove);wrap.appendChild(chip);
+  });
+}
+async function addNoteFiles(fileList){
+  const n=current();
+  if(!n || !n.id){alert("Create or select a note before attaching files.");return;}
+  const files=Array.from(fileList||[]);
+  if(!files.length)return;
+  const allowed=/\.(html?|docx?|xlsx?|csv|ods|pdf|txt|rtf)$/i;
+  const valid=files.filter(f=>allowed.test(f.name));
+  const invalid=files.filter(f=>!allowed.test(f.name));
+  if(invalid.length)alert("Unsupported file(s) skipped: "+invalid.map(f=>f.name).join(", "));
+  for(const f of valid){
+    const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+"_"+Math.random().toString(36).slice(2));
+    await attachmentTx("readwrite",s=>s.put({id,noteId:n.id,name:f.name,type:f.type,size:f.size,blob:f,addedAt:Date.now()}));
+  }
+  await renderAttachments();
+}
+document.getElementById("attachFileBtn").addEventListener("click",()=>document.getElementById("noteFileInput").click());
+document.getElementById("noteFileInput").addEventListener("change",async e=>{await addNoteFiles(e.target.files);e.target.value="";});
+const editorDropZone=document.querySelector(".editor-body");
+["dragenter","dragover"].forEach(type=>editorDropZone.addEventListener(type,e=>{e.preventDefault();e.stopPropagation();editorDropZone.classList.add("drag-over");}));
+["dragleave","dragend"].forEach(type=>editorDropZone.addEventListener(type,e=>{e.preventDefault();if(!editorDropZone.contains(e.relatedTarget))editorDropZone.classList.remove("drag-over");}));
+editorDropZone.addEventListener("drop",async e=>{e.preventDefault();e.stopPropagation();editorDropZone.classList.remove("drag-over");await addNoteFiles(e.dataTransfer.files);});
+const originalRenderAttachmentsHook=render;
+render=function(){originalRenderAttachmentsHook();renderAttachments();};
 
 load();updateClock();setInterval(updateClock,1000);
 
