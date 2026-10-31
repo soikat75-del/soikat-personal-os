@@ -1763,6 +1763,17 @@ body:has(#editorPanel.keep-existing-open.mobile-open) .keep-editor-backdrop{disp
   margin:0!important;
 }
 
+
+/* Drag-to-reorder notes on desktop and touch devices. */
+.keep-drag-handle{
+  border:0!important;background:transparent!important;color:#9aa0a6!important;
+  cursor:grab!important;font-size:20px!important;line-height:1!important;
+  padding:4px 6px!important;touch-action:none!important;user-select:none!important;
+}
+.keep-drag-handle:active{cursor:grabbing!important}
+.keep-card.is-dragging{opacity:.42!important}
+.keep-card.drag-over{outline:2px dashed #8ab4f8!important;outline-offset:2px!important}
+
 </style>
 </style>
 
@@ -1957,7 +1968,10 @@ function renderNotes(){
  let list=source.filter(n=>(String(n.title||"")+" "+String(n.content||"")).toLowerCase().includes(q));
  if(newNoteOpen && activeView==="notes")list=list.filter(n=>n.id!==currentId);
  if(activeView==="reminders")list=list.filter(n=>!!n.reminder);
- list.sort((a,b)=>(Number(!!b.pinned)-Number(!!a.pinned))||((b.updated||"").localeCompare(a.updated||"")));
+ list.sort((a,b)=>(Number(!!b.pinned)-Number(!!a.pinned))||
+   ((Number.isFinite(a._manualOrder)?a._manualOrder:Number.NEGATIVE_INFINITY)-
+    (Number.isFinite(b._manualOrder)?b._manualOrder:Number.NEGATIVE_INFINITY))||
+   ((b.updated||"").localeCompare(a.updated||"")));
  if(!list.length){
    if(activeView==="archive"){
      box.innerHTML='<div class="keep-empty keep-archive-empty"><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M15 32h90v13H15zM22 45v58h76V45M15 32l10-15h70l10 15M43 68l17 17 17-17M60 85V57"/></svg><div>Your archived notes appear here</div></div>';
@@ -1974,8 +1988,8 @@ function renderNotes(){
    ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}<div class="keep-card-content">${escapeHtml(n.content||"")}</div>
    <div class="keep-card-bottom"><span>Deleted ${escapeHtml(formatArchiveDate(n.deletedAt))} · ${daysLeft(n.deletedAt)} day${daysLeft(n.deletedAt)===1?"":"s"} left</span></div>
    <div class="keep-trash-card-actions"><button type="button" data-trash-action="restore" data-id="${String(n.id)}">Restore</button><button type="button" data-trash-action="forever" data-id="${String(n.id)}">Delete forever</button></div>
- </article>`:`<article class="note keep-card ${n.id===currentId?"active":""}" style="--note-bg:${escapeHtml(n.color||"#ffffff")}" onclick="selectNote('${String(n.id).replace(/'/g,"\\\\'")}')">
- <div class="keep-card-actions">${n.pinned?'<span title="Pinned">📌</span>':""}${n.reminder?'<span title="Reminder">🔔</span>':""}</div>
+ </article>`:`<article class="note keep-card ${n.id===currentId?"active":""}" data-note-card="${escapeHtml(n.id)}" style="--note-bg:${escapeHtml(n.color||"#ffffff")}" onclick="selectNote('${String(n.id).replace(/'/g,"\\\\'")}')">
+ <div class="keep-card-actions"><button type="button" class="keep-drag-handle" aria-label="Drag to reorder" title="Drag to reorder">⠿</button>${n.pinned?'<span title="Pinned">📌</span>':""}${n.reminder?'<span title="Reminder">🔔</span>':""}</div>
  ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}<div class="keep-card-content">${escapeHtml(n.content||"")}</div>
  <div class="keep-card-bottom"><span class="keep-card-pin">⋮</span></div></article>`).join("");
  box.classList.toggle("list-view",keepListView);
@@ -2892,5 +2906,50 @@ function editedDateLabel(value){
 })();
 </script>
 
+<script>
+
+(function(){
+ let dragged=null, pointerId=null, moved=false;
+ const cards=()=>Array.from(document.querySelectorAll("#notes .keep-card[data-note-card]"));
+ document.addEventListener("pointerdown",function(e){
+   const handle=e.target.closest(".keep-drag-handle");
+   if(!handle || activeView!=="notes")return;
+   const card=handle.closest(".keep-card[data-note-card]");
+   if(!card)return;
+   dragged=card;pointerId=e.pointerId;moved=false;
+   try{handle.setPointerCapture(pointerId)}catch(_){}
+   e.preventDefault();
+ },true);
+ document.addEventListener("pointermove",function(e){
+   if(!dragged || e.pointerId!==pointerId)return;
+   const target=document.elementFromPoint(e.clientX,e.clientY)?.closest("#notes .keep-card[data-note-card]");
+   if(!target || target===dragged)return;
+   const r=target.getBoundingClientRect();
+   const before=e.clientY<r.top+r.height/2;
+   target.parentNode.insertBefore(dragged,before?target:target.nextSibling);
+   cards().forEach(c=>c.classList.toggle("drag-over",c===target));
+   dragged.classList.add("is-dragging");moved=true;
+ },true);
+ function finish(e){
+   if(!dragged || (e && e.pointerId!==pointerId))return;
+   const card=dragged;
+   card.classList.remove("is-dragging");
+   cards().forEach(c=>c.classList.remove("drag-over"));
+   if(moved){
+     const ids=cards().map(c=>c.dataset.noteCard);
+     ids.forEach((id,index)=>{const n=notes.find(x=>String(x.id)===id);if(n)n._manualOrder=index;});
+     persist();
+     renderNotes();
+   }
+   dragged=null;pointerId=null;moved=false;
+ }
+ document.addEventListener("pointerup",finish,true);
+ document.addEventListener("pointercancel",finish,true);
+ document.addEventListener("click",function(e){
+   if(e.target.closest(".keep-drag-handle")){e.preventDefault();e.stopImmediatePropagation();}
+ },true);
+})();
+
+</script>
 </body>
 </html>
