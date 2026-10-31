@@ -377,6 +377,56 @@ body{margin:0!important;background:#fff!important;color:#202124!important;font-f
 }
 @media(max-width:360px){.keep-note-board{columns:1}.keep-header{gap:4px}.keep-brand{font-size:17px}}
 
+
+/* Header refinements and dark Keep theme */
+body{background:#202124!important;color:#e8eaed!important}
+body::before,body::after{display:none!important}
+.keep-header{background:#202124!important;border-bottom:1px solid #3c4043!important;color:#e8eaed!important;gap:8px;padding:0 18px}
+.keep-back-btn,.keep-menu-btn{flex:0 0 40px;width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:#bdc1c6;font-size:23px;cursor:pointer}
+.keep-back-btn:hover,.keep-menu-btn:hover,.keep-header-actions button:hover{background:#303134}
+.keep-brand{min-width:180px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;color:#e8eaed;font-size:16px;font-weight:700;letter-spacing:1.3px;line-height:1.05}
+.keep-brand small{font-size:11px;font-weight:500;letter-spacing:2px;color:#9aa0a6;margin-top:4px}
+.keep-global-search{background:#303134!important;border:1px solid transparent}
+.keep-global-search:focus-within{background:#3c4043!important;border-color:#5f6368}
+.keep-global-search input{color:#e8eaed!important}
+.keep-global-search input::placeholder{color:#9aa0a6}
+.keep-search-symbol,.keep-search-clear{color:#bdc1c6!important}
+.keep-header-actions button{color:#bdc1c6!important}
+.keep-header-actions button.active{background:#3c4043;color:#e8eaed!important}
+.keep-header-actions .refreshing{animation:keepRefresh .6s ease}
+@keyframes keepRefresh{to{transform:rotate(360deg)}}
+.keep-layout{background:#202124!important}
+.keep-sidebar{background:#202124!important}
+.keep-nav-item{color:#e8eaed!important}
+.keep-nav-item span,.keep-label-head,.keep-label-head button{color:#bdc1c6!important}
+.keep-nav-item:hover{background:#303134!important}
+.keep-nav-item.active{background:#41331c!important;color:#fdd663!important}
+.keep-nav-item.active span{color:#fdd663!important}
+.keep-sidebar-footer{color:#80868b!important}
+.keep-content{background:#202124!important}
+.keep-take-note{background:#202124!important;border-color:#5f6368!important;color:#9aa0a6!important;box-shadow:0 1px 3px rgba(0,0,0,.4)!important}
+.keep-take-note:hover{box-shadow:0 2px 6px rgba(0,0,0,.55)!important}
+.keep-take-actions{color:#bdc1c6!important}
+.keep-card{background:var(--note-bg,#202124)!important;border-color:#5f6368!important;color:#e8eaed!important}
+.keep-card .note-title,.keep-card-content{color:inherit!important}
+.keep-card-bottom,.keep-card-actions{color:#bdc1c6!important}
+.keep-empty{color:#9aa0a6!important}
+.editor{background:#202124!important;color:#e8eaed!important;border-color:#5f6368!important}
+.editor.mobile-open:before{background:rgba(0,0,0,.62)!important}
+.title-input,.content{color:#e8eaed!important}
+.title-input::placeholder,.content::placeholder{color:#9aa0a6!important}
+.toolbar{border-color:#3c4043!important}
+.mobile-editor-close{color:#bdc1c6!important}
+@media(max-width:640px){
+ .keep-header{padding:0 7px;gap:3px}
+ .keep-back-btn,.keep-menu-btn{flex-basis:34px;width:34px;height:34px;font-size:20px}
+ .keep-brand{min-width:88px;font-size:12px;letter-spacing:1px}
+ .keep-brand small{font-size:8px;letter-spacing:1.2px;margin-top:3px}
+ .keep-global-search{min-width:0;gap:4px;padding:0 7px}
+ .keep-header-actions{display:flex!important;margin-left:0!important}
+ .keep-header-actions button{display:flex!important;flex:0 0 34px;width:34px;height:34px;align-items:center;justify-content:center;font-size:19px}
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -393,10 +443,11 @@ if ('serviceWorker' in navigator) {
 <body>
 
 <header class="keep-header">
+  <button class="keep-back-btn" type="button" onclick="goBack()" aria-label="Back" title="Back">←</button>
   <button class="keep-menu-btn" type="button" onclick="toggleKeepSidebar()" aria-label="Toggle menu">☰</button>
-  <a class="keep-brand" href="javascript:history.back()" title="Back"><span class="keep-brand-mark">💡</span><span>Keep</span></a>
-  <div class="keep-global-search"><span class="keep-search-symbol">⌕</span><input id="search" type="search" placeholder="Search" oninput="renderNotes()" aria-label="Search notes"><button type="button" class="keep-search-clear" onclick="clearKeepSearch()" aria-label="Clear search">×</button></div>
-  <div class="keep-header-actions"><button type="button" title="Refresh" onclick="render()">↻</button><button type="button" title="List view" id="viewToggle" onclick="toggleKeepView()">▤</button><button type="button" title="Settings">⚙</button><span class="keep-avatar">S</span></div>
+  <div class="keep-brand"><span>SOIKAT</span><small>· NOTEPAD</small></div>
+  <div class="keep-global-search"><span class="keep-search-symbol">⌕</span><input id="search" type="text" placeholder="Search" oninput="renderNotes()" aria-label="Search notes"><button type="button" class="keep-search-clear" onclick="clearKeepSearch()" aria-label="Clear search">×</button></div>
+  <div class="keep-header-actions"><button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()">↻</button><button type="button" title="Toggle list view" aria-label="Toggle list view" id="viewToggle" onclick="toggleKeepView()">▤</button></div>
 </header>
 <main class="keep-layout" id="keepLayout">
   <aside class="keep-sidebar" id="keepSidebar"><nav class="keep-nav" aria-label="Keep navigation">
@@ -565,8 +616,28 @@ function setKeepActive(id){["navNotes","navReminders"].forEach(x=>document.getEl
 function showNotesView(){activeView="notes";document.getElementById("viewTitle").textContent="Notes";setKeepActive("navNotes");renderNotes();}
 function showRemindersView(){activeView="reminders";document.getElementById("viewTitle").textContent="Reminders";setKeepActive("navReminders");renderNotes();}
 function showTrashView(){openArchive();}
-function toggleKeepSidebar(){const layout=document.getElementById("keepLayout");if(window.matchMedia("(max-width:640px)").matches)layout.classList.toggle("sidebar-open");else layout.classList.toggle("sidebar-collapsed");}
-function toggleKeepView(){keepListView=!keepListView;document.getElementById("viewToggle").textContent=keepListView?"▦":"▤";renderNotes();}
+function toggleKeepSidebar(){
+ const layout=document.getElementById("keepLayout");
+ if(window.matchMedia("(max-width:640px)").matches){layout.classList.toggle("sidebar-open");return;}
+ const open=layout.classList.toggle("sidebar-collapsed")===false;
+ try{localStorage.setItem("soikat_notepad_sidebar_open",open?"1":"0");}catch(e){}
+}
+function applySavedSidebarState(){
+ const layout=document.getElementById("keepLayout");
+ if(!window.matchMedia("(max-width:640px)").matches){
+  let open=true;try{open=localStorage.getItem("soikat_notepad_sidebar_open")!=="0";}catch(e){}
+  layout.classList.toggle("sidebar-collapsed",!open);
+ }
+}
+function goBack(){if(document.getElementById("editorPanel").classList.contains("mobile-open")){closeMobileEditor();return;}if(document.getElementById("keepLayout").classList.contains("sidebar-open")){document.getElementById("keepLayout").classList.remove("sidebar-open");return;}if(history.length>1)history.back();}
+function refreshKeepNotes(){
+ const btn=document.querySelector(".keep-header-actions button[aria-label='Refresh']");
+ if(btn){btn.classList.remove("refreshing");void btn.offsetWidth;btn.classList.add("refreshing");}
+ try{load();}catch(e){}
+ render();
+ setTimeout(()=>btn?.classList.remove("refreshing"),650);
+}
+function toggleKeepView(){keepListView=!keepListView;document.getElementById("viewToggle").textContent=keepListView?"▦":"▤";document.getElementById("viewToggle").classList.toggle("active",keepListView);renderNotes();}
 function clearKeepSearch(){document.getElementById("search").value="";renderNotes();}
 function selectNote(id){
   draftMode=false;
@@ -1298,5 +1369,6 @@ render=function(){originalRenderAttachmentsHook();renderAttachments();};
 load();updateClock();setInterval(updateClock,1000);
 
 </script>
+<script>document.addEventListener("DOMContentLoaded",applySavedSidebarState);window.addEventListener("resize",applySavedSidebarState);</script>
 </body>
 </html>
