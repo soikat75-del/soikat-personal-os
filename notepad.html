@@ -297,73 +297,85 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 .editor-body.drag-over .drop-hint{display:flex}
 
 
-/* Google Keep-inspired responsive workspace */
-.keep-app{width:min(1600px,100%);margin:0 auto;padding:0;display:grid;grid-template-columns:248px minmax(0,1fr);gap:0;min-height:calc(100vh - 58px)}
-.keep-sidebar{height:calc(100vh - 58px);min-height:0;border:0;border-right:1px solid rgba(105,140,180,.16);border-radius:0;background:rgba(5,14,26,.78);box-shadow:none;padding:22px 12px;display:flex;flex-direction:column;gap:18px}
-.keep-new{height:48px;border-radius:24px;text-align:left;padding:0 20px;font-size:15px;background:linear-gradient(110deg,#2c83db,#6655d9);box-shadow:0 7px 20px rgba(59,117,255,.15)}
-.keep-new span{font-size:24px;margin-right:12px}
-.keep-nav{display:flex;flex-direction:column;gap:5px}
-.keep-nav-item{height:46px;border:0;border-radius:0 24px 24px 0;background:transparent;color:#a9bbd4;text-align:left;padding:0 18px;font-size:14px;display:flex;align-items:center;gap:18px;cursor:pointer}
-.keep-nav-item span{width:20px;text-align:center;font-size:19px;color:#8eacd4}
-.keep-nav-item:hover,.keep-nav-item.active{background:rgba(69,132,214,.17);color:#fff}
-.keep-nav-item.active{box-shadow:inset 3px 0 #5b9dff}
-.keep-sidebar-bottom{margin-top:auto}
-.keep-sidebar .search{margin:0;background:#091727}
-.keep-side-hint{padding:15px 10px 0;color:#637b9e;font-size:11px}
-.keep-main{min-width:0;padding:24px clamp(16px,3vw,46px) 30px;position:relative}
-.keep-main-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 auto 22px;max-width:1250px}
-.keep-view-title{font-size:22px;font-weight:600;color:#e9f1ff}
-.keep-search-mobile,.keep-mobile-new{display:none}
-.keep-note-board{max-width:1250px;margin:0 auto;columns:4 220px;column-gap:14px}
-.keep-card{display:inline-block;width:100%;break-inside:avoid;vertical-align:top;margin:0 0 14px;padding:15px 16px 12px;border:1px solid rgba(121,153,194,.26);border-radius:13px;background:linear-gradient(145deg,rgba(12,28,48,.96),rgba(7,19,33,.96));box-shadow:0 3px 12px rgba(0,0,0,.12);cursor:pointer;transition:border-color .18s,transform .18s,box-shadow .18s;min-height:90px}
-.keep-card:hover{border-color:#4b8bd0;box-shadow:0 8px 24px rgba(0,0,0,.22);transform:translateY(-1px)}
-.keep-card.active{border-color:#579cff}
-.keep-card-top{height:6px;display:flex;justify-content:flex-end;gap:8px}
-.keep-card .pin{position:static}
-.keep-card .note-title{font-size:16px;white-space:normal;overflow-wrap:anywhere;padding:0;margin:5px 0 9px}
-.keep-card-content{color:#c2d0e5;font-size:14px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:12;-webkit-box-orient:vertical;overflow:hidden}
-.keep-card-date{font-size:10px;color:#6f88ab;margin-top:13px}
-.keep-empty{min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7088aa;font-size:14px;gap:15px}
-.keep-empty span{font-size:52px;opacity:.45}
-.keep-app .editor{display:none;position:fixed;z-index:160;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 36px));height:min(82vh,760px);min-height:420px;padding:20px;border:1px solid #355477;border-radius:17px;background:#071321;box-shadow:0 25px 90px rgba(0,0,0,.65)}
-.keep-app .editor.mobile-open{display:flex;flex-direction:column}
-.keep-app .editor::before{content:"";position:fixed;z-index:-1;inset:-100vh -100vw;background:rgba(0,5,13,.68);backdrop-filter:blur(5px)}
-.keep-app .title-input{height:48px;font-size:20px;background:#091727}
-.keep-app .editor-body{flex:1;height:auto;min-height:0}
-.keep-app .content{font-size:16px}
-.keep-app .mobile-editor-close{display:flex;position:absolute;right:12px;top:12px;width:34px;height:34px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#b8c9e3;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:5}
-.keep-app .toolbar{margin:9px 0}
-.keep-app .current-date-box{margin-top:0}
-@media(max-width:1050px){.keep-note-board{columns:3 210px}}
-@media(max-width:760px){
- .topbar{height:54px;grid-template-columns:auto 1fr auto;padding:0 12px;gap:8px}
- .logo{font-size:11px;letter-spacing:1px;text-align:center;white-space:nowrap}
- .back{font-size:11px}.clock{font-size:9px}
- .keep-app{display:block;min-height:calc(100vh - 54px)}
- .keep-sidebar{display:none}
- .keep-main{padding:16px 12px 25px}
- .keep-main-head{margin-bottom:15px}
- .keep-view-title{font-size:20px}
- .keep-search-mobile{display:block;flex:1;max-width:230px}
- .keep-search-mobile input{width:100%;height:38px;border:1px solid #29476e;border-radius:20px;background:#091727;color:#fff;padding:0 13px;outline:0;font-size:13px}
- .keep-mobile-new{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:0;border-radius:50%;background:#347fd0;color:#fff;font-size:24px}
- .keep-note-board{columns:2 145px;column-gap:9px}
- .keep-card{padding:12px;margin-bottom:9px;border-radius:12px}
- .keep-card .note-title{font-size:14px}
- .keep-card-content{font-size:12px;line-height:1.45;-webkit-line-clamp:10}
- .keep-card-date{font-size:9px}
- .keep-app .editor{width:calc(100vw - 16px);height:calc(100dvh - 16px);max-height:none;min-height:0;top:8px;left:8px;transform:none;padding:12px;border-radius:14px;overflow:hidden}
- .keep-app .editor-body{min-height:0;padding:12px}
- .keep-app .title-input{height:44px;font-size:17px;padding:0 12px;padding-right:45px}
- .keep-app .toolbar{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto}
- .keep-app .current-date-box{flex:1;min-width:0}
- .keep-app .toolbar .spacer{display:none}
- .keep-app .feature-btn,.keep-app .toolbar .icon-btn{width:34px;height:34px;min-width:34px;flex:0 0 34px}
- .keep-app .file-add-btn{height:34px;min-width:34px;padding:0 7px}
- .keep-app .content{font-size:15px}
- footer{margin-top:18px}
+/* Google Keep-inspired responsive interface */
+:root{--keep-yellow:#fbbc04;--keep-ink:#202124;--keep-muted:#5f6368}
+body{margin:0!important;background:#fff!important;color:#202124!important;font-family:Roboto,Arial,sans-serif!important}
+.topbar{display:none!important}
+.keep-header{height:64px;position:sticky;top:0;z-index:80;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:18px;padding:0 22px;color:#5f6368}
+.keep-menu-btn,.keep-header-actions button{border:0;background:transparent;color:#5f6368;width:42px;height:42px;border-radius:50%;font-size:22px;cursor:pointer}
+.keep-menu-btn:hover,.keep-header-actions button:hover{background:#f1f3f4}
+.keep-brand{display:flex;align-items:center;gap:9px;min-width:190px;text-decoration:none;color:#5f6368;font-size:22px;font-weight:500}
+.keep-brand-mark{font-size:25px;color:#fbbc04}
+.keep-global-search{height:48px;max-width:720px;flex:1;display:flex;align-items:center;gap:12px;padding:0 15px;border-radius:9px;background:#f1f3f4}
+.keep-search-symbol{font-size:26px;color:#5f6368}
+.keep-global-search input{border:0;outline:0;background:transparent;flex:1;min-width:0;font-size:16px;color:#202124}
+.keep-search-clear{border:0;background:transparent;color:#5f6368;font-size:21px;cursor:pointer}
+.keep-header-actions{display:flex;align-items:center;gap:5px;margin-left:auto}
+.keep-header-actions button{font-size:20px}
+.keep-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#1a73e8;color:white;font-size:14px;margin-left:9px}
+.keep-layout{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:calc(100vh - 64px);transition:grid-template-columns .18s}
+.keep-sidebar{position:sticky;top:64px;height:calc(100vh - 64px);padding:10px 0 18px;background:#fff;display:flex;flex-direction:column;overflow:auto}
+.keep-nav{display:flex;flex-direction:column;gap:3px}
+.keep-nav-item{height:48px;margin-right:12px;border:0;border-radius:0 25px 25px 0;background:transparent;display:flex;align-items:center;gap:30px;padding:0 26px;color:#3c4043;font-size:14px;text-align:left;cursor:pointer}
+.keep-nav-item span{width:20px;text-align:center;color:#5f6368;font-size:19px}
+.keep-nav-item:hover{background:#f1f3f4}
+.keep-nav-item.active{background:#feefc3;color:#202124}
+.keep-nav-item.active span{color:#202124}
+.keep-label-head{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 25px 0 28px;color:#5f6368;font-size:10px;letter-spacing:1px;margin-top:8px}
+.keep-label-head button{border:0;background:transparent;color:#5f6368;font-size:20px}
+.keep-sidebar-footer{margin-top:auto;padding:15px 25px;color:#9aa0a6;font-size:10px;letter-spacing:1.2px}
+.keep-content{min-width:0;padding:24px clamp(18px,3vw,48px) 50px}
+.keep-mobile-title{display:none}
+.keep-take-note{display:flex;align-items:center;justify-content:space-between;width:min(600px,100%);height:56px;margin:0 auto 32px;padding:0 17px 0 20px;border:1px solid #dadce0;border-radius:8px;background:#fff;color:#5f6368;font-size:16px;text-align:left;box-shadow:0 2px 5px rgba(60,64,67,.22),0 1px 2px rgba(60,64,67,.12);cursor:text}
+.keep-take-note:hover{box-shadow:0 3px 8px rgba(60,64,67,.28)}
+.keep-take-actions{display:flex;align-items:center;gap:25px;color:#5f6368;font-size:21px}
+.keep-note-board{max-width:1500px;margin:0 auto;columns:5 220px;column-gap:16px}
+.keep-card{display:inline-block;vertical-align:top;break-inside:avoid;width:100%;margin:0 0 16px;padding:15px 16px 9px;border:1px solid #dadce0;border-radius:8px;background:var(--note-bg,#fff);color:#202124;box-shadow:none;cursor:pointer;transition:box-shadow .15s}
+.keep-card:hover{box-shadow:0 1px 4px rgba(60,64,67,.25)}
+.keep-card.active{border-color:#aeb4b9}
+.keep-card-actions{height:12px;display:flex;justify-content:flex-end;gap:8px;font-size:13px;color:#5f6368}
+.keep-card .note-title{font-size:16px;font-weight:500;line-height:1.4;margin:3px 0 10px;color:#202124;white-space:normal}
+.keep-card-content{font-size:14px;line-height:1.5;color:#202124;white-space:pre-wrap;overflow-wrap:anywhere;max-height:380px;overflow:hidden}
+.keep-card-bottom{height:27px;margin-top:9px;display:flex;align-items:center;justify-content:space-between;color:#80868b;font-size:10px}
+.keep-card-pin{font-size:17px;opacity:0}.keep-card:hover .keep-card-pin{opacity:1}
+.keep-note-board.list-view{columns:1}.keep-note-board.list-view .keep-card{max-width:700px}
+.keep-empty{min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;color:#80868b;font-size:14px}
+.keep-empty span{font-size:54px;opacity:.5}
+.keep-layout.sidebar-collapsed{grid-template-columns:72px minmax(0,1fr)}
+.keep-layout.sidebar-collapsed .keep-nav-item{font-size:0;gap:0;padding:0 25px}
+.keep-layout.sidebar-collapsed .keep-nav-item span{font-size:20px}
+.keep-layout.sidebar-collapsed .keep-label-head,.keep-layout.sidebar-collapsed .keep-sidebar-footer{display:none}
+.editor{display:none;position:fixed!important;z-index:200;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:min(600px,calc(100vw - 32px));height:min(82vh,720px);min-height:400px;background:#fff!important;color:#202124!important;border:1px solid #dadce0!important;border-radius:8px!important;box-shadow:0 8px 28px rgba(60,64,67,.3)!important;padding:17px!important}
+.editor.mobile-open{display:flex!important;flex-direction:column}
+.editor.mobile-open:before{content:"";position:fixed;z-index:-1;inset:-100vh -100vw;background:rgba(32,33,36,.45)}
+.title-input{background:transparent!important;color:#202124!important;border:0!important;font-size:18px!important}
+.editor-body{background:transparent!important;flex:1;min-height:0}
+.content{background:transparent!important;color:#202124!important;font-size:15px!important}
+.toolbar{border-top:1px solid #eee;padding-top:9px}
+.mobile-editor-close{display:block;position:absolute;right:12px;top:10px;border:0;background:transparent;color:#5f6368;font-size:24px;cursor:pointer}
+@media(max-width:1100px){.keep-note-board{columns:4 205px}}
+@media(max-width:850px){.keep-layout{grid-template-columns:220px minmax(0,1fr)}.keep-note-board{columns:3 190px}.keep-brand{min-width:130px}}
+@media(max-width:640px){
+ .keep-header{height:56px;padding:0 10px;gap:7px}.keep-menu-btn{width:36px;height:36px;font-size:19px}
+ .keep-brand{min-width:auto;font-size:19px;gap:5px}.keep-brand-mark{font-size:22px}
+ .keep-global-search{height:40px;padding:0 9px;gap:6px}.keep-global-search input{font-size:14px}
+ .keep-header-actions{gap:0}.keep-header-actions button{display:none}.keep-avatar{width:30px;height:30px;margin-left:2px}
+ .keep-layout{display:block;min-height:calc(100dvh - 56px)}
+ .keep-sidebar{position:fixed;z-index:100;left:0;top:56px;bottom:0;width:min(82vw,290px);height:auto;box-shadow:5px 0 25px rgba(60,64,67,.18);transform:translateX(-110%);transition:transform .2s}
+ .keep-layout.sidebar-open .keep-sidebar{transform:translateX(0)}
+ .keep-layout.sidebar-open:after{content:"";position:fixed;z-index:90;inset:56px 0 0;background:rgba(32,33,36,.25)}
+ .keep-content{padding:15px 12px 35px}.keep-mobile-title{display:flex;align-items:center;justify-content:space-between;margin:0 4px 14px;font-size:18px;font-weight:500}
+ .keep-mobile-title button{width:38px;height:38px;border:0;border-radius:50%;background:#f1f3f4;color:#5f6368;font-size:24px}
+ .keep-take-note{height:50px;margin-bottom:18px;padding:0 13px;font-size:14px}.keep-take-actions{gap:15px;font-size:18px}
+ .keep-note-board{columns:2 145px;column-gap:9px}.keep-card{padding:12px 12px 7px;margin-bottom:9px;border-radius:8px}
+ .keep-card .note-title{font-size:14px;margin:2px 0 8px}.keep-card-content{font-size:13px;line-height:1.45;max-height:300px}.keep-card-bottom{font-size:9px}
+ .editor{left:0!important;top:0!important;transform:none!important;width:100vw!important;height:100dvh!important;max-height:100dvh!important;min-height:0!important;border-radius:0!important;padding:14px!important}
+ .title-input{font-size:18px!important;padding-right:42px!important}.toolbar{display:flex;gap:7px;overflow-x:auto}
+ .toolbar .spacer{display:none}.current-date-box{flex:1;min-width:0}
+ .feature-btn,.toolbar .icon-btn{flex:0 0 36px;width:36px;height:36px}.file-add-btn{height:36px;min-width:36px}
+ .editor-body{padding:10px 3px!important}.content{font-size:15px!important}
 }
-@media(max-width:380px){.keep-note-board{columns:1}.keep-search-mobile{max-width:none}}
+@media(max-width:360px){.keep-note-board{columns:1}.keep-header{gap:4px}.keep-brand{font-size:17px}}
 
 </style>
 
@@ -380,62 +392,41 @@ if ('serviceWorker' in navigator) {
 </head>
 <body>
 
-<header class="topbar">
-  <a class="back" href="javascript:history.back()">← Back</a>
-  <div class="logo">SOIKAT · NOTEPAD</div>
-  <div class="clock" id="clock"></div>
+<header class="keep-header">
+  <button class="keep-menu-btn" type="button" onclick="toggleKeepSidebar()" aria-label="Toggle menu">☰</button>
+  <a class="keep-brand" href="javascript:history.back()" title="Back"><span class="keep-brand-mark">💡</span><span>Keep</span></a>
+  <div class="keep-global-search"><span class="keep-search-symbol">⌕</span><input id="search" type="search" placeholder="Search" oninput="renderNotes()" aria-label="Search notes"><button type="button" class="keep-search-clear" onclick="clearKeepSearch()" aria-label="Clear search">×</button></div>
+  <div class="keep-header-actions"><button type="button" title="Refresh" onclick="render()">↻</button><button type="button" title="List view" id="viewToggle" onclick="toggleKeepView()">▤</button><button type="button" title="Settings">⚙</button><span class="keep-avatar">S</span></div>
 </header>
-
-<main class="app keep-app">
-  <aside class="panel sidebar keep-sidebar">
-    <button class="new-btn keep-new" type="button" onclick="newNote()"><span>＋</span>New note</button>
-    <nav class="keep-nav" aria-label="Notepad navigation">
-      <button class="keep-nav-item active" id="navNotes" type="button" onclick="showNotesView()"> <span>▤</span> Notes</button>
-      <button class="keep-nav-item" id="navReminders" type="button" onclick="showRemindersView()"><span>♧</span> Reminders</button>
-      <button class="keep-nav-item" type="button" onclick="openArchive()"><span>▣</span> Archive</button>
-      <button class="keep-nav-item" type="button" onclick="showTrashView()"><span>⌫</span> Trash / Deleted</button>
-    </nav>
-    <div class="keep-sidebar-bottom">
-      <div class="search" id="searchBox">
-        <div class="search-icon">⌕</div>
-        <input id="search" type="text" placeholder="Search notes..." oninput="renderNotes()">
-      </div>
-      <div class="keep-side-hint">Your notes stay on this device</div>
-    </div>
-  </aside>
-
-  <section class="keep-main">
-    <div class="keep-main-head">
-      <div class="keep-view-title" id="viewTitle">Notes</div>
-      <div class="keep-search-mobile">
-        <input id="mobileSearch" type="search" placeholder="Search notes..." oninput="document.getElementById('search').value=this.value;renderNotes()">
-      </div>
-      <button class="keep-mobile-new" type="button" onclick="newNote()">＋</button>
-    </div>
+<main class="keep-layout" id="keepLayout">
+  <aside class="keep-sidebar" id="keepSidebar"><nav class="keep-nav" aria-label="Keep navigation">
+    <button class="keep-nav-item active" id="navNotes" type="button" onclick="showNotesView()"><span>▤</span> Notes</button>
+    <button class="keep-nav-item" id="navReminders" type="button" onclick="showRemindersView()"><span>♧</span> Reminders</button>
+    <div class="keep-label-head"><span>LABELS</span><button type="button" title="Edit labels">＋</button></div>
+    <button class="keep-nav-item" type="button" onclick="openArchive()"><span>▣</span> Archive</button>
+    <button class="keep-nav-item" type="button" onclick="showTrashView()"><span>⌫</span> Trash</button>
+  </nav><div class="keep-sidebar-footer">SOIKAT · NOTEPAD</div></aside>
+  <section class="keep-content">
+    <div class="keep-mobile-title"><span id="viewTitle">Notes</span><button type="button" onclick="newNote()" aria-label="Create note">＋</button></div>
+    <button class="keep-take-note" type="button" onclick="newNote()"><span>Take a note...</span><span class="keep-take-actions"><span>☑</span><span>✎</span><span>▧</span></span></button>
     <div class="keep-note-board" id="notes"></div>
-    <section class="panel editor" id="editorPanel" aria-label="Note editor">
-      <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
-      <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
-      <div class="toolbar">
-        <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
-        <div class="spacer"></div>
-        <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
-        <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
-        <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
-        <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
-      </div>
-      <div class="editor-body">
-        <button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
-        <div id="reminderDisplay" class="countdown-display" style="display:none"></div>
-        <div id="noteAttachments" class="attachments"></div>
-        <div class="drop-hint">DROP FILES TO ATTACH</div>
-        <textarea id="content" class="content" placeholder="Start writing..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
-        <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
-      </div>
-    </section>
+  </section>
+  <section class="panel editor" id="editorPanel" aria-label="Note editor">
+    <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
+    <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
+    <div class="toolbar"><div class="date-box current-date-box"><span>📆</span><span id="date"></span></div><div class="spacer"></div>
+      <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
+      <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
+      <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
+      <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
+    </div>
+    <div class="editor-body"><button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
+      <div id="reminderDisplay" class="countdown-display" style="display:none"></div><div id="noteAttachments" class="attachments"></div><div class="drop-hint">DROP FILES TO ATTACH</div>
+      <textarea id="content" class="content" placeholder="Take a note..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
+      <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
+    </div>
   </section>
 </main>
-
 <div class="feature-modal" id="reminderModal" onclick="closeFeatureModal(event,'reminderModal')">
   <div class="feature-box" onclick="event.stopPropagation()">
     <div class="feature-head">
@@ -556,28 +547,33 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 let activeView="notes";
+let keepListView=false;
 function renderNotes(){
-  const q=(document.getElementById("search")?.value||"").trim().toLowerCase();
-  const box=document.getElementById("notes");
-  let list=notes.filter(n=>(n.title+" "+n.content).toLowerCase().includes(q));
-  if(activeView==="reminders") list=list.filter(n=>!!n.reminder);
-  list.sort((a,b)=>(b.pinned-a.pinned)||((b.updated||"").localeCompare(a.updated||"")));
-  if(!list.length){box.innerHTML='<div class="keep-empty"><span>▤</span><div>'+(activeView==="reminders"?"No reminders yet":"Notes you add appear here")+'</div></div>';return}
-  box.innerHTML=list.map(n=>`
-    <article class="note keep-card ${n.id===currentId?"active":""}" onclick="selectNote('${n.id}')">
-      <div class="keep-card-top">${n.pinned?'<span class="pin">📌</span>':""}${n.reminder?'<span class="note-reminder-icon" title="Reminder set">🔔</span>':""}</div>
-      ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}
-      <div class="keep-card-content">${escapeHtml(n.content||"")}</div>
-      <div class="keep-card-date">${escapeHtml(n.updated||"")}</div>
-    </article>`).join("");
+ const q=(document.getElementById("search")?.value||"").trim().toLowerCase();
+ const box=document.getElementById("notes");
+ let list=notes.filter(n=>(String(n.title||"")+" "+String(n.content||"")).toLowerCase().includes(q));
+ if(activeView==="reminders")list=list.filter(n=>!!n.reminder);
+ list.sort((a,b)=>(Number(!!b.pinned)-Number(!!a.pinned))||((b.updated||"").localeCompare(a.updated||"")));
+ if(!list.length){box.innerHTML='<div class="keep-empty"><span>💡</span><div>'+(activeView==="reminders"?"No reminders":"Notes you add appear here")+'</div></div>';return}
+ box.innerHTML=list.map(n=>`<article class="note keep-card ${n.id===currentId?"active":""}" style="--note-bg:${escapeHtml(n.color||"#ffffff")}" onclick="selectNote('${String(n.id).replace(/'/g,"\\\\'")}')">
+ <div class="keep-card-actions">${n.pinned?'<span title="Pinned">📌</span>':""}${n.reminder?'<span title="Reminder">🔔</span>':""}</div>
+ ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}<div class="keep-card-content">${escapeHtml(n.content||"")}</div>
+ <div class="keep-card-bottom"><span>${escapeHtml(n.updated||"")}</span><span class="keep-card-pin">⋮</span></div></article>`).join("");
+ box.classList.toggle("list-view",keepListView);
 }
-function showNotesView(){activeView="notes";document.getElementById("viewTitle").textContent="Notes";document.getElementById("navNotes").classList.add("active");document.getElementById("navReminders").classList.remove("active");renderNotes();}
-function showRemindersView(){activeView="reminders";document.getElementById("viewTitle").textContent="Reminders";document.getElementById("navReminders").classList.add("active");document.getElementById("navNotes").classList.remove("active");renderNotes();}
+function setKeepActive(id){["navNotes","navReminders"].forEach(x=>document.getElementById(x)?.classList.toggle("active",x===id));document.getElementById("keepLayout")?.classList.remove("sidebar-open");}
+function showNotesView(){activeView="notes";document.getElementById("viewTitle").textContent="Notes";setKeepActive("navNotes");renderNotes();}
+function showRemindersView(){activeView="reminders";document.getElementById("viewTitle").textContent="Reminders";setKeepActive("navReminders");renderNotes();}
 function showTrashView(){openArchive();}
+function toggleKeepSidebar(){const layout=document.getElementById("keepLayout");if(window.matchMedia("(max-width:640px)").matches)layout.classList.toggle("sidebar-open");else layout.classList.toggle("sidebar-collapsed");}
+function toggleKeepView(){keepListView=!keepListView;document.getElementById("viewToggle").textContent=keepListView?"▦":"▤";renderNotes();}
+function clearKeepSearch(){document.getElementById("search").value="";renderNotes();}
 function selectNote(id){
   draftMode=false;
   currentId=id;
-  document.getElementById("editorPanel").classList.add("mobile-open");
+  if(window.innerWidth<=600){
+    document.getElementById("editorPanel").classList.add("mobile-open");
+  }
   render();
 }
 function current(){return notes.find(n=>n.id===currentId)}
@@ -659,7 +655,9 @@ function saveCurrent(){
 function newNote(){
   draftMode=true;
   currentId=null;
-  document.getElementById("editorPanel").classList.add("mobile-open");
+  if(window.innerWidth<=600){
+    document.getElementById("editorPanel").classList.add("mobile-open");
+  }
   document.getElementById("title").value="";
   document.getElementById("content").value="";
   document.getElementById("count").textContent="0";
