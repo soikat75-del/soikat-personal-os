@@ -296,6 +296,75 @@ footer{display:flex;align-items:center;justify-content:center;gap:35px;margin-to
 .drop-hint{display:none;position:absolute;inset:0;z-index:8;align-items:center;justify-content:center;background:rgba(4,13,26,.88);border:2px dashed #4b9cff;border-radius:12px;color:#dceaff;font-size:16px;font-weight:700;letter-spacing:1px;pointer-events:none}
 .editor-body.drag-over .drop-hint{display:flex}
 
+
+/* Google Keep-inspired responsive workspace */
+.keep-app{width:min(1600px,100%);margin:0 auto;padding:0;display:grid;grid-template-columns:248px minmax(0,1fr);gap:0;min-height:calc(100vh - 58px)}
+.keep-sidebar{height:calc(100vh - 58px);min-height:0;border:0;border-right:1px solid rgba(105,140,180,.16);border-radius:0;background:rgba(5,14,26,.78);box-shadow:none;padding:22px 12px;display:flex;flex-direction:column;gap:18px}
+.keep-new{height:48px;border-radius:24px;text-align:left;padding:0 20px;font-size:15px;background:linear-gradient(110deg,#2c83db,#6655d9);box-shadow:0 7px 20px rgba(59,117,255,.15)}
+.keep-new span{font-size:24px;margin-right:12px}
+.keep-nav{display:flex;flex-direction:column;gap:5px}
+.keep-nav-item{height:46px;border:0;border-radius:0 24px 24px 0;background:transparent;color:#a9bbd4;text-align:left;padding:0 18px;font-size:14px;display:flex;align-items:center;gap:18px;cursor:pointer}
+.keep-nav-item span{width:20px;text-align:center;font-size:19px;color:#8eacd4}
+.keep-nav-item:hover,.keep-nav-item.active{background:rgba(69,132,214,.17);color:#fff}
+.keep-nav-item.active{box-shadow:inset 3px 0 #5b9dff}
+.keep-sidebar-bottom{margin-top:auto}
+.keep-sidebar .search{margin:0;background:#091727}
+.keep-side-hint{padding:15px 10px 0;color:#637b9e;font-size:11px}
+.keep-main{min-width:0;padding:24px clamp(16px,3vw,46px) 30px;position:relative}
+.keep-main-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:0 auto 22px;max-width:1250px}
+.keep-view-title{font-size:22px;font-weight:600;color:#e9f1ff}
+.keep-search-mobile,.keep-mobile-new{display:none}
+.keep-note-board{max-width:1250px;margin:0 auto;columns:4 220px;column-gap:14px}
+.keep-card{display:inline-block;width:100%;break-inside:avoid;vertical-align:top;margin:0 0 14px;padding:15px 16px 12px;border:1px solid rgba(121,153,194,.26);border-radius:13px;background:linear-gradient(145deg,rgba(12,28,48,.96),rgba(7,19,33,.96));box-shadow:0 3px 12px rgba(0,0,0,.12);cursor:pointer;transition:border-color .18s,transform .18s,box-shadow .18s;min-height:90px}
+.keep-card:hover{border-color:#4b8bd0;box-shadow:0 8px 24px rgba(0,0,0,.22);transform:translateY(-1px)}
+.keep-card.active{border-color:#579cff}
+.keep-card-top{height:6px;display:flex;justify-content:flex-end;gap:8px}
+.keep-card .pin{position:static}
+.keep-card .note-title{font-size:16px;white-space:normal;overflow-wrap:anywhere;padding:0;margin:5px 0 9px}
+.keep-card-content{color:#c2d0e5;font-size:14px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:12;-webkit-box-orient:vertical;overflow:hidden}
+.keep-card-date{font-size:10px;color:#6f88ab;margin-top:13px}
+.keep-empty{min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7088aa;font-size:14px;gap:15px}
+.keep-empty span{font-size:52px;opacity:.45}
+.keep-app .editor{display:none;position:fixed;z-index:160;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 36px));height:min(82vh,760px);min-height:420px;padding:20px;border:1px solid #355477;border-radius:17px;background:#071321;box-shadow:0 25px 90px rgba(0,0,0,.65)}
+.keep-app .editor.mobile-open{display:flex;flex-direction:column}
+.keep-app .editor::before{content:"";position:fixed;z-index:-1;inset:-100vh -100vw;background:rgba(0,5,13,.68);backdrop-filter:blur(5px)}
+.keep-app .title-input{height:48px;font-size:20px;background:#091727}
+.keep-app .editor-body{flex:1;height:auto;min-height:0}
+.keep-app .content{font-size:16px}
+.keep-app .mobile-editor-close{display:flex;position:absolute;right:12px;top:12px;width:34px;height:34px;border:1px solid #29476e;border-radius:9px;background:#071525;color:#b8c9e3;align-items:center;justify-content:center;font-size:20px;cursor:pointer;z-index:5}
+.keep-app .toolbar{margin:9px 0}
+.keep-app .current-date-box{margin-top:0}
+@media(max-width:1050px){.keep-note-board{columns:3 210px}}
+@media(max-width:760px){
+ .topbar{height:54px;grid-template-columns:auto 1fr auto;padding:0 12px;gap:8px}
+ .logo{font-size:11px;letter-spacing:1px;text-align:center;white-space:nowrap}
+ .back{font-size:11px}.clock{font-size:9px}
+ .keep-app{display:block;min-height:calc(100vh - 54px)}
+ .keep-sidebar{display:none}
+ .keep-main{padding:16px 12px 25px}
+ .keep-main-head{margin-bottom:15px}
+ .keep-view-title{font-size:20px}
+ .keep-search-mobile{display:block;flex:1;max-width:230px}
+ .keep-search-mobile input{width:100%;height:38px;border:1px solid #29476e;border-radius:20px;background:#091727;color:#fff;padding:0 13px;outline:0;font-size:13px}
+ .keep-mobile-new{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:0;border-radius:50%;background:#347fd0;color:#fff;font-size:24px}
+ .keep-note-board{columns:2 145px;column-gap:9px}
+ .keep-card{padding:12px;margin-bottom:9px;border-radius:12px}
+ .keep-card .note-title{font-size:14px}
+ .keep-card-content{font-size:12px;line-height:1.45;-webkit-line-clamp:10}
+ .keep-card-date{font-size:9px}
+ .keep-app .editor{width:calc(100vw - 16px);height:calc(100dvh - 16px);max-height:none;min-height:0;top:8px;left:8px;transform:none;padding:12px;border-radius:14px;overflow:hidden}
+ .keep-app .editor-body{min-height:0;padding:12px}
+ .keep-app .title-input{height:44px;font-size:17px;padding:0 12px;padding-right:45px}
+ .keep-app .toolbar{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto}
+ .keep-app .current-date-box{flex:1;min-width:0}
+ .keep-app .toolbar .spacer{display:none}
+ .keep-app .feature-btn,.keep-app .toolbar .icon-btn{width:34px;height:34px;min-width:34px;flex:0 0 34px}
+ .keep-app .file-add-btn{height:34px;min-width:34px;padding:0 7px}
+ .keep-app .content{font-size:15px}
+ footer{margin-top:18px}
+}
+@media(max-width:380px){.keep-note-board{columns:1}.keep-search-mobile{max-width:none}}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -317,41 +386,53 @@ if ('serviceWorker' in navigator) {
   <div class="clock" id="clock"></div>
 </header>
 
-<main class="app">
-  <aside class="panel sidebar">
-    <div class="mobile-actions">
-      <button class="new-btn" type="button" onclick="newNote()"><span>＋</span>New Note</button>
-      <button class="search-toggle" type="button" aria-label="Search" onclick="toggleMobileSearch()">⌕</button>
-      <button type="button" class="archive-btn" onclick="openArchive()"><span>🗃️ &nbsp; Archive</span>🗃️</button>
+<main class="app keep-app">
+  <aside class="panel sidebar keep-sidebar">
+    <button class="new-btn keep-new" type="button" onclick="newNote()"><span>＋</span>New note</button>
+    <nav class="keep-nav" aria-label="Notepad navigation">
+      <button class="keep-nav-item active" id="navNotes" type="button" onclick="showNotesView()"> <span>▤</span> Notes</button>
+      <button class="keep-nav-item" id="navReminders" type="button" onclick="showRemindersView()"><span>♧</span> Reminders</button>
+      <button class="keep-nav-item" type="button" onclick="openArchive()"><span>▣</span> Archive</button>
+      <button class="keep-nav-item" type="button" onclick="showTrashView()"><span>⌫</span> Trash / Deleted</button>
+    </nav>
+    <div class="keep-sidebar-bottom">
+      <div class="search" id="searchBox">
+        <div class="search-icon">⌕</div>
+        <input id="search" type="text" placeholder="Search notes..." oninput="renderNotes()">
+      </div>
+      <div class="keep-side-hint">Your notes stay on this device</div>
     </div>
-    <div class="search" id="searchBox">
-      <div class="search-icon">⌕</div>
-      <input id="search" type="text" placeholder="Search notes..." oninput="renderNotes()">
-    </div>
-
-    <div class="notes" id="notes"></div>
   </aside>
 
-  <section class="panel editor" id="editorPanel">
-    <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
-    <input id="title" class="title-input" placeholder="Note title" oninput="saveCurrent()">
-    <div class="toolbar">
-      <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
-      <div class="spacer"></div>
-      <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
-      <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
-      
-      <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
-      <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
+  <section class="keep-main">
+    <div class="keep-main-head">
+      <div class="keep-view-title" id="viewTitle">Notes</div>
+      <div class="keep-search-mobile">
+        <input id="mobileSearch" type="search" placeholder="Search notes..." oninput="document.getElementById('search').value=this.value;renderNotes()">
+      </div>
+      <button class="keep-mobile-new" type="button" onclick="newNote()">＋</button>
     </div>
-    <div class="editor-body">
-      <button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
-      <div id="reminderDisplay" class="countdown-display" style="display:none"></div>
-      <div id="noteAttachments" class="attachments"></div>
-      <div class="drop-hint">DROP FILES TO ATTACH</div>
-      <textarea id="content" class="content" placeholder="Start writing..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
-      <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
-    </div>
+    <div class="keep-note-board" id="notes"></div>
+    <section class="panel editor" id="editorPanel" aria-label="Note editor">
+      <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
+      <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
+      <div class="toolbar">
+        <div class="date-box current-date-box"><span>📆</span><span id="date"></span></div>
+        <div class="spacer"></div>
+        <button type="button" id="attachFileBtn" class="file-add-btn" title="Attach files" aria-label="Attach files">📎</button><input type="file" id="noteFileInput" multiple accept=".html,.htm,.doc,.docx,.xls,.xlsx,.csv,.ods,.pdf,.txt,.rtf" hidden>
+        <button type="button" id="reminderBtn" class="feature-btn" title="Reminder" aria-label="Reminder">🔔</button>
+        <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
+        <button type="button" id="deleteBtn" class="tool-btn delete icon-btn" title="Delete" aria-label="Delete note">🗑️</button>
+      </div>
+      <div class="editor-body">
+        <button type="button" id="checklistBtn" class="editor-checklist-btn" title="Add Checklist" aria-label="Add Checklist">☑️</button>
+        <div id="reminderDisplay" class="countdown-display" style="display:none"></div>
+        <div id="noteAttachments" class="attachments"></div>
+        <div class="drop-hint">DROP FILES TO ATTACH</div>
+        <textarea id="content" class="content" placeholder="Start writing..." oninput="saveCurrent()" onkeydown="handleEditorEnter(event)"></textarea>
+        <div class="counter"><span id="count">0</span> characters · Last edited <span id="lastEdited">—</span></div>
+      </div>
+    </section>
   </section>
 </main>
 
@@ -474,24 +555,29 @@ function purgeExpiredArchive(){
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
+let activeView="notes";
 function renderNotes(){
-  const q=document.getElementById("search").value.trim().toLowerCase();
+  const q=(document.getElementById("search")?.value||"").trim().toLowerCase();
   const box=document.getElementById("notes");
   let list=notes.filter(n=>(n.title+" "+n.content).toLowerCase().includes(q));
+  if(activeView==="reminders") list=list.filter(n=>!!n.reminder);
   list.sort((a,b)=>(b.pinned-a.pinned)||((b.updated||"").localeCompare(a.updated||"")));
-  if(!list.length){box.innerHTML='<div class="empty">No notes found.</div>';return}
+  if(!list.length){box.innerHTML='<div class="keep-empty"><span>▤</span><div>'+(activeView==="reminders"?"No reminders yet":"Notes you add appear here")+'</div></div>';return}
   box.innerHTML=list.map(n=>`
-    <div class="note ${n.id===currentId?"active":""}" onclick="selectNote('${n.id}')">
-      <div class="note-title">${escapeHtml(n.title||"Untitled")}${n.reminder?'<span class="note-reminder-icon" title="Reminder set">🔔</span>':""}</div>
-      ${n.pinned?'<div class="pin">📌</div>':""}
-    </div>`).join("");
+    <article class="note keep-card ${n.id===currentId?"active":""}" onclick="selectNote('${n.id}')">
+      <div class="keep-card-top">${n.pinned?'<span class="pin">📌</span>':""}${n.reminder?'<span class="note-reminder-icon" title="Reminder set">🔔</span>':""}</div>
+      ${n.title?`<div class="note-title">${escapeHtml(n.title)}</div>`:""}
+      <div class="keep-card-content">${escapeHtml(n.content||"")}</div>
+      <div class="keep-card-date">${escapeHtml(n.updated||"")}</div>
+    </article>`).join("");
 }
+function showNotesView(){activeView="notes";document.getElementById("viewTitle").textContent="Notes";document.getElementById("navNotes").classList.add("active");document.getElementById("navReminders").classList.remove("active");renderNotes();}
+function showRemindersView(){activeView="reminders";document.getElementById("viewTitle").textContent="Reminders";document.getElementById("navReminders").classList.add("active");document.getElementById("navNotes").classList.remove("active");renderNotes();}
+function showTrashView(){openArchive();}
 function selectNote(id){
   draftMode=false;
   currentId=id;
-  if(window.innerWidth<=600){
-    document.getElementById("editorPanel").classList.add("mobile-open");
-  }
+  document.getElementById("editorPanel").classList.add("mobile-open");
   render();
 }
 function current(){return notes.find(n=>n.id===currentId)}
@@ -573,9 +659,7 @@ function saveCurrent(){
 function newNote(){
   draftMode=true;
   currentId=null;
-  if(window.innerWidth<=600){
-    document.getElementById("editorPanel").classList.add("mobile-open");
-  }
+  document.getElementById("editorPanel").classList.add("mobile-open");
   document.getElementById("title").value="";
   document.getElementById("content").value="";
   document.getElementById("count").textContent="0";
