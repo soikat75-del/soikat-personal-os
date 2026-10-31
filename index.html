@@ -1958,8 +1958,63 @@ document.querySelectorAll(".card").forEach(card => {
   const cancelBtn=document.getElementById("cancelBackupImport");
   const confirmBtn=document.getElementById("confirmBackupImport");
   if(!exportBtn||!importBtn||!fileInput||!status||!modal||!cancelBtn||!confirmBtn)return;
+
+  const ATTACH_DB_NAME="soikat_notepad_attachments_v1";
+  const ATTACH_STORE="files";
+  let attachDbPromise=null;
   let pendingBackup=null;
   let statusTimer=null;
+
+  function openAttachDb(){
+    if(attachDbPromise)return attachDbPromise;
+    attachDbPromise=new Promise((resolve,reject)=>{
+      if(!window.indexedDB){reject(new Error("IndexedDB unavailable"));return;}
+      const req=indexedDB.open(ATTACH_DB_NAME,1);
+      req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(ATTACH_STORE))db.createObjectStore(ATTACH_STORE,{keyPath:"id"});};
+      req.onsuccess=()=>resolve(req.result);
+      req.onerror=()=>reject(req.error||new Error("Could not open attachment database"));
+      req.onblocked=()=>reject(new Error("Attachment database is blocked"));
+    });
+    return attachDbPromise;
+  }
+  async function getAllAttachments(){
+    const db=await openAttachDb();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(ATTACH_STORE,"readonly");
+      const req=tx.objectStore(ATTACH_STORE).getAll();
+      req.onsuccess=()=>resolve(req.result||[]);
+      req.onerror=()=>reject(req.error||tx.error);
+    });
+  }
+  async function replaceAttachments(items){
+    const db=await openAttachDb();
+    return new Promise((resolve,reject)=>{
+      const tx=db.transaction(ATTACH_STORE,"readwrite");
+      const store=tx.objectStore(ATTACH_STORE);
+      store.clear();
+      for(const item of items)store.put(item);
+      tx.oncomplete=()=>resolve();
+      tx.onerror=()=>reject(tx.error||new Error("Could not restore attachments"));
+      tx.onabort=()=>reject(tx.error||new Error("Attachment restore was cancelled"));
+    });
+  }
+  function blobToBase64(blob){
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const result=String(reader.result||"");
+        resolve(result.substring(result.indexOf(",")+1));
+      };
+      reader.onerror=()=>reject(reader.error||new Error("Could not read attachment"));
+      reader.readAsDataURL(blob);
+    });
+  }
+  function base64ToBlob(base64,type){
+    const binary=atob(base64);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    return new Blob([bytes],{type:type||"application/octet-stream"});
+  }
   function setStatus(message,type="success",duration=2600){
     status.textContent=message;
     status.hidden=false;
@@ -1969,25 +2024,34 @@ document.querySelectorAll(".card").forEach(card => {
     statusTimer=setTimeout(()=>{status.classList.remove("show");},duration);
   }
   function closeModal(){modal.classList.remove("open");pendingBackup=null;}
-  function openModal(){modal.classList.add("open");confirmBtn.focus();}
+  function openModal(){modal.classList.add("open");}
 
-  exportBtn.addEventListener("click",()=>{
+  exportBtn.addEventListener("click",async()=>{
+    exportBtn.disabled=true;
     try{
       const data={};
       for(let i=0;i<localStorage.length;i++){
         const key=localStorage.key(i);
         if(key!==null)data[key]=localStorage.getItem(key);
       }
-      const backup={format:"SOIKAT_PERSONAL_OS_BACKUP",version:1,exportedAt:new Date().toISOString(),origin:location.origin,storage:data};
-      const blob=new Blob([JSON.stringify(backup,null,2)],{type:"application/json"});
+      const storedFiles=await getAllAttachments();
+      const attachments=[];
+      for(const item of storedFiles){
+        if(!item || !item.blob)continue;
+        attachments.push({id:String(item.id),noteId:String(item.noteId),name:String(item.name||"file"),type:String(item.type||"application/octet-stream"),size:Number(item.size||item.blob.size||0),addedAt:Number(item.addedAt||Date.now()),data:await blobToBase64(item.blob)});
+      }
+      const backup={format:"SOIKAT_PERSONAL_OS_BACKUP",version:2,exportedAt:new Date().toISOString(),origin:location.origin,storage:data,attachments};
+      const blob=new Blob([JSON.stringify(backup)],{type:"application/json"});
       const url=URL.createObjectURL(blob);
       const link=document.createElement("a");
       link.href=url;
       link.download=`soikat-personal-os-backup-${new Date().toISOString().slice(0,10)}.json`;
+      link.style.display="none";
       document.body.appendChild(link);link.click();link.remove();
-      setTimeout(()=>URL.revokeObjectURL(url),1000);
-      setStatus("Export complete.");
-    }catch(error){setStatus("Export failed. Check browser storage permissions.","error");}
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+      setStatus(`Export complete. ${attachments.length} attached file(s) included.`);
+    }catch(error){console.error("Backup export failed:",error);setStatus("Export failed. Check browser storage permissions and available space.","error");}
+    finally{exportBtn.disabled=false;}
   });
 
   importBtn.addEventListener("click",()=>fileInput.click());
@@ -2003,28 +2067,39 @@ document.querySelectorAll(".card").forEach(card => {
       if(!parsed||parsed.format!=="SOIKAT_PERSONAL_OS_BACKUP"||!parsed.storage||typeof parsed.storage!=="object"||Array.isArray(parsed.storage))throw new Error("invalid backup");
       const entries=Object.entries(parsed.storage);
       for(const [key,value] of entries){if(typeof key!=="string"||typeof value!=="string")throw new Error("invalid storage entry");}
-      pendingBackup=entries;
+      let attachments=null;
+      if(Array.isArray(parsed.attachments)){
+        attachments=parsed.attachments.map(item=>{
+          if(!item||typeof item.id!=="string"||typeof item.noteId!=="string"||typeof item.name!=="string"||typeof item.data!=="string")throw new Error("invalid attachment entry");
+          return {id:item.id,noteId:item.noteId,name:item.name,type:String(item.type||"application/octet-stream"),size:Number(item.size||0),addedAt:Number(item.addedAt||Date.now()),blob:base64ToBlob(item.data,item.type)};
+        });
+      } else if(Number(parsed.version)>=2) throw new Error("missing attachment data");
+      pendingBackup={entries,attachments};
       openModal();
-    }catch(error){setStatus("Import failed: the selected file is not a valid backup.","error");fileInput.value="";}
+    }catch(error){console.error("Backup import validation failed:",error);setStatus("Import failed: the selected file is not a valid backup.","error");fileInput.value="";}
   });
 
-  confirmBtn.addEventListener("click",()=>{
+  confirmBtn.addEventListener("click",async()=>{
     if(!pendingBackup)return;
-    const entries=pendingBackup;
-    // Keep an in-memory rollback copy so a failed restore does not leave a partial import.
+    confirmBtn.disabled=true;
+    const {entries,attachments}=pendingBackup;
     const previous={};
     for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key!==null)previous[key]=localStorage.getItem(key);}
+    let previousAttachments=null;
     try{
+      if(attachments!==null){previousAttachments=await getAllAttachments();await replaceAttachments(attachments);}
       localStorage.clear();
       for(const [key,value] of entries)localStorage.setItem(key,value);
       closeModal();fileInput.value="";
-      setStatus("Import successful.","success",1800);
-      // Give the success toast time to be seen before refreshing the dashboard.
-      setTimeout(()=>location.reload(),1800);
+      const count=attachments===null?null:attachments.length;
+      setStatus(count===null?"Import successful.":`Import successful. ${count} attached file(s) restored.`,"success",2000);
+      setTimeout(()=>location.reload(),2000);
     }catch(error){
-      try{localStorage.clear();for(const [key,value] of Object.entries(previous))localStorage.setItem(key,value);}catch(rollbackError){}
+      console.error("Backup import failed:",error);
+      try{localStorage.clear();for(const [key,value] of Object.entries(previous))localStorage.setItem(key,value);}catch(rollbackError){console.error("Local data rollback failed:",rollbackError);}
+      if(previousAttachments!==null){try{await replaceAttachments(previousAttachments);}catch(rollbackError){console.error("Attachment rollback failed:",rollbackError);}}
       closeModal();fileInput.value="";setStatus("Import failed. Existing data was restored where possible.","error");
-    }
+    }finally{confirmBtn.disabled=false;}
   });
 })();
 
