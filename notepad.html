@@ -2749,14 +2749,28 @@ load();updateClock();setInterval(updateClock,1000);
 
 
 <script>
+let ignoreNextCardClickAfterClose=false;
 document.addEventListener("pointerdown",function(e){
  const panel=document.getElementById("editorPanel");
  if(!panel||!panel.classList.contains("mobile-open"))return;
  if(panel.contains(e.target))return;
  const clickedCard=e.target.closest(".keep-card");
- // Do not rebuild the board on a card click: preserve the click target so
- // its normal click handler opens the next note immediately.
- closeMobileEditor(!!clickedCard);
+ if(clickedCard){
+   ignoreNextCardClickAfterClose=true;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   closeMobileEditor(false);
+   return;
+ }
+ closeMobileEditor(false);
+},true);
+document.addEventListener("click",function(e){
+ if(!ignoreNextCardClickAfterClose)return;
+ const card=e.target.closest(".keep-card");
+ if(!card)return;
+ ignoreNextCardClickAfterClose=false;
+ e.preventDefault();
+ e.stopImmediatePropagation();
 },true);
 
 <script>
@@ -2799,5 +2813,7 @@ function editedDateLabel(value){
 })();
 </script>
 
-</body>
+document.addEventListener("pointerdown",function(e){
+ if(!e.target.closest(".keep-card"))ignoreNextCardClickAfterClose=false;
+},false);\n</body>
 </html>
