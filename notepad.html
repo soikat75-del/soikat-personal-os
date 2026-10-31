@@ -1683,6 +1683,10 @@ html.keep-editor-active,html.keep-editor-active body{overflow:auto!important}
   .keep-note-board:not(.list-view) .keep-card{margin-bottom:10px!important}
 }
 
+
+/* Quick-switch cleanup: the editor has no separate top-right X control. */
+.editor .mobile-editor-close{display:none!important}
+
 </style>
 </style>
 
@@ -1723,7 +1727,6 @@ if ('serviceWorker' in navigator) {
     <div class="keep-note-board" id="notes"></div>
   </section>
   <section class="panel editor" id="editorPanel" aria-label="Note editor">
-    <button type="button" class="mobile-editor-close" onclick="closeMobileEditor()" aria-label="Close">×</button>
     <div class="keep-title-row">
       <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
       <button type="button" id="pinBtn" class="tool-btn pin-btn icon-btn" title="Pin" aria-label="Pin note"><span id="pinIcon">📌</span></button>
@@ -2554,7 +2557,7 @@ function toggleMobileSearch(){
     document.getElementById("search").focus();
   }
 }
-function closeMobileEditor(){
+function closeMobileEditor(skipBoardRender=false){
   const panel=document.getElementById("editorPanel");
   if(!panel)return;
   panel.classList.remove("mobile-open","keep-existing-open","new-note-inline");
@@ -2563,7 +2566,7 @@ function closeMobileEditor(){
     draftMode=false;
     currentId=null;
   }
-  renderNotes();
+  if(!skipBoardRender)renderNotes();
 }
 
 function updateClock(){
@@ -2746,29 +2749,15 @@ load();updateClock();setInterval(updateClock,1000);
 
 
 <script>
-let suppressCardClickAfterEditorClose=false;
 document.addEventListener("pointerdown",function(e){
  const panel=document.getElementById("editorPanel");
  if(!panel||!panel.classList.contains("mobile-open"))return;
  if(panel.contains(e.target))return;
- const outsideCard=e.target.closest(".keep-card");
- closeMobileEditor();
- if(outsideCard){
-   /* Clicking another card while the editor is open only dismisses the
-      current editor; it must not open the card underneath on the same click. */
-   suppressCardClickAfterEditorClose=true;
-   e.preventDefault();
-   e.stopImmediatePropagation();
- }
+ const clickedCard=e.target.closest(".keep-card");
+ // Do not rebuild the board on a card click: preserve the click target so
+ // its normal click handler opens the next note immediately.
+ closeMobileEditor(!!clickedCard);
 },true);
-document.addEventListener("click",function(e){
- if(!suppressCardClickAfterEditorClose)return;
- if(!e.target.closest(".keep-card"))return;
- suppressCardClickAfterEditorClose=false;
- e.preventDefault();
- e.stopImmediatePropagation();
-},true);
-</script>
 
 <script>
 function autoGrowNote(){
