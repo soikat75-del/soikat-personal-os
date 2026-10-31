@@ -1470,7 +1470,8 @@ body::after{
   transition:opacity .22s ease,transform .22s ease,visibility .22s;
   pointer-events:none;
 }
-.backup-status.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.backup-status.show{opacity:1;visibility:visible;transform:translate(-50%,0);animation:backupStatusPop .38s cubic-bezier(.2,.85,.25,1.25) both}
+@keyframes backupStatusPop{0%{opacity:0;transform:translate(-50%,12px) scale(.92)}70%{transform:translate(-50%,0) scale(1.035)}100%{opacity:1;transform:translate(-50%,0) scale(1)}}
 .backup-status.error{border-color:#fff;background:#fff;color:#000}
 @media(max-width:600px){.backup-status{bottom:16px;padding:10px 14px;font-size:11px}}
 
@@ -1492,7 +1493,7 @@ body::after{
  .backup-btn{min-height:27px;padding:5px 10px;font-size:9px}
  .backup-dialog{padding:22px 18px 18px;border-radius:16px}
 }
-@media(prefers-reduced-motion:reduce){.backup-dialog{animation:none}.backup-btn,.backup-status{transition:none}}
+@media(prefers-reduced-motion:reduce){.backup-dialog,.backup-status.show{animation:none}.backup-btn,.backup-status{transition:none}}
 
 
 /* ================= PIXEL ARCADE CARD ================= */
@@ -2049,7 +2050,7 @@ document.querySelectorAll(".card").forEach(card => {
       link.style.display="none";
       document.body.appendChild(link);link.click();link.remove();
       setTimeout(()=>URL.revokeObjectURL(url),30000);
-      setStatus(`Export complete. ${attachments.length} attached file(s) included.`);
+      setStatus("Export complete ✓");
     }catch(error){console.error("Backup export failed:",error);setStatus("Export failed. Check browser storage permissions and available space.","error");}
     finally{exportBtn.disabled=false;}
   });
@@ -2092,7 +2093,7 @@ document.querySelectorAll(".card").forEach(card => {
       for(const [key,value] of entries)localStorage.setItem(key,value);
       closeModal();fileInput.value="";
       const count=attachments===null?null:attachments.length;
-      setStatus(count===null?"Import successful.":`Import successful. ${count} attached file(s) restored.`,"success",2000);
+      setStatus("Import complete ✓","success",2000);
       setTimeout(()=>location.reload(),2000);
     }catch(error){
       console.error("Backup import failed:",error);
