@@ -2746,14 +2746,27 @@ load();updateClock();setInterval(updateClock,1000);
 
 
 <script>
+let suppressCardClickAfterEditorClose=false;
 document.addEventListener("pointerdown",function(e){
  const panel=document.getElementById("editorPanel");
  if(!panel||!panel.classList.contains("mobile-open"))return;
  if(panel.contains(e.target))return;
- /* A note-card click must reach its click handler; closing here would
-    re-render the board during pointerdown and swallow that click. */
- if(e.target.closest(".keep-card"))return;
+ const outsideCard=e.target.closest(".keep-card");
  closeMobileEditor();
+ if(outsideCard){
+   /* Clicking another card while the editor is open only dismisses the
+      current editor; it must not open the card underneath on the same click. */
+   suppressCardClickAfterEditorClose=true;
+   e.preventDefault();
+   e.stopImmediatePropagation();
+ }
+},true);
+document.addEventListener("click",function(e){
+ if(!suppressCardClickAfterEditorClose)return;
+ if(!e.target.closest(".keep-card"))return;
+ suppressCardClickAfterEditorClose=false;
+ e.preventDefault();
+ e.stopImmediatePropagation();
 },true);
 </script>
 
