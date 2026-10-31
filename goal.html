@@ -1398,25 +1398,66 @@ if ('serviceWorker' in navigator) {
     width:100% !important;
     height:100% !important;
     min-height:100% !important;
+    margin:0 !important;
     overflow:hidden !important;
     overscroll-behavior:none !important;
   }
   body { position:fixed !important; inset:0 !important; }
+
+  /* Hide every original page element, including hover/click targets and scroll content. */
+  body * {
+    visibility:hidden !important;
+    pointer-events:none !important;
+  }
+
+  /* Restore only the existing header and footer. */
+  .topbar, .topbar *,
+  header, header *,
+  footer, footer * {
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+  .topbar, header {
+    position:fixed !important;
+    top:0 !important; left:0 !important; right:0 !important;
+    z-index:1102 !important;
+    background:rgba(7,11,20,.96) !important;
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+  footer {
+    position:fixed !important;
+    left:0 !important; right:0 !important; bottom:0 !important;
+    z-index:1102 !important;
+    margin:0 !important;
+    padding:12px 10px !important;
+    background:rgba(7,11,20,.96) !important;
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+  }
+
+  /* The pause screen is the only visible page content besides header/footer. */
   #project-pause-screen {
     position:fixed !important;
     inset:0 !important;
-    z-index:1050 !important;
+    z-index:1100 !important;
     display:flex !important;
     flex-direction:column;
     align-items:center;
     justify-content:center;
     gap:14px;
-    padding:20px;
-    background:radial-gradient(circle at 50% 45%, rgba(38,57,88,.25), transparent 42%), #070b14;
+    padding:72px 20px 60px;
+    box-sizing:border-box;
+    background:radial-gradient(circle at 50% 45%, rgba(38,57,88,.25), transparent 42%), #070b14 !important;
     color:#edf3ff;
     text-align:center;
     font-family:Inter,Segoe UI,Arial,sans-serif;
-    pointer-events:none;
+    visibility:visible !important;
+    pointer-events:auto !important;
+  }
+  #project-pause-screen * {
+    visibility:visible !important;
+    pointer-events:none !important;
   }
   #project-pause-screen .pause-main {
     font:700 clamp(24px,5vw,42px)/1.2 system-ui,sans-serif;
@@ -1437,29 +1478,6 @@ if ('serviceWorker' in navigator) {
     width:1.5em;
     text-align:left;
     animation:pauseDots 1.5s steps(4,end) infinite;
-  }
-  /* Keep only the original header and footer visible above the full-screen pause layer. */
-  .topbar, header {
-    position:fixed !important;
-    top:0 !important;
-    left:0 !important;
-    right:0 !important;
-    z-index:1100 !important;
-    background:rgba(7,11,20,.88) !important;
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-  }
-  footer {
-    position:fixed !important;
-    left:0 !important;
-    right:0 !important;
-    bottom:0 !important;
-    z-index:1100 !important;
-    margin:0 !important;
-    padding:12px 10px !important;
-    background:rgba(7,11,20,.92) !important;
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
   }
   @keyframes pauseFloat {0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   @keyframes pauseGlow {0%,100%{text-shadow:0 0 8px rgba(255,255,255,.08);opacity:.82}50%{text-shadow:0 0 24px rgba(255,255,255,.28);opacity:1}}
