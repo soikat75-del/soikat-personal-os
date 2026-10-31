@@ -826,7 +826,7 @@ body::before,body::after{display:none!important}
 /* Google Keep behavior: expand the composer in place, not as a modal */
 .keep-content{position:relative!important}
 .keep-take-note{display:flex!important}
-.keep-content:has(#editorPanel.mobile-open) .keep-take-note{display:none!important}
+.keep-content:has(#editorPanel.mobile-open) .keep-take-note{display:flex!important}
 .keep-content .editor{
   display:none!important;position:relative!important;inset:auto!important;
   left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
@@ -1687,6 +1687,82 @@ html.keep-editor-active,html.keep-editor-active body{overflow:auto!important}
 /* Quick-switch cleanup: the editor has no separate top-right X control. */
 .editor .mobile-editor-close{display:none!important}
 
+
+/* Real viewport backdrop: blur the page behind the note, never the note itself. */
+.keep-editor-backdrop{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  background:rgba(0,0,0,.16);
+  -webkit-backdrop-filter:blur(5px);
+  backdrop-filter:blur(5px);
+  pointer-events:none;
+}
+body:has(#editorPanel.mobile-open) .keep-editor-backdrop{display:block!important}
+
+
+/* Editor layout: action toolbar stays pinned at the bottom; only note text scrolls. */
+.keep-content .editor.keep-existing-open.mobile-open{
+  display:flex!important;
+  flex-direction:column!important;
+  height:auto!important;
+  max-height:88dvh!important;
+  overflow:hidden!important;
+  box-sizing:border-box!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .title-input,
+.keep-content .editor.keep-existing-open.mobile-open .keep-title-row{
+  flex:0 0 auto!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .editor-body{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .editor-body::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .editor-body .content{
+  display:block!important;
+  height:auto!important;
+  min-height:52px!important;
+  max-height:none!important;
+  overflow:visible!important;
+  flex:0 0 auto!important;
+  field-sizing:content!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .toolbar{
+  flex:0 0 auto!important;
+  margin-top:auto!important;
+  padding-top:12px!important;
+  overflow:visible!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .editor-footer{
+  flex:0 0 auto!important;
+}
+
+
+/* Pin button: keep it at the far-right edge of the note title row. */
+.keep-content .editor.keep-existing-open.mobile-open .keep-title-row{
+  position:relative!important;
+  padding-right:54px!important;
+}
+.keep-content .editor.keep-existing-open.mobile-open .keep-title-row #pinBtn{
+  position:absolute!important;
+  right:12px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+}
+
 </style>
 </style>
 
@@ -1726,6 +1802,7 @@ if ('serviceWorker' in navigator) {
     <button class="keep-take-note" type="button" onclick="newNote()"><span>Take a note...</span><span class="keep-take-actions"><span>☑</span><span>✎</span><span>▧</span></span></button>
     <div class="keep-note-board" id="notes"></div>
   </section>
+  <div class="keep-editor-backdrop" aria-hidden="true"></div>
   <section class="panel editor" id="editorPanel" aria-label="Note editor">
     <div class="keep-title-row">
       <input id="title" class="title-input" placeholder="Title" oninput="saveCurrent()">
