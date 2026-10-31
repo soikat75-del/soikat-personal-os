@@ -427,6 +427,25 @@ body::before,body::after{display:none!important}
  .keep-header-actions button{display:flex!important;flex:0 0 34px;width:34px;height:34px;align-items:center;justify-content:center;font-size:19px}
 }
 
+
+.keep-mobile-search-btn{display:none!important}
+@media(max-width:640px){
+ .keep-mobile-search-btn{display:flex!important}
+ .keep-global-search{display:none!important}
+ .keep-header.mobile-search-open .keep-brand{display:none!important}
+ .keep-header.mobile-search-open .keep-global-search{
+   display:flex!important;position:absolute;left:9px;right:9px;top:8px;z-index:3;
+   height:40px;max-width:none;width:auto;box-sizing:border-box;
+   background:#303134!important;border:1px solid #5f6368!important;
+   border-radius:9px;padding:0 10px;gap:8px
+ }
+ .keep-header.mobile-search-open .keep-global-search input{display:block!important}
+ .keep-header.mobile-search-open .keep-back-btn,
+ .keep-header.mobile-search-open .keep-menu-btn{visibility:hidden}
+ .keep-header.mobile-search-open .keep-header-actions{margin-left:auto!important;position:relative;z-index:4}
+ .keep-header.mobile-search-open .keep-mobile-search-btn{background:#3c4043!important}
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -445,9 +464,9 @@ if ('serviceWorker' in navigator) {
 <header class="keep-header">
   <button class="keep-back-btn" type="button" onclick="goBack()" aria-label="Back" title="Back">←</button>
   <button class="keep-menu-btn" type="button" onclick="toggleKeepSidebar()" aria-label="Toggle menu">☰</button>
-  <div class="keep-brand"><span>SOIKAT</span><small>· NOTEPAD</small></div>
+  <div class="keep-brand"><span>SOIKAT</span><small>NOTEPAD</small></div>
   <div class="keep-global-search"><span class="keep-search-symbol">⌕</span><input id="search" type="text" placeholder="Search" oninput="renderNotes()" aria-label="Search notes"><button type="button" class="keep-search-clear" onclick="clearKeepSearch()" aria-label="Clear search">×</button></div>
-  <div class="keep-header-actions"><button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()">↻</button><button type="button" title="Toggle list view" aria-label="Toggle list view" id="viewToggle" onclick="toggleKeepView()">▤</button></div>
+  <div class="keep-header-actions"><button type="button" class="keep-mobile-search-btn" title="Search" aria-label="Search" onclick="toggleKeepHeaderSearch()">⌕</button><button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()">↻</button><button type="button" title="Toggle list view" aria-label="Toggle list view" id="viewToggle" onclick="toggleKeepView()">▤</button></div>
 </header>
 <main class="keep-layout" id="keepLayout">
   <aside class="keep-sidebar" id="keepSidebar"><nav class="keep-nav" aria-label="Keep navigation">
@@ -456,7 +475,7 @@ if ('serviceWorker' in navigator) {
     <div class="keep-label-head"><span>LABELS</span><button type="button" title="Edit labels">＋</button></div>
     <button class="keep-nav-item" type="button" onclick="openArchive()"><span>▣</span> Archive</button>
     <button class="keep-nav-item" type="button" onclick="showTrashView()"><span>⌫</span> Trash</button>
-  </nav><div class="keep-sidebar-footer">SOIKAT · NOTEPAD</div></aside>
+  </nav><div class="keep-sidebar-footer">SOIKAT NOTEPAD</div></aside>
   <section class="keep-content">
     <div class="keep-mobile-title"><span id="viewTitle">Notes</span><button type="button" onclick="newNote()" aria-label="Create note">＋</button></div>
     <button class="keep-take-note" type="button" onclick="newNote()"><span>Take a note...</span><span class="keep-take-actions"><span>☑</span><span>✎</span><span>▧</span></span></button>
@@ -1189,6 +1208,19 @@ function checkReminders(){
   if(changed){
     persist();
     renderNotes();
+  }
+}
+
+function toggleKeepHeaderSearch(){
+  if(window.innerWidth>640)return;
+  const header=document.querySelector(".keep-header");
+  if(!header)return;
+  const opening=!header.classList.contains("mobile-search-open");
+  header.classList.toggle("mobile-search-open",opening);
+  if(opening){
+    setTimeout(()=>document.getElementById("search")?.focus(),30);
+  }else{
+    document.getElementById("search")?.blur();
   }
 }
 
