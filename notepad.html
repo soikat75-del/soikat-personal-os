@@ -2024,7 +2024,7 @@ function selectNote(id){
   // Fetch attachments again after the selected note is rendered and visible.
   renderAttachments(id);
   requestAnimationFrame(()=>renderAttachments(id));
-  setTimeout(()=>renderAttachments(id),250);
+  setTimeout(()=>renderAttachments(id),300);
   const note=current();
   const editedEl=document.getElementById("editorEditedLabel");
   if(editedEl)editedEl.textContent=note?.updated ? editedDateLabel(note.updated) : "";
@@ -2761,16 +2761,16 @@ function openAttachDb(){
 async function attachmentTx(mode, action){
   const db=await openAttachDb();
   return new Promise((resolve,reject)=>{
-    const tx=db.transaction(ATTACH_STORE,mode);
-    const store=tx.objectStore(ATTACH_STORE);
-    let req=null, result;
+    let tx, req=null, result;
     try{
-      req=action(store);
+      tx=db.transaction(ATTACH_STORE,mode);
+      req=action(tx.objectStore(ATTACH_STORE));
       if(req)req.onsuccess=()=>{result=req.result;};
-    }catch(e){reject(e);return;}
-    tx.oncomplete=()=>resolve(result);
-    tx.onerror=()=>reject(tx.error||new Error("Attachment transaction failed"));
-    tx.onabort=()=>reject(tx.error||new Error("Attachment transaction aborted"));
+      tx.oncomplete=()=>resolve(result);
+      tx.onerror=()=>reject(tx.error||new Error("Attachment transaction failed"));
+      tx.onabort=()=>reject(tx.error||new Error("Attachment transaction aborted"));
+      if(req)req.onerror=()=>reject(req.error||new Error("Attachment request failed"));
+    }catch(e){reject(e);}
   });
 }
 function fileIcon(name){
@@ -2785,16 +2785,24 @@ let attachmentRenderToken=0;
 async function renderAttachments(targetNoteId){
   const wrap=document.getElementById("noteAttachments");
   if(!wrap)return;
-  const noteId=String(targetNoteId ?? current()?.id ?? "");
-  if(!noteId){wrap.innerHTML="";return;}
+  const note=current();
+  const noteId=String(targetNoteId ?? note?.id ?? "");
+  if(!noteId)return;
   const token=++attachmentRenderToken;
-  let items=[];
-  try{items=await attachmentTx("readonly",s=>s.getAll())||[];}
-  catch(e){console.warn("Attachment storage unavailable",e);return;}
-  if(token!==attachmentRenderToken || String(current()?.id ?? "")!==noteId)return;
+  let items;
+  try{
+    items=await attachmentTx("readonly",store=>store.getAll());
+  }catch(e){
+    console.error("Could not read saved note attachments:",e);
+    return;
+  }
+  if(token!==attachmentRenderToken)return;
+  const selected=current();
+  if(!selected || String(selected.id)!==noteId)return;
 
+  const matches=items.filter(file=>String(file.noteId)===noteId);
   const fragment=document.createDocumentFragment();
-  items.filter(f=>String(f.noteId)===noteId).forEach(f=>{
+  for(const f of matches){
     const chip=document.createElement("div");chip.className="attachment-chip";
     const icon=document.createElement("span");icon.className="attachment-icon";icon.textContent=fileIcon(f.name);
     const name=document.createElement("span");name.className="attachment-name";name.textContent=f.name;name.title=f.name;
@@ -2805,9 +2813,13 @@ async function renderAttachments(targetNoteId){
       document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);
     });
     const remove=document.createElement("button");remove.className="attachment-action attachment-remove";remove.type="button";remove.textContent="×";remove.title="Remove file";
-    remove.addEventListener("click",async()=>{await attachmentTx("readwrite",s=>s.delete(f.id));renderAttachments(noteId);});
-    chip.append(icon,name,download,remove);fragment.appendChild(chip);
-  });
+    remove.addEventListener("click",async()=>{
+      await attachmentTx("readwrite",store=>store.delete(f.id));
+      renderAttachments(noteId);
+    });
+    chip.append(icon,name,download,remove);
+    fragment.appendChild(chip);
+  }
   wrap.replaceChildren(fragment);
 }
 
@@ -2824,7 +2836,7 @@ async function addNoteFiles(fileList){
     const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+"_"+Math.random().toString(36).slice(2));
     await attachmentTx("readwrite",s=>s.put({id,noteId:n.id,name:f.name,type:f.type,size:f.size,blob:f,addedAt:Date.now()}));
   }
-  await renderAttachments();
+  await renderAttachments(n.id);
 }
 document.getElementById("attachFileBtn").addEventListener("click",()=>document.getElementById("noteFileInput").click());
 document.getElementById("noteFileInput").addEventListener("change",async e=>{await addNoteFiles(e.target.files);e.target.value="";});
@@ -2835,6 +2847,11 @@ editorDropZone.addEventListener("drop",async e=>{e.preventDefault();e.stopPropag
 const originalRenderAttachmentsHook=render;
 render=function(){originalRenderAttachmentsHook();renderAttachments(current()?.id);};
 
+document.addEventListener("click",e=>{
+  if(e.target.closest("#notes .keep-card[data-note-card]")){
+    setTimeout(()=>{const n=current();if(n)renderAttachments(n.id);},0);
+  }
+},true);
 load();
 window.addEventListener("pageshow",()=>{
   const id=current()?.id;
