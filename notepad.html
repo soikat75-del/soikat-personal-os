@@ -2021,6 +2021,12 @@ function selectNote(id){
   panel.classList.add("keep-existing-open","mobile-open");
   render();
   panel.classList.add("keep-existing-open","mobile-open");
+  // Fetch attachments again after the selected note is rendered and visible.
+  if(typeof renderAttachments==="function"){
+    renderAttachments();
+    requestAnimationFrame(()=>renderAttachments());
+    setTimeout(()=>renderAttachments(),180);
+  }
   const note=current();
   const editedEl=document.getElementById("editorEditedLabel");
   if(editedEl)editedEl.textContent=note?.updated ? editedDateLabel(note.updated) : "";
@@ -2830,7 +2836,13 @@ load();
 // Re-read attachments after the initial note selection and when a page is restored
 // from the browser's back-forward cache.
 requestAnimationFrame(()=>renderAttachments());
-window.addEventListener("pageshow",()=>renderAttachments());
+window.addEventListener("pageshow",()=>{
+  renderAttachments();
+  setTimeout(()=>renderAttachments(),180);
+});
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden)renderAttachments();
+});
 updateClock();setInterval(updateClock,1000);
 
 </script>
