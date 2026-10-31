@@ -392,9 +392,10 @@ body::before,body::after{display:none!important}
 .keep-global-search input::placeholder{color:#9aa0a6}
 .keep-search-symbol,.keep-search-clear{color:#bdc1c6!important}
 .keep-header-actions button{color:#bdc1c6!important}
-.keep-header-actions button.active{background:#3c4043;color:#e8eaed!important}
-.keep-header-actions .refreshing{animation:keepRefresh .6s ease}
-@keyframes keepRefresh{to{transform:rotate(360deg)}}
+.keep-header-actions button.active{background:transparent!important;color:#bdc1c6!important}
+.keep-header-actions button[aria-label='Refresh'] svg{transform-box:fill-box;transform-origin:center}
+.keep-header-actions button[aria-label='Refresh'].refreshing svg{animation:keepRefresh .6s ease-in-out}
+@keyframes keepRefresh{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .keep-layout{background:#202124!important}
 .keep-sidebar{background:#202124!important}
 .keep-nav-item{color:#e8eaed!important}
@@ -462,6 +463,45 @@ body::before,body::after{display:none!important}
  .keep-header-actions button svg{width:25px;height:25px;stroke-width:2.15}
 }
 
+
+@media(min-width:641px){
+ .keep-header-actions button{
+   box-sizing:border-box!important;
+   width:38px!important;height:38px!important;flex:0 0 38px!important;
+   padding:0!important;margin:0!important;border:0!important;
+   border-radius:50%!important;outline:none!important;
+   box-shadow:none!important;
+   background:transparent!important;
+   transition:background-color .15s ease!important;
+ }
+ .keep-header-actions button:hover{
+   background:#303134!important;
+   outline:none!important;box-shadow:none!important;
+ }
+ .keep-header-actions button:focus,
+ .keep-header-actions button:focus-visible,
+ .keep-header-actions button:active{
+   outline:none!important;box-shadow:none!important;
+ }
+}
+
+
+@media(min-width:641px){
+ .keep-header-actions button,
+ .keep-header-actions button.active{
+   background:transparent!important;
+   border-radius:50%!important;
+   box-shadow:none!important;
+   outline:none!important;
+ }
+ .keep-header-actions button:hover,
+ .keep-header-actions button.active:hover{
+   background:#303134!important;
+   box-shadow:none!important;
+   outline:none!important;
+ }
+}
+
 </style>
 
 <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
@@ -484,7 +524,7 @@ if ('serviceWorker' in navigator) {
   <div class="keep-global-search"><span class="keep-search-symbol">⌕</span><input id="search" type="text" placeholder="Search" oninput="renderNotes()" aria-label="Search notes"><button type="button" class="keep-search-clear" onclick="clearKeepSearch()" aria-label="Clear search">×</button></div>
   <div class="keep-header-actions">
     <button type="button" class="keep-mobile-search-btn" title="Search" aria-label="Search" onclick="toggleKeepHeaderSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.7"/><path d="m15.8 15.8 5 5"/></svg></button>
-    <button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19.1 12a7.2 7.2 0 1 1-1.9-5"/></svg></button>
+    <button type="button" title="Refresh" aria-label="Refresh" onclick="refreshKeepNotes()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.93 9h-2.02A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor" stroke="none"/></svg></button>
     <button type="button" title="Toggle list view" aria-label="Toggle list view" id="viewToggle" onclick="toggleKeepView()"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx=".5"/><path d="M3.5 9.3h17M3.5 14.7h17"/></svg></button>
   </div>
 </header>
@@ -676,7 +716,7 @@ function refreshKeepNotes(){
  render();
  setTimeout(()=>btn?.classList.remove("refreshing"),650);
 }
-function toggleKeepView(){keepListView=!keepListView;document.getElementById("viewToggle").textContent=keepListView?"▦":"▤";document.getElementById("viewToggle").classList.toggle("active",keepListView);renderNotes();}
+function toggleKeepView(){keepListView=!keepListView;document.getElementById("viewToggle").classList.toggle("active",keepListView);renderNotes();}
 function clearKeepSearch(){document.getElementById("search").value="";renderNotes();}
 function selectNote(id){
   draftMode=false;
